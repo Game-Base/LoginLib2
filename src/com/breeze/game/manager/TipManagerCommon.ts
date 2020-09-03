@@ -15,7 +15,7 @@ module qmr
 			return TipManagerCommon.instance;
 		}
 
-		private commonMessInfo: Array<{ mess: string, color: number, yPos: number, itemcfg: ItemConfigCfg }>;	/** 同上 */
+		private commonMessInfo: Array<{ mess: string, color: number, yPos: number}>;	/** 同上 */
 
 		private isConmmoning: boolean;
 
@@ -37,7 +37,7 @@ module qmr
 		 * ----------------------------添加飘字内容-------------------------------
 		 * 添加了新的背景，所有的颜色只能用白色  2017-04-01 by Don
 		 */
-		public createCommonTip(msg: string, msgColor: number = 0xffffff, yPos: number = 0, itemcfg: ItemConfigCfg = null): void
+		public createCommonTip(msg: string, msgColor: number = 0xffffff, yPos: number = 0): void
 		{
 			let flag: boolean = false;
 			for (let item of this.commonMessInfo)
@@ -50,7 +50,7 @@ module qmr
 			}
 			if (!flag)
 			{
-				this.commonMessInfo.push({ mess: msg, color: msgColor, yPos: yPos, itemcfg: itemcfg });
+				this.commonMessInfo.push({ mess: msg, color: msgColor, yPos: yPos});
 			}
 			if (!this.isConmmoning)
 			{
@@ -60,9 +60,9 @@ module qmr
 		}
 
 		/**成功飘绿色的/失败飘红色*/
-		public createCommonColorTip(msg: string, isSuccess: boolean = false, yPos: number = 0, itemcfg: ItemConfigCfg = null): void
+		public createCommonColorTip(msg: string, isSuccess: boolean = false, yPos: number = 0): void
 		{
-			this.createCommonTip(msg, isSuccess ? 0x09a608 : 0xFF0000, yPos, itemcfg);
+			this.createCommonTip(msg, isSuccess ? 0x09a608 : 0xFF0000, yPos);
 		}
 
 		public recycleCommonTip(commonTip: CommonTip): void

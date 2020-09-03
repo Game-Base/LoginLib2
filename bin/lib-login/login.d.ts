@@ -1000,26 +1000,6 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class PlayerNameCfg extends BaseBean {
-        /**ID*/
-        readonly id: number;
-        /**姓*/
-        readonly name_xing: string;
-        /**男名*/
-        readonly name_ming_nan: string;
-        /**女名*/
-        readonly name_ming_nv: string;
-        constructor(element: any);
-    }
-    class CodeCfgCfg extends BaseBean {
-        /**ID*/
-        readonly id: number;
-        /**消息描述*/
-        readonly msg: string;
-        /**消息类型*/
-        readonly type: number;
-        constructor(element: any);
-    }
     class MusicCfg extends BaseBean {
         /**音效key*/
         readonly soundType: string;
@@ -1027,15 +1007,6 @@ declare module qmr {
         readonly soundName: string;
         /**是否同时播放*/
         readonly isPlaySameTime: number;
-        constructor(element: any);
-    }
-    class ClientCnCfg extends BaseBean {
-        /**键*/
-        readonly id: string;
-        /**值*/
-        readonly value: string;
-        /**颜色:1：绿色，0：红色 --默认不填不设置颜色*/
-        readonly colerType: number;
         constructor(element: any);
     }
 }
@@ -1465,9 +1436,9 @@ declare module qmr {
          * ----------------------------添加飘字内容-------------------------------
          * 添加了新的背景，所有的颜色只能用白色  2017-04-01 by Don
          */
-        createCommonTip(msg: string, msgColor?: number, yPos?: number, itemcfg?: ItemConfigCfg): void;
+        createCommonTip(msg: string, msgColor?: number, yPos?: number): void;
         /**成功飘绿色的/失败飘红色*/
-        createCommonColorTip(msg: string, isSuccess?: boolean, yPos?: number, itemcfg?: ItemConfigCfg): void;
+        createCommonColorTip(msg: string, isSuccess?: boolean, yPos?: number): void;
         recycleCommonTip(commonTip: CommonTip): void;
         /**
          * 在界面显示飘字内容

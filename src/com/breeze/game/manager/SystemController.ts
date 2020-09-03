@@ -81,22 +81,6 @@ module qmr
 		{
 			let code = s.code;
 			LogUtil.log("[错误码: " + code + "]");
-			let codeConf: CodeCfgCfg = ConfigManagerBase.getConf(ConfigEnumBase.CODECFG, code);
-			if (codeConf)
-			{
-				if (code == 1217){//服务器不开放新注册用户
-					Rpc.getInstance().close();
-					GameLoading.getInstance().close();
-					TipManagerCommon.getInstance().createCommonColorTip(codeConf.msg);
-				}
-				else if (code == 1171){
-					this.dispatch(NotifyConstLogin.S_USER_LOGIN_REPEAT);
-					TipManagerCommon.getInstance().createCommonColorTip(codeConf.msg);
-				}
-				else{
-					this.dispatch(NotifyConstLogin.S_ERROR_CODE,code);	
-				}
-			}
 		}
 	}
 }

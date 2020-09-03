@@ -2950,84 +2950,6 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var PlayerNameCfg = (function (_super) {
-        __extends(PlayerNameCfg, _super);
-        function PlayerNameCfg(element) {
-            var _this = _super.call(this, element) || this;
-            _this.key = "id";
-            return _this;
-        }
-        Object.defineProperty(PlayerNameCfg.prototype, "id", {
-            /**ID*/
-            get: function () {
-                return this.d["id"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PlayerNameCfg.prototype, "name_xing", {
-            /**姓*/
-            get: function () {
-                return this.d["name_xing"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PlayerNameCfg.prototype, "name_ming_nan", {
-            /**男名*/
-            get: function () {
-                return this.d["name_ming_nan"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PlayerNameCfg.prototype, "name_ming_nv", {
-            /**女名*/
-            get: function () {
-                return this.d["name_ming_nv"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return PlayerNameCfg;
-    }(qmr.BaseBean));
-    qmr.PlayerNameCfg = PlayerNameCfg;
-    __reflect(PlayerNameCfg.prototype, "qmr.PlayerNameCfg");
-    var CodeCfgCfg = (function (_super) {
-        __extends(CodeCfgCfg, _super);
-        function CodeCfgCfg(element) {
-            var _this = _super.call(this, element) || this;
-            _this.key = "id";
-            return _this;
-        }
-        Object.defineProperty(CodeCfgCfg.prototype, "id", {
-            /**ID*/
-            get: function () {
-                return this.d["id"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(CodeCfgCfg.prototype, "msg", {
-            /**消息描述*/
-            get: function () {
-                return this.d["msg"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(CodeCfgCfg.prototype, "type", {
-            /**消息类型*/
-            get: function () {
-                return this.d["type"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return CodeCfgCfg;
-    }(qmr.BaseBean));
-    qmr.CodeCfgCfg = CodeCfgCfg;
-    __reflect(CodeCfgCfg.prototype, "qmr.CodeCfgCfg");
     var MusicCfg = (function (_super) {
         __extends(MusicCfg, _super);
         function MusicCfg(element) {
@@ -3063,41 +2985,6 @@ var qmr;
     }(qmr.BaseBean));
     qmr.MusicCfg = MusicCfg;
     __reflect(MusicCfg.prototype, "qmr.MusicCfg");
-    var ClientCnCfg = (function (_super) {
-        __extends(ClientCnCfg, _super);
-        function ClientCnCfg(element) {
-            var _this = _super.call(this, element) || this;
-            _this.key = "id";
-            return _this;
-        }
-        Object.defineProperty(ClientCnCfg.prototype, "id", {
-            /**键*/
-            get: function () {
-                return this.d["id"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ClientCnCfg.prototype, "value", {
-            /**值*/
-            get: function () {
-                return this.d["value"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ClientCnCfg.prototype, "colerType", {
-            /**颜色:1：绿色，0：红色 --默认不填不设置颜色*/
-            get: function () {
-                return this.d["colerType"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return ClientCnCfg;
-    }(qmr.BaseBean));
-    qmr.ClientCnCfg = ClientCnCfg;
-    __reflect(ClientCnCfg.prototype, "qmr.ClientCnCfg");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -4615,21 +4502,6 @@ var qmr;
         SystemController.prototype.onRecExceptionMsg = function (s) {
             var code = s.code;
             qmr.LogUtil.log("[错误码: " + code + "]");
-            var codeConf = qmr.ConfigManagerBase.getConf(qmr.ConfigEnumBase.CODECFG, code);
-            if (codeConf) {
-                if (code == 1217) {
-                    qmr.Rpc.getInstance().close();
-                    qmr.GameLoading.getInstance().close();
-                    qmr.TipManagerCommon.getInstance().createCommonColorTip(codeConf.msg);
-                }
-                else if (code == 1171) {
-                    this.dispatch(qmr.NotifyConstLogin.S_USER_LOGIN_REPEAT);
-                    qmr.TipManagerCommon.getInstance().createCommonColorTip(codeConf.msg);
-                }
-                else {
-                    this.dispatch(qmr.NotifyConstLogin.S_ERROR_CODE, code);
-                }
-            }
         };
         return SystemController;
     }(qmr.BaseController));
@@ -4659,10 +4531,9 @@ var qmr;
          * ----------------------------添加飘字内容-------------------------------
          * 添加了新的背景，所有的颜色只能用白色  2017-04-01 by Don
          */
-        TipManagerCommon.prototype.createCommonTip = function (msg, msgColor, yPos, itemcfg) {
+        TipManagerCommon.prototype.createCommonTip = function (msg, msgColor, yPos) {
             if (msgColor === void 0) { msgColor = 0xffffff; }
             if (yPos === void 0) { yPos = 0; }
-            if (itemcfg === void 0) { itemcfg = null; }
             var flag = false;
             for (var _i = 0, _a = this.commonMessInfo; _i < _a.length; _i++) {
                 var item = _a[_i];
@@ -4672,7 +4543,7 @@ var qmr;
                 }
             }
             if (!flag) {
-                this.commonMessInfo.push({ mess: msg, color: msgColor, yPos: yPos, itemcfg: itemcfg });
+                this.commonMessInfo.push({ mess: msg, color: msgColor, yPos: yPos });
             }
             if (!this.isConmmoning) {
                 this.isConmmoning = true;
@@ -4680,11 +4551,10 @@ var qmr;
             }
         };
         /**成功飘绿色的/失败飘红色*/
-        TipManagerCommon.prototype.createCommonColorTip = function (msg, isSuccess, yPos, itemcfg) {
+        TipManagerCommon.prototype.createCommonColorTip = function (msg, isSuccess, yPos) {
             if (isSuccess === void 0) { isSuccess = false; }
             if (yPos === void 0) { yPos = 0; }
-            if (itemcfg === void 0) { itemcfg = null; }
-            this.createCommonTip(msg, isSuccess ? 0x09a608 : 0xFF0000, yPos, itemcfg);
+            this.createCommonTip(msg, isSuccess ? 0x09a608 : 0xFF0000, yPos);
         };
         TipManagerCommon.prototype.recycleCommonTip = function (commonTip) {
             this.commonTips.push(commonTip);
