@@ -1,5 +1,5 @@
 module qmr {
-	export class ConfigManagerBase {
+	export class ConfigManager {
 		
 		private static cfgDic: Dictionary = new Dictionary();
 		private static zipDic: Dictionary;

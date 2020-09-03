@@ -120,7 +120,7 @@ module qmr{
                 version = VersionManager.versionConfig[resPath];
             }
             // 文件路径中插入版本号+后缀扩展名
-            resPath = PlatformConfig.webUrl + VersionManager.defaultDir +  "/" + version + "/" + resPath;
+            resPath = PlatformConfig.webUrl + VersionManager.defaultDir +  "/" + version + "/" + resPath + "?v="+Math.random();
             // qmr.LogUtil.log("==================》》》加载版本控制路径资源："+resPath);
             return resPath;
         }

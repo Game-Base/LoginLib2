@@ -86,8 +86,6 @@ public txt_account:eui.TextInput;
             egret.Tween.get(this.imgWindSlow, { loop: true }).to({ x: windTarget }, moveTime);
             egret.Tween.get(this.imgWindFast, { loop: true }).to({ x: windTarget }, moveTime / 2);
             egret.Tween.get(this.imgWindMiddle, { loop: true }).to({ x: windTarget }, moveTime / 1.5);
-
-
         }
 
         /**

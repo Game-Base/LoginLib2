@@ -2758,14 +2758,14 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var ConfigManagerBase = (function () {
-        function ConfigManagerBase() {
+    var ConfigManager = (function () {
+        function ConfigManager() {
         }
         /**
          * @description 根据Id获取当前行数对象
          * ConfigEnum
          */
-        ConfigManagerBase.getConf = function (jsonName, confId) {
+        ConfigManager.getConf = function (jsonName, confId) {
             var conf;
             var cfg = this.getBean(jsonName);
             if (cfg) {
@@ -2778,7 +2778,7 @@ var qmr;
          * 根据文件名获取一个配置表
          * return dic
          */
-        ConfigManagerBase.getBean = function (fileName) {
+        ConfigManager.getBean = function (fileName) {
             var dic = this.cfgDic.get(fileName);
             if (!dic) {
                 dic = this.parseConfigFromZip(fileName);
@@ -2788,7 +2788,7 @@ var qmr;
             return dic;
         };
         /**从zip中解析一张表*/
-        ConfigManagerBase.parseConfigFromZip = function (fileName) {
+        ConfigManager.parseConfigFromZip = function (fileName) {
             var t = this;
             var dic = new qmr.Dictionary();
             var className = fileName.charAt(0).toLocaleUpperCase() + fileName.slice(1, fileName.length) + "Cfg"; //转换为类名
@@ -2822,7 +2822,7 @@ var qmr;
             }
             return dic;
         };
-        ConfigManagerBase.getZip = function (resName) {
+        ConfigManager.getZip = function (resName) {
             if (!this.zipDic) {
                 this.zipDic = new qmr.Dictionary();
             }
@@ -2837,7 +2837,7 @@ var qmr;
             return zip;
         };
         //获取配置表的唯一key值
-        ConfigManagerBase.getkey = function (cfg, cfgValue) {
+        ConfigManager.getkey = function (cfg, cfgValue) {
             if (!cfg.key) {
                 return;
             }
@@ -2854,14 +2854,14 @@ var qmr;
             }
             return newKey;
         };
-        ConfigManagerBase.cfgDic = new qmr.Dictionary();
+        ConfigManager.cfgDic = new qmr.Dictionary();
         /**默认的资源包名称 */
-        ConfigManagerBase.WHOLE_CONFIG_NAME = "config_bin";
-        ConfigManagerBase.BASE_CONFIG_NAME = "configbase_bin";
-        return ConfigManagerBase;
+        ConfigManager.WHOLE_CONFIG_NAME = "config_bin";
+        ConfigManager.BASE_CONFIG_NAME = "configbase_bin";
+        return ConfigManager;
     }());
-    qmr.ConfigManagerBase = ConfigManagerBase;
-    __reflect(ConfigManagerBase.prototype, "qmr.ConfigManagerBase");
+    qmr.ConfigManager = ConfigManager;
+    __reflect(ConfigManager.prototype, "qmr.ConfigManager");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -4693,7 +4693,7 @@ var qmr;
                 version = VersionManager.versionConfig[resPath];
             }
             // 文件路径中插入版本号+后缀扩展名
-            resPath = qmr.PlatformConfig.webUrl + VersionManager.defaultDir + "/" + version + "/" + resPath;
+            resPath = qmr.PlatformConfig.webUrl + VersionManager.defaultDir + "/" + version + "/" + resPath + "?v=" + Math.random();
             // qmr.LogUtil.log("==================》》》加载版本控制路径资源："+resPath);
             return resPath;
         };
@@ -7063,7 +7063,7 @@ var qmr;
             if (this._soundCfgDic.has(soundType)) {
                 return this._soundCfgDic.get(soundType);
             }
-            var cfg = qmr.ConfigManagerBase.getConf(qmr.ConfigEnumBase.MUSIC, soundType);
+            var cfg = qmr.ConfigManager.getConf(qmr.ConfigEnumBase.MUSIC, soundType);
             if (cfg) {
                 this._soundCfgDic.set(soundType, cfg);
             }

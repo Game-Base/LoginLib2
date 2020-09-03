@@ -911,7 +911,7 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class ConfigManagerBase {
+    class ConfigManager {
         private static cfgDic;
         private static zipDic;
         /**默认的资源包名称 */

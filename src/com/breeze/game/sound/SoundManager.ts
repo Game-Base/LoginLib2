@@ -277,7 +277,7 @@ module qmr
             {
                 return this._soundCfgDic.get(soundType);
             }
-            let cfg: MusicCfg = ConfigManagerBase.getConf(ConfigEnumBase.MUSIC, soundType);
+            let cfg: MusicCfg = ConfigManager.getConf(ConfigEnumBase.MUSIC, soundType);
             if (cfg)
             {
                 this._soundCfgDic.set(soundType, cfg);
