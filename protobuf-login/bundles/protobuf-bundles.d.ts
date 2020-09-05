@@ -92,7 +92,7 @@ declare namespace com {
         interface IC_USER_LOGIN {
 
             /** C_USER_LOGIN username */
-            username?: (string|null);
+            username?: (number|Long|null);
 
             /** C_USER_LOGIN gameSite */
             gameSite?: (string|null);
@@ -111,7 +111,7 @@ declare namespace com {
             constructor(properties?: com.message.IC_USER_LOGIN);
 
             /** C_USER_LOGIN username. */
-            public username: string;
+            public username: (number|Long);
 
             /** C_USER_LOGIN gameSite. */
             public gameSite: string;
@@ -180,7 +180,7 @@ declare namespace com {
         interface IC_LOGIN_REGISTER {
 
             /** C_LOGIN_REGISTER username */
-            username?: (string|null);
+            username?: (number|Long|null);
 
             /** C_LOGIN_REGISTER gameSite */
             gameSite?: (string|null);
@@ -205,7 +205,7 @@ declare namespace com {
             constructor(properties?: com.message.IC_LOGIN_REGISTER);
 
             /** C_LOGIN_REGISTER username. */
-            public username: string;
+            public username: (number|Long);
 
             /** C_LOGIN_REGISTER gameSite. */
             public gameSite: string;

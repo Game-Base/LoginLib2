@@ -22,7 +22,6 @@ module qmr
 			egret.log("平台登陆");
 			return new Promise((resolve, reject) =>
 			{
-				GlobalConfig.token = "2322232";
 				this.isGetPlatformInfo = true;
 				resolve();
 				egret.log("平台登陆成功:" + status);

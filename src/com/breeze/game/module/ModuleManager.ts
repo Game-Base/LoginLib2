@@ -303,6 +303,7 @@ namespace qmr
             let t = this;
             t.registerClass(ModuleNameLogin.LOGIN_VIEW, qmr.LoginView);//登录界面
             t.registerClass(ModuleNameLogin.GAME_LOADING_VIEW, qmr.GameLoadingView); //游戏加载界面
+            t.registerClass(ModuleNameLogin.DISCONNECT_VIEW, qmr.DisConnectView);			//掉线模块
 
         }
 

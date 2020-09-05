@@ -1511,7 +1511,7 @@ var qmr;
     var BaseActor = (function (_super) {
         __extends(BaseActor, _super);
         function BaseActor(resourcePath, loadCallBack, loadThisObject, defaultAct) {
-            if (defaultAct === void 0) { defaultAct = "idle"; }
+            if (defaultAct === void 0) { defaultAct = "move"; }
             var _this = _super.call(this) || this;
             var t = _this;
             t.resourcePath = resourcePath;
@@ -1579,14 +1579,16 @@ var qmr;
                 var t = this;
                 t.addPartTo(part, partId, partIndex, dir, isDirLoad, resPath);
                 //这里是添加转圈特效，用来在模型资源加载完成之前显示一个loading特效的功能
-                if (part == qmr.ActorPart.BODY && isShowDefault) {
-                    var animalClip = t.partDic[qmr.ActorPart.DEFAULT];
-                    if (!animalClip) {
-                        t.addPartTo(qmr.ActorPart.DEFAULT, 168, partIndex, dir, isDirLoad, resPath);
-                        animalClip = t.partDic[qmr.ActorPart.DEFAULT];
-                        animalClip.offsetY = -85;
-                    }
-                }
+                // if (part == ActorPart.BODY && isShowDefault)
+                // {
+                //     let animalClip: AnimateClip = t.partDic[ActorPart.DEFAULT];
+                //     if (!animalClip)
+                //     {
+                //         t.addPartTo(ActorPart.DEFAULT, 9999, partIndex, dir, isDirLoad, resPath);
+                //         animalClip = t.partDic[ActorPart.DEFAULT];
+                //         animalClip.offsetY = -85;
+                //     }
+                // }
             }
         };
         BaseActor.prototype.addPartTo = function (part, partId, partIndex, dir, isDirLoad, resPath) {
@@ -2868,17 +2870,6 @@ var qmr;
     var GlobalConfig = (function () {
         function GlobalConfig() {
         }
-        Object.defineProperty(GlobalConfig, "isOpenRecharge", {
-            /**是否开放充值 */
-            get: function () {
-                if (!this.cdata) {
-                    return true;
-                }
-                return this.cdata.charge == 1;
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(GlobalConfig, "isSysIos", {
             /**
              * 是否ios系统
@@ -2889,38 +2880,22 @@ var qmr;
             enumerable: true,
             configurable: true
         });
-        /** 是否上报日志到reportLogUrl服务器上 */
-        // public static bIsReportLog = false;
-        GlobalConfig.reportLogData = {};
-        GlobalConfig.reportLogUrl = "http://testmt.housepig.cn/xyws/";
         /** 是否开启Slow个人日志 */
         GlobalConfig.bIsShowSlowLog = false;
         GlobalConfig.loginInitFinish = false; //是否是调试状态LOGIN_INIT_FINISH
         GlobalConfig.isDebugF = false; //是否是调试战斗状态
-        GlobalConfig.userId = 0; //玩家的账号
-        GlobalConfig.signature = ""; //会话签名，用于检验
-        GlobalConfig.unverifysvr = 0; //是否跳过校验用户(内部开发测试服务器全部传1, 接了SDK后传0或者不传)
-        GlobalConfig.platLoginTime = ""; //登录平台SDK返回的时间
-        /**我最近登陆的服务器列表 */
-        GlobalConfig.recentLoginServerList = [];
-        GlobalConfig.loginProxyServer = "h5liutingting7000.cn"; //当前QQ空间代理的登陆服务器
-        /** 是否是sdk登出状态 */
-        GlobalConfig.isSDKLogout = false;
-        /**客户端注册用户英雄id */
-        GlobalConfig.registerAccountHeroId = 0;
         /**游戏登陆账号 */
-        GlobalConfig.account = "";
-        GlobalConfig.token = "";
+        GlobalConfig.account = 0;
+        /**登录服务器 */
+        GlobalConfig.loginServer = "192.168.3.116";
+        //登陆服务器端口
+        GlobalConfig.loginPort = 8003;
+        //玩家的账号             
+        GlobalConfig.userId = 0;
+        /**登陆服下发后端参数(直接透传给后端)*/
+        GlobalConfig.sparam = "0";
         /**服务器id */
         GlobalConfig.sid = "1";
-        /**客户端登录游戏秘钥 */
-        GlobalConfig.loginKey = '^SOLaMeMOBILE#2019!COMMONKEY24@^$^%(*9183098abcdhghhde';
-        /**QOS打点服务器秘钥 */
-        GlobalConfig.qosKey = 'SolGAmE2019QOSSecReTkeY#RewaRdSecRet^Ket%';
-        /**登录服务器 */
-        GlobalConfig.loginServer = "";
-        /**是否是全新用户 */
-        GlobalConfig.isFirstNewUser = false;
         /**客户端ip*/
         GlobalConfig.clientIp = "127.0.0.1";
         /**登录时间 */
@@ -3928,6 +3903,10 @@ var qmr;
                             return [4 /*yield*/, this.loadCommonGroup()];
                         case 5:
                             _a.sent();
+                            this.isGameResAfterLoginLoaded = true;
+                            if (this.gameResAfterLoginLoadedCall) {
+                                this.gameResAfterLoginLoadedCall.call(this);
+                            }
                             return [2 /*return*/];
                     }
                 });
@@ -4422,14 +4401,20 @@ var qmr;
     var LoginManager = (function () {
         function LoginManager() {
         }
-        LoginManager.showLoginView = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    qmr.ModuleManager.showModule(qmr.ModuleNameLogin.LOGIN_VIEW);
-                    return [2 /*return*/];
-                });
-            });
+        /**请求连接游戏服务器 */
+        LoginManager.connectGameServer = function () {
+            var t = this;
+            var onConnect = function () {
+                qmr.GameLoading.getInstance().setLoadingTip("服务器连接成功...");
+                LoginManager.isConnected = true;
+                console.log("==========================服务器socket连接成功==========================");
+                qmr.ModuleManager.showModule(qmr.ModuleNameLogin.LOGIN_VIEW);
+            };
+            // PlatformManager.instance.platform.setLoadingStatus("登录中...");
+            qmr.GameLoading.getInstance().setLoadingTip("正在连接服务器...");
+            qmr.Rpc.getInstance().connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, onConnect, t);
         };
+        LoginManager.isConnected = false;
         return LoginManager;
     }());
     qmr.LoginManager = LoginManager;
@@ -4938,6 +4923,7 @@ var qmr;
             var t = this;
             t.registerClass(qmr.ModuleNameLogin.LOGIN_VIEW, qmr.LoginView); //登录界面
             t.registerClass(qmr.ModuleNameLogin.GAME_LOADING_VIEW, qmr.GameLoadingView); //游戏加载界面
+            t.registerClass(qmr.ModuleNameLogin.DISCONNECT_VIEW, qmr.DisConnectView); //掉线模块
         };
         ModuleManager.registerClass = function (name, appClass) {
             this._classAppMap[name] = appClass;
@@ -4966,6 +4952,7 @@ var qmr;
         }
         ModuleNameLogin.LOGIN_VIEW = "qmr.LoginView"; //登录模块
         ModuleNameLogin.GAME_LOADING_VIEW = "qmr.GameLoadingView"; //游戏加载界面
+        ModuleNameLogin.DISCONNECT_VIEW = "qmr.DisConnectView"; //掉线模块
         return ModuleNameLogin;
     }());
     qmr.ModuleNameLogin = ModuleNameLogin;
@@ -5035,6 +5022,65 @@ __reflect(Main.prototype, "Main");
 var qmr;
 (function (qmr) {
     /**
+     * coler
+     * 掉线模块
+     */
+    var DisConnectView = (function (_super) {
+        __extends(DisConnectView, _super);
+        function DisConnectView() {
+            var _this = _super.call(this) || this;
+            _this.qmrSkinName = "DisConnectSkin";
+            _this.isNeedMask = true;
+            _this.isClickHide = false;
+            _this.isCenter = true;
+            return _this;
+        }
+        /** 初始化事件,需被子类继承 */
+        DisConnectView.prototype.initListener = function () {
+            _super.prototype.initListener.call(this);
+            this.addEvent(this.btn_refresh, egret.TouchEvent.TOUCH_TAP, this.onRefresh, this);
+        };
+        /**
+         * @description 请求刷新页面
+         */
+        DisConnectView.prototype.onRefresh = function () {
+            qmr.GameLoadingView.getInstance().closeVitureProgress();
+            qmr.PlatformManager.instance.platform.reloadGame();
+        };
+        /**
+         * @description 初始化数据,需被子类继承
+         */
+        DisConnectView.prototype.initData = function () {
+            _super.prototype.initData.call(this);
+            var data = this.data;
+            if (data) {
+                this.txt_tip.text = data.msg + "";
+                this.txt_code.visible = false;
+                if (data.code != -1) {
+                    this.txt_code.text = "错误码: " + data.code;
+                    this.txt_code.visible = true;
+                }
+            }
+            else {
+                this.txt_tip.text = "服务器链接不上";
+                this.txt_code.text = "请稍后重试";
+            }
+        };
+        /**
+         * dispose
+         */
+        DisConnectView.prototype.dispose = function () {
+            qmr.LogUtil.log("DisConnectView被释放了");
+            _super.prototype.dispose.call(this);
+        };
+        return DisConnectView;
+    }(qmr.SuperBaseModule));
+    qmr.DisConnectView = DisConnectView;
+    __reflect(DisConnectView.prototype, "qmr.DisConnectView");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    /**
      *
      * @description 游戏loading
      *
@@ -5088,6 +5134,8 @@ var qmr;
             this._loadingRun = new eui.Image(RES.getRes("preloading_loading_png"));
             this.addChild(this._loadingRun);
             this._txProgress = new eui.Label;
+            // this._txProgress.textColor = 0xdd1900;
+            this._txProgress.fontFamily = "specialGameFont";
             this.addChild(this._txProgress);
             this.updateSize();
         };
@@ -5344,17 +5392,10 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    /**
-     *
-     * @description 登陆通信控制器
-     *
-     */
     var LoginController = (function (_super) {
         __extends(LoginController, _super);
         function LoginController() {
-            var _this = _super.call(this) || this;
-            _this.isEnterGame = false;
-            return _this;
+            return _super.call(this) || this;
         }
         Object.defineProperty(LoginController, "instance", {
             /**  获取单例对象  */
@@ -5368,30 +5409,101 @@ var qmr;
             configurable: true
         });
         LoginController.prototype.initListeners = function () {
+            var t = this;
+            t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGIN, t.onRecLoginSuccess, t, true);
+            t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGOUT, t.onRecUseLoginOut, t, true);
+            t.addSocketListener(qmr.MessageIDLogin.S_SEND_SDK_DATA, t.onSdkReportResponse, t, true);
         };
-        LoginController.prototype.onEnterGame = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    this.isEnterGame = true;
-                    this.destoryLoginRes();
-                    /**
-                     * 非常重要：
-                     * 这里是进入游戏之前加载完成必须加载
-                     * 进入游戏所需要资源必须在这里先加载完成后才允许执行游戏渲染逻辑
-                     * */
-                    // GameLoadManager.instance.loadGameResAfterLogin();
-                    // await GameLoadManager.instance.waitGameResLoaded();
-                    qmr.EntryAfterLogin.onEnterGame();
-                    return [2 /*return*/];
-                });
-            });
-        };
-        LoginController.prototype.destoryLoginRes = function () {
-            var preLoadBg = document.getElementById("preLoadBg");
-            if (preLoadBg && preLoadBg.parentNode) {
-                preLoadBg.parentNode.removeChild(preLoadBg);
+        /**
+         *  ---请求登陆---
+         */
+        LoginController.prototype.reqLogin = function (username, gameSite) {
+            if (gameSite === void 0) { gameSite = "1"; }
+            qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
+            egret.log("登陆账号:" + username, "区服:" + gameSite);
+            var c = new com.message.C_USER_LOGIN();
+            c.username = username;
+            c.gameSite = gameSite;
+            var sparam = qmr.GlobalConfig.sparam;
+            if (sparam) {
+                c.sparam = JSON.stringify(sparam);
             }
-            qmr.ModuleManager.hideModule(qmr.ModuleNameLogin.LOGIN_VIEW, true);
+            this.sendCmd(c, qmr.MessageIDLogin.C_USER_LOGIN, true);
+        };
+        /**
+         *  ---请求注册---
+         */
+        LoginController.prototype.reqLoginRegister = function (username, gameSite, nickname, heroId) {
+            var c = new com.message.C_LOGIN_REGISTER();
+            c.username = username;
+            c.gameSite = gameSite;
+            c.nickname = nickname;
+            c.heroId = heroId;
+            var sparam = qmr.GlobalConfig.sparam;
+            if (sparam) {
+                c.sparam = JSON.stringify(sparam);
+            }
+            this.sendCmd(c, qmr.MessageIDLogin.C_LOGIN_REGISTER);
+        };
+        /**
+         *  ===返回登陆/注册成功===
+         */
+        LoginController.prototype.onRecLoginSuccess = function (s) {
+            if (qmr.LoginModel.instance.isReconnect) {
+                qmr.SystemController.instance.startHeart();
+                qmr.GameLoading.getInstance().close();
+                qmr.PbGlobalCounter.maxReconnectCount = 3;
+                qmr.LogUtil.log("断线重连完成！！");
+            }
+            else {
+                qmr.LoginModel.instance.onRecLoginSuccess(s);
+                this.dispatch(qmr.NotifyConstLogin.S_USER_LOGIN);
+            }
+        };
+        /**
+         *  ---请求登出---
+         */
+        LoginController.prototype.reqUserLogout = function (playerId) {
+            var c = new com.message.C_USER_LOGOUT();
+            c.playerId = playerId;
+            this.sendCmd(c, qmr.MessageIDLogin.C_USER_LOGOUT, true);
+        };
+        /**
+         *  ===收到登出成功===
+         */
+        LoginController.prototype.onRecUseLoginOut = function (s) {
+            if (s.beKickOut) {
+                qmr.LoginModel.instance.isInstead = true;
+            }
+            else {
+                qmr.LoginModel.instance.isDisconnect = true;
+            }
+            this.dispatch(qmr.NotifyConstLogin.S_USER_LOGOUT);
+        };
+        LoginController.prototype.reqReconnect = function () {
+            //平台下如果未通过验证 不重连
+            if (!qmr.PlatformManager.instance.platform.isVerify) {
+                return;
+            }
+            qmr.LoginModel.instance.isReconnect = true;
+            this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.sid);
+        };
+        LoginController.prototype.reqRelogin = function () {
+            //平台下如果未通过验证 不重连
+            if (!qmr.PlatformManager.instance.platform.isVerify) {
+                return;
+            }
+            qmr.LoginModel.instance.isReconnect = false;
+            this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.sid);
+        };
+        LoginController.prototype.reportSdkPortRequest = function (url, p) {
+            var c = new com.message.C_SEND_SDK_DATA();
+            c.reportStr = p;
+            c.reportUrl = url;
+            this.sendCmd(c, qmr.MessageIDLogin.C_SEND_SDK_DATA, true);
+        };
+        LoginController.prototype.onSdkReportResponse = function (s) {
+            console.log("sdk数据上报结果：" + s.canUse);
         };
         return LoginController;
     }(qmr.BaseController));
@@ -5400,6 +5512,12 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
+    /**
+     *
+     * @author coler
+     * @description 登陆数据模型
+     *
+     */
     var LoginModel = (function () {
         function LoginModel() {
         }
@@ -5413,6 +5531,44 @@ var qmr;
             enumerable: true,
             configurable: true
         });
+        /**
+         *  返回登陆、注册成功
+         */
+        LoginModel.prototype.onRecLoginSuccess = function (s) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            qmr.SystemController.instance.startHeart(); //服务器说这里才开始心跳
+                            qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+                            if (!(qmr.GlobalConfig.userId > 0)) return [3 /*break*/, 2];
+                            qmr.GameLoading.getInstance().close();
+                            this.isEnterGame = true;
+                            this.destoryLoginRes();
+                            qmr.GameLoadManager.instance.loadGameResAfterLogin();
+                            return [4 /*yield*/, qmr.GameLoadManager.instance.waitGameResLoaded()];
+                        case 1:
+                            _a.sent();
+                            qmr.EntryAfterLogin.onEnterGame();
+                            return [3 /*break*/, 3];
+                        case 2:
+                            /**
+                             * 这里创建玩家账号
+                             * */
+                            qmr.TipManagerCommon.getInstance().createCommonColorTip("非法账号，请确认账号信息");
+                            _a.label = 3;
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        LoginModel.prototype.destoryLoginRes = function () {
+            var preLoadBg = document.getElementById("preLoadBg");
+            if (preLoadBg && preLoadBg.parentNode) {
+                preLoadBg.parentNode.removeChild(preLoadBg);
+            }
+            qmr.ModuleManager.hideModule(qmr.ModuleNameLogin.LOGIN_VIEW, true);
+        };
         return LoginModel;
     }());
     qmr.LoginModel = LoginModel;
@@ -5432,10 +5588,26 @@ var qmr;
          */
         LoginView.prototype.initListener = function () {
             _super.prototype.initListener.call(this);
-            this.addClickEvent(this.btn_login, this.onCloseClick, this);
+            this.addClickEvent(this.btn_login, this.startLogin, this);
         };
-        LoginView.prototype.onCloseClick = function () {
-            qmr.LoginController.instance.onEnterGame();
+        LoginView.prototype.startLogin = function () {
+            var userName = this.txt_account.text.trim();
+            if (userName.length == 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
+                return;
+            }
+            if (!qmr.LoginManager.isConnected) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                return;
+            }
+            if (!qmr.RegexpUtil.isPhoneNumber(userName)) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
+                return;
+            }
+            var telNum = Number(userName);
+            qmr.GlobalConfig.account = telNum;
+            qmr.LoginController.instance.reqLogin(telNum);
+            egret.localStorage.setItem("testUserid", qmr.GlobalConfig.account + "");
         };
         LoginView.prototype.addedToStage = function (evt) {
             _super.prototype.addedToStage.call(this, evt);
@@ -5447,6 +5619,7 @@ var qmr;
             if (styleSpan && styleSpan.parentNode) {
                 styleSpan.parentNode.removeChild(styleSpan);
             }
+            qmr.GameLoading.getInstance().close();
             qmr.PlatformManager.instance.platform.setLoadingStatus("");
             qmr.GameLoadManager.instance.loadGameResAfterLogin();
             this.onBgResBack();
@@ -5479,6 +5652,7 @@ var qmr;
         */
         LoginView.prototype.initData = function () {
             _super.prototype.initData.call(this);
+            this.txt_account.text = egret.localStorage.getItem("testUserid");
         };
         LoginView.prototype.dispose = function () {
             _super.prototype.dispose.call(this);
@@ -5539,9 +5713,10 @@ var qmr;
                             return [4 /*yield*/, qmr.GameLoadManager.instance.loadLoginRes()];
                         case 2:
                             _a.sent();
-                            return [4 /*yield*/, qmr.LoginManager.showLoginView()];
+                            return [4 /*yield*/, qmr.PlatformManager.instance.platform.reqLogin()];
                         case 3:
                             _a.sent();
+                            qmr.LoginManager.connectGameServer();
                             return [2 /*return*/];
                     }
                 });
@@ -6050,11 +6225,6 @@ var qmr;
          * 请求支付
          */
         PlatformManager.prototype.reqPay = function (payInfo) {
-            if (!qmr.GlobalConfig.isOpenRecharge) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("暂未开放充值！");
-                return;
-            }
-            this.platform.reqPay(payInfo);
         };
         /**
          * 升级上报
@@ -6182,7 +6352,6 @@ var qmr;
                 return __generator(this, function (_a) {
                     egret.log("平台登陆");
                     return [2 /*return*/, new Promise(function (resolve, reject) {
-                            qmr.GlobalConfig.token = "2322232";
                             _this.isGetPlatformInfo = true;
                             resolve();
                             egret.log("平台登陆成功:" + status);
@@ -6423,11 +6592,6 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    /**
-     *
-     * @description websocket的rpc回调实现
-     *
-     */
     var Rpc = (function () {
         function Rpc() {
             this.eventPool = {};
@@ -6577,6 +6741,63 @@ var qmr;
             var t = this;
             qmr.PbGlobalCounter.getInstance().resetCounter();
             qmr.SystemController.instance.clearHeart();
+            if (qmr.LoginModel.instance.isInstead) {
+                t.showDisConnectView("您的账号在另一台设备登录，请重新登录");
+            }
+            else if (!qmr.LoginModel.instance.isDisconnect) {
+                if (qmr.PbGlobalCounter.maxReconnectCount > 0) {
+                    qmr.PbGlobalCounter.maxReconnectCount--;
+                    Rpc.getInstance().close();
+                    if (qmr.LoginModel.instance.isEnterGame) {
+                        qmr.GameLoading.getInstance().setLoadingTip("重连中");
+                        egret.setTimeout(function () {
+                            Rpc.getInstance().startReConnect();
+                        }, t, 2000);
+                    }
+                    else {
+                        egret.setTimeout(function () {
+                            Rpc.getInstance().startReLogin();
+                        }, t, 2000);
+                    }
+                }
+                else if (!qmr.LoginModel.instance.isEnterGame) {
+                    qmr.PbGlobalCounter.maxReconnectCount = 3;
+                    Rpc.getInstance().close();
+                    qmr.GameLoading.getInstance().close();
+                    qmr.TipManagerCommon.getInstance().createCommonColorTip("连接服务器失败，请重试！", false);
+                }
+                else {
+                    t.showDisConnectView("重连服务器失败，请检查网络环境!");
+                }
+            }
+            else {
+                t.showDisConnectView("小伙子，不要开车，你掉线了");
+            }
+        };
+        Rpc.prototype.showDisConnectView = function (msg) {
+            qmr.GameLoading.getInstance().close();
+            qmr.ModuleManager.showModule(qmr.ModuleNameLogin.DISCONNECT_VIEW, { msg: msg, code: -1 }, qmr.LayerConst.TIP, true, false);
+        };
+        Rpc.prototype.startReConnect = function () {
+            this.connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, this.onGameServerConnect, this);
+        };
+        Rpc.prototype.onGameServerConnect = function () {
+            qmr.GameLoading.getInstance().setLoadingTip("重连中");
+            qmr.LoginController.instance.reqReconnect();
+        };
+        Rpc.prototype.startReLogin = function () {
+            this.connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, this.onGameLoginServerConnect, this);
+        };
+        Rpc.prototype.onGameLoginServerConnect = function () {
+            qmr.GameLoading.getInstance().setLoadingTip("登录中");
+            qmr.LoginController.instance.reqRelogin();
+        };
+        /**
+         *  当链接错误的时候调用
+         */
+        Rpc.prototype.onConnnectError = function () {
+            qmr.PbGlobalCounter.getInstance().resetCounter();
+            qmr.LogUtil.log("ioerror");
         };
         /**
         *  关闭一个socket（目前游戏使用一个socket就可以了）
@@ -6589,8 +6810,13 @@ var qmr;
             }
         };
         /**
-        *  超时检测
-        */
+         *  当发生报错
+         */
+        Rpc.prototype.fnErrorTrap = function () {
+        };
+        /**
+         *  超时检测
+         */
         Rpc.prototype.checkTimeOut = function () {
             var callbackPool = this.callbackPool;
             for (var msgId in callbackPool) {
@@ -7794,7 +8020,7 @@ var qmr;
         DirtyWordsUtils.hasDirtywords = function (content, callbackF, thisObj) {
             var time = (new Date().getTime() / 1000 | 0);
             var contentEncode = encodeURI(content);
-            var sign = encodeURI(qmr.Md5Util.getInstance().hex_md5(content + time + qmr.GlobalConfig.loginKey));
+            var sign = encodeURI(qmr.Md5Util.getInstance().hex_md5(content + time));
             var url = qmr.PlatformManager.instance.platform.dirtyWordCheckUrl
                 + "?time=" + time + "&content=" + contentEncode + "&sign=" + sign;
             qmr.LogUtil.log("url=", url);
@@ -9243,21 +9469,42 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var ResPathUtil = (function () {
-        function ResPathUtil() {
+    var RegexpUtil = (function () {
+        function RegexpUtil() {
         }
-        /** 获取bg图路径 */
-        ResPathUtil.getBgUrl = function (resName) {
-            return qmr.SystemPath.bgPath + resName + ".png";
+        // 手机号校验
+        RegexpUtil.isPhoneNumber = function (phoneNum) {
+            // let let reg = /^[1][3,4,5,7,8,9][0-9]{9}$/;
+            /*
+            * 移动号码包括的号段：134/135/136/137,138,139；
+            *                     147/148(物联卡号)；
+            *                     150/151/152/157/158/159；
+            *                     165（虚拟运营商）；
+            *                     1703/1705/1706（虚拟运营商）、178；
+            *                     182/183/184/187/188
+            *                     198
+
+            * 联通号段包括：130/131
+            *               145
+            *               155/156
+            *               166/167(虚拟运营商)
+            *               1704/1707/1708/1709、171
+            *               186/186
+            *
+            * 电信号段包括： 133
+            *                153
+            *                162(虚拟运营商)
+            *                1700/1701/1702(虚拟运营商)
+            *                180/181/189
+            *                191/199
+            * */
+            var reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
+            return reg.test(phoneNum);
         };
-        /** 地图资源路径 */
-        ResPathUtil.getMapUrl = function (mapName) {
-            return qmr.SystemPath.mapPath + mapName;
-        };
-        return ResPathUtil;
+        return RegexpUtil;
     }());
-    qmr.ResPathUtil = ResPathUtil;
-    __reflect(ResPathUtil.prototype, "qmr.ResPathUtil");
+    qmr.RegexpUtil = RegexpUtil;
+    __reflect(RegexpUtil.prototype, "qmr.RegexpUtil");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -9473,13 +9720,6 @@ var qmr;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SystemPath, "mapPath", {
-            get: function () {
-                return qmr.PlatformConfig.webRoot + "map/";
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(SystemPath, "defaultPath", {
             get: function () {
                 return "resourceLogin/animation/";
@@ -9489,42 +9729,35 @@ var qmr;
         });
         Object.defineProperty(SystemPath, "rolePath", {
             get: function () {
-                return qmr.PlatformConfig.webRoot + "animation/role/";
+                return qmr.PlatformConfig.webRoot + "avatar/role/";
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(SystemPath, "roleUiPath", {
             get: function () {
-                return qmr.PlatformConfig.webRoot + "animation/uiRole/";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SystemPath, "bgPath", {
-            get: function () {
-                return qmr.PlatformConfig.webRoot + "unpack/bg/";
+                return qmr.PlatformConfig.webRoot + "avatar/uiRole/";
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(SystemPath, "weaponPath", {
             get: function () {
-                return qmr.PlatformConfig.webRoot + "animation/weapon/";
+                return qmr.PlatformConfig.webRoot + "avatar/weapon/";
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(SystemPath, "horsePath", {
             get: function () {
-                return qmr.PlatformConfig.webRoot + "animation/horse/";
+                return qmr.PlatformConfig.webRoot + "avatar/horse/";
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(SystemPath, "wingPath", {
             get: function () {
-                return qmr.PlatformConfig.webRoot + "animation/wing/";
+                return qmr.PlatformConfig.webRoot + "avatar/wing/";
             },
             enumerable: true,
             configurable: true

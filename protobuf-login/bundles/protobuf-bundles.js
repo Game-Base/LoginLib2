@@ -206,7 +206,7 @@ $root.com = (function() {
              * Properties of a C_USER_LOGIN.
              * @memberof com.message
              * @interface IC_USER_LOGIN
-             * @property {string|null} [username] C_USER_LOGIN username
+             * @property {number|Long|null} [username] C_USER_LOGIN username
              * @property {string|null} [gameSite] C_USER_LOGIN gameSite
              * @property {string|null} [sparam] C_USER_LOGIN sparam
              */
@@ -228,11 +228,11 @@ $root.com = (function() {
 
             /**
              * C_USER_LOGIN username.
-             * @member {string} username
+             * @member {number|Long} username
              * @memberof com.message.C_USER_LOGIN
              * @instance
              */
-            C_USER_LOGIN.prototype.username = "";
+            C_USER_LOGIN.prototype.username = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
             /**
              * C_USER_LOGIN gameSite.
@@ -263,7 +263,7 @@ $root.com = (function() {
                 if (!writer)
                     writer = $Writer.create();
                 if (message.username != null && message.hasOwnProperty("username"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.username);
+                    writer.uint32(/* id 1, wireType 0 =*/8).int64(message.username);
                 if (message.gameSite != null && message.hasOwnProperty("gameSite"))
                     writer.uint32(/* id 2, wireType 2 =*/18).string(message.gameSite);
                 if (message.sparam != null && message.hasOwnProperty("sparam"))
@@ -290,7 +290,7 @@ $root.com = (function() {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.username = reader.string();
+                        message.username = reader.int64();
                         break;
                     case 2:
                         message.gameSite = reader.string();
@@ -396,7 +396,7 @@ $root.com = (function() {
              * Properties of a C_LOGIN_REGISTER.
              * @memberof com.message
              * @interface IC_LOGIN_REGISTER
-             * @property {string|null} [username] C_LOGIN_REGISTER username
+             * @property {number|Long|null} [username] C_LOGIN_REGISTER username
              * @property {string|null} [gameSite] C_LOGIN_REGISTER gameSite
              * @property {string|null} [nickname] C_LOGIN_REGISTER nickname
              * @property {number|null} [heroId] C_LOGIN_REGISTER heroId
@@ -420,11 +420,11 @@ $root.com = (function() {
 
             /**
              * C_LOGIN_REGISTER username.
-             * @member {string} username
+             * @member {number|Long} username
              * @memberof com.message.C_LOGIN_REGISTER
              * @instance
              */
-            C_LOGIN_REGISTER.prototype.username = "";
+            C_LOGIN_REGISTER.prototype.username = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
             /**
              * C_LOGIN_REGISTER gameSite.
@@ -471,7 +471,7 @@ $root.com = (function() {
                 if (!writer)
                     writer = $Writer.create();
                 if (message.username != null && message.hasOwnProperty("username"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.username);
+                    writer.uint32(/* id 1, wireType 0 =*/8).int64(message.username);
                 if (message.gameSite != null && message.hasOwnProperty("gameSite"))
                     writer.uint32(/* id 2, wireType 2 =*/18).string(message.gameSite);
                 if (message.nickname != null && message.hasOwnProperty("nickname"))
@@ -502,7 +502,7 @@ $root.com = (function() {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.username = reader.string();
+                        message.username = reader.int64();
                         break;
                     case 2:
                         message.gameSite = reader.string();

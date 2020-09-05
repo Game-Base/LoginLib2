@@ -34,12 +34,7 @@ module qmr
 		 */
 		public reqPay(payInfo): void
 		{
-			if (!GlobalConfig.isOpenRecharge)
-			{
-				TipManagerCommon.getInstance().createCommonColorTip("暂未开放充值！");
-				return;
-			}
-			this.platform.reqPay(payInfo);
+			
 		}
 
 		/**

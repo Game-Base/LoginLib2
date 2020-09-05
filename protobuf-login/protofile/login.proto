@@ -3,9 +3,9 @@ package com.message;
 
 // 登录
 message C_USER_LOGIN {
-	string username=1; // 账号
+	int64 username=1; // 账号
 	string gameSite=2; // 区服
-	string sparam = 3;			//后端透传参数
+	string sparam = 3; //预留参数
 }
 
 // 登录返回
@@ -15,7 +15,7 @@ message S_USER_LOGIN {
 
 // 注册
 message C_LOGIN_REGISTER {
-	string username=1; // 账号
+	int64 username=1; // 账号
 	string gameSite=2; // 区服
 	string nickname=3; // 玩家昵称
 	int32 heroId=4;  //所选角色

@@ -22,8 +22,9 @@ module qmr {
 			//this.stage.dirtyRegionPolicy = egret.DirtyRegionPolicy.OFF;
 			this.initLocalStorage();
 			await GameLoadManager.instance.loadLoginRes();
+			await PlatformManager.instance.platform.reqLogin();
 
-			await LoginManager.showLoginView();
+			LoginManager.connectGameServer();
 		}
 
 		/** 读取缓存 */

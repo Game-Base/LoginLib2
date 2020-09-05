@@ -75,6 +75,11 @@ namespace qmr
 			await this.loadConfigGroup();
 			this.setLoadingViewParams("加载公共资源...", true, 0.5, 0.9, true);
 			await this.loadCommonGroup();
+
+			this.isGameResAfterLoginLoaded = true;
+			if(this.gameResAfterLoginLoadedCall){
+				this.gameResAfterLoginLoadedCall.call(this);
+			}
 		}
 
 		/**等待登录界面后台资源加载完成 */
@@ -151,7 +156,6 @@ namespace qmr
 					resPath = item.path + resName + ".png";
 					LoaderManager.instance.addGroupRef(resPath);
 				}
-				
 			}
 		}
 

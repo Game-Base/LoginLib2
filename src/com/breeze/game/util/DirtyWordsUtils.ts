@@ -12,7 +12,7 @@ module qmr
 		{
 			let time: number = (new Date().getTime() / 1000 | 0);
 			let contentEncode: string = encodeURI(content);
-			let sign = encodeURI(Md5Util.getInstance().hex_md5(content+time+GlobalConfig.loginKey));
+			let sign = encodeURI(Md5Util.getInstance().hex_md5(content+time));
 			let url = PlatformManager.instance.platform.dirtyWordCheckUrl
 					+ "?time=" + time + "&content=" + contentEncode + "&sign=" + sign;
 			LogUtil.log("url=", url);

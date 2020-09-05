@@ -28,7 +28,7 @@ module qmr
         private _timeScale: number;                   //帧频速度,越大越快
         private _isNoRendering: boolean;              //是否不循环渲染，用于外面设置是否播放，级别最大
 
-        public constructor(resourcePath: string, loadCallBack: Function, loadThisObject: any, defaultAct: string = "idle")
+        public constructor(resourcePath: string, loadCallBack: Function, loadThisObject: any, defaultAct: string = "move")
         {
             super();
             let t = this;
@@ -100,16 +100,16 @@ module qmr
                 let t = this;
                 t.addPartTo(part, partId, partIndex, dir, isDirLoad, resPath);
                 //这里是添加转圈特效，用来在模型资源加载完成之前显示一个loading特效的功能
-                if (part == ActorPart.BODY && isShowDefault)
-                {
-                    let animalClip: AnimateClip = t.partDic[ActorPart.DEFAULT];
-                    if (!animalClip)
-                    {
-                        t.addPartTo(ActorPart.DEFAULT, 168, partIndex, dir, isDirLoad, resPath);
-                        animalClip = t.partDic[ActorPart.DEFAULT];
-                        animalClip.offsetY = -85;
-                    }
-                }
+                // if (part == ActorPart.BODY && isShowDefault)
+                // {
+                //     let animalClip: AnimateClip = t.partDic[ActorPart.DEFAULT];
+                //     if (!animalClip)
+                //     {
+                //         t.addPartTo(ActorPart.DEFAULT, 9999, partIndex, dir, isDirLoad, resPath);
+                //         animalClip = t.partDic[ActorPart.DEFAULT];
+                //         animalClip.offsetY = -85;
+                //     }
+                // }
             }
         }
 

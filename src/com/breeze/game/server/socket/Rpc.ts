@@ -1,10 +1,6 @@
 module qmr {
     import ByteArray = egret.ByteArray;
-	/**
-	 *
-	 * @description websocket的rpc回调实现
-	 *
-	 */
+
     export class Rpc {
         private static instance: Rpc;
         private loginSocket: WebSocket;
@@ -167,7 +163,68 @@ module qmr {
 
             PbGlobalCounter.getInstance().resetCounter();
             SystemController.instance.clearHeart();
-            
+            if (qmr.LoginModel.instance.isInstead) {
+                t.showDisConnectView("您的账号在另一台设备登录，请重新登录");
+            }
+            else if (!qmr.LoginModel.instance.isDisconnect) {
+                if (PbGlobalCounter.maxReconnectCount > 0) {
+                    PbGlobalCounter.maxReconnectCount--;
+                    Rpc.getInstance().close();
+                    if (qmr.LoginModel.instance.isEnterGame) {
+                        qmr.GameLoading.getInstance().setLoadingTip("重连中");
+                        egret.setTimeout(function () {
+                            Rpc.getInstance().startReConnect();
+                        }, t, 2000);
+                    } else {
+                        egret.setTimeout(function () {
+                            Rpc.getInstance().startReLogin();
+                        }, t, 2000);
+                    }
+                } 
+                else if (!LoginModel.instance.isEnterGame){
+                    PbGlobalCounter.maxReconnectCount = 3;
+                    Rpc.getInstance().close();
+                    GameLoading.getInstance().close();
+                    TipManagerCommon.getInstance().createCommonColorTip("连接服务器失败，请重试！",false);
+                }
+                else {
+                    t.showDisConnectView("重连服务器失败，请检查网络环境!");
+                }
+            }
+            else{
+                t.showDisConnectView("小伙子，不要开车，你掉线了");
+            }
+        }
+
+        private showDisConnectView(msg: string): void {
+            qmr.GameLoading.getInstance().close();
+            qmr.ModuleManager.showModule(qmr.ModuleNameLogin.DISCONNECT_VIEW, { msg: msg, code: -1 }, LayerConst.TIP, true, false);
+        }
+
+        private startReConnect(): void {
+            this.connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, this.onGameServerConnect, this);
+        }
+
+        private onGameServerConnect(): void {
+            qmr.GameLoading.getInstance().setLoadingTip("重连中");
+            qmr.LoginController.instance.reqReconnect();
+        }
+
+        private startReLogin(): void {
+            this.connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, this.onGameLoginServerConnect, this);
+        }
+
+        private onGameLoginServerConnect(): void {
+            qmr.GameLoading.getInstance().setLoadingTip("登录中");
+            qmr.LoginController.instance.reqRelogin();
+        }
+
+        /**
+         *  当链接错误的时候调用
+         */
+        private onConnnectError(): void {
+            PbGlobalCounter.getInstance().resetCounter();
+            LogUtil.log("ioerror");
         }
 
         /**
@@ -181,7 +238,14 @@ module qmr {
             }
         }
 
-         /**
+        /**
+         *  当发生报错
+         */
+        private fnErrorTrap(): void {
+
+        }
+
+        /**
          *  超时检测
          */
         private checkTimeOut(): void {

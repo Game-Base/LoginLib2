@@ -29,11 +29,28 @@ public txt_account:eui.TextInput;
         {
             super.initListener();
 
-            this.addClickEvent(this.btn_login, this.onCloseClick, this);
+            this.addClickEvent(this.btn_login, this.startLogin, this);
         }
 
-        private onCloseClick():void{
-            LoginController.instance.onEnterGame();
+        private startLogin():void{
+            let userName: string = this.txt_account.text.trim();
+            if (userName.length == 0)
+            {
+                TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
+                return;
+            }
+            if(!LoginManager.isConnected){
+                TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                return;
+            }
+            if(!RegexpUtil.isPhoneNumber(userName)){
+                TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
+                return;
+            }
+            let telNum:number = Number(userName);
+            GlobalConfig.account = telNum;
+            LoginController.instance.reqLogin(telNum);
+            egret.localStorage.setItem("testUserid", GlobalConfig.account+"");
         }
 
         protected addedToStage(evt: egret.Event): void
@@ -51,6 +68,7 @@ public txt_account:eui.TextInput;
                 styleSpan.parentNode.removeChild(styleSpan);
             }
             
+            GameLoading.getInstance().close();
             PlatformManager.instance.platform.setLoadingStatus("");
             GameLoadManager.instance.loadGameResAfterLogin();
 
@@ -94,7 +112,7 @@ public txt_account:eui.TextInput;
         protected initData(): void
         {
             super.initData();
-
+            this.txt_account.text = egret.localStorage.getItem("testUserid");
         }
 
         public dispose(): void

@@ -10,29 +10,23 @@ module qmr
         public static get loginPath(): string {
             return PlatformConfig.webRoot + "resourceLogin/";
         }
-        public static get mapPath(): string {
-            return PlatformConfig.webRoot + "map/"; 
-        }
         public static get defaultPath(): string {
             return "resourceLogin/animation/";
         }
         public static get rolePath(): string {
-            return PlatformConfig.webRoot + "animation/role/";
+            return PlatformConfig.webRoot + "avatar/role/";
         }
         public static get roleUiPath(): string {
-            return PlatformConfig.webRoot + "animation/uiRole/";
-        }
-        public static get bgPath(): string {
-            return PlatformConfig.webRoot + "unpack/bg/"; 
+            return PlatformConfig.webRoot + "avatar/uiRole/";
         }
         public static get weaponPath(): string {
-            return PlatformConfig.webRoot + "animation/weapon/"; 
+            return PlatformConfig.webRoot + "avatar/weapon/"; 
         }
         public static get horsePath(): string {
-            return PlatformConfig.webRoot + "animation/horse/";
+            return PlatformConfig.webRoot + "avatar/horse/";
         }
         public static get wingPath(): string {
-            return PlatformConfig.webRoot + "animation/wing/";
+            return PlatformConfig.webRoot + "avatar/wing/";
         }
         public static get bg_music(): string {
             return PlatformConfig.webRoot + "sound/music/"; 

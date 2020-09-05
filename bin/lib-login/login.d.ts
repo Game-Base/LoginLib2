@@ -931,56 +931,25 @@ declare module qmr {
 }
 declare module qmr {
     class GlobalConfig {
-        /** 是否上报日志到reportLogUrl服务器上 */
-        static reportLogData: {};
-        static reportLogUrl: string;
         /** 是否开启Slow个人日志 */
         static bIsShowSlowLog: boolean;
         static loginInitFinish: boolean;
         static isDebugF: boolean;
+        /**游戏登陆账号 */
+        static account: number;
+        /**登录服务器 */
+        static loginServer: string;
         static loginPort: number;
         static userId: number | Long;
-        static signature: string;
-        static unverifysvr: number;
-        static platLoginTime: string;
-        /**平台拉取的服务器列表*/
-        static serverList: any[];
-        /**我最近登陆的服务器列表 */
-        static recentLoginServerList: any[];
         /**登陆服下发后端参数(直接透传给后端)*/
         static sparam: any;
-        static nickName: string;
-        static loginProxyServer: string;
-        /** 是否是sdk登出状态 */
-        static isSDKLogout: boolean;
-        /**客户端注册用户英雄id */
-        static registerAccountHeroId: number;
-        /**游戏登陆账号 */
-        static account: string;
-        static token: string;
         /**服务器id */
         static sid: string;
         static sName: string;
-        /**客户端登录游戏秘钥 */
-        static loginKey: string;
-        /**QOS打点服务器秘钥 */
-        static qosKey: string;
-        /**用户唯一id */
-        static uid: string;
-        /**登录服务器 */
-        static loginServer: string;
-        /**是否是全新用户 */
-        static isFirstNewUser: boolean;
         /**客户端ip*/
         static clientIp: string;
-        /**本次登录是否请求了创建角色 */
-        static isCreatRoleEnterGame: boolean;
-        /**登录服下发前端参数(fcm-防沉迷标记,charge-充值标记(1-充值开启, false-充值关闭 qosurl-打点URL.(当此接口为空时表示不需要打点)))*/
-        static cdata: any;
         /**登录时间 */
         static logintime: number;
-        /**是否开放充值 */
-        static readonly isOpenRecharge: boolean;
         /**
          * 是否ios系统
          */
@@ -1386,7 +1355,9 @@ declare namespace qmr {
 declare module qmr {
     /**游戏服务器登录流程控制类 */
     class LoginManager {
-        static showLoginView(): Promise<void>;
+        static isConnected: boolean;
+        /**请求连接游戏服务器 */
+        static connectGameServer(): void;
     }
 }
 declare module qmr {
@@ -1528,6 +1499,7 @@ declare module qmr {
     class ModuleNameLogin {
         static LOGIN_VIEW: string;
         static GAME_LOADING_VIEW: string;
+        static DISCONNECT_VIEW: string;
     }
 }
 declare class LoadingUI extends egret.Sprite implements RES.PromiseTaskReporter {
@@ -1538,6 +1510,32 @@ declare class LoadingUI extends egret.Sprite implements RES.PromiseTaskReporter 
 }
 declare class Main extends eui.UILayer {
     protected createChildren(): void;
+}
+declare module qmr {
+    /**
+     * coler
+     * 掉线模块
+     */
+    class DisConnectView extends SuperBaseModule {
+        txt_tip: eui.Label;
+        txt_code: eui.Label;
+        btn_refresh: eui.Button;
+        constructor();
+        /** 初始化事件,需被子类继承 */
+        protected initListener(): void;
+        /**
+         * @description 请求刷新页面
+         */
+        private onRefresh();
+        /**
+         * @description 初始化数据,需被子类继承
+         */
+        protected initData(): void;
+        /**
+         * dispose
+         */
+        dispose(): void;
+    }
 }
 declare module qmr {
     /**
@@ -1645,27 +1643,58 @@ declare module qmr {
     }
 }
 declare module qmr {
-    /**
-     *
-     * @description 登陆通信控制器
-     *
-     */
     class LoginController extends BaseController {
         private static _instance;
         /**  获取单例对象  */
         static readonly instance: LoginController;
         constructor();
         protected initListeners(): void;
-        isEnterGame: boolean;
-        onEnterGame(): Promise<void>;
-        private destoryLoginRes();
+        /**
+         *  ---请求登陆---
+         */
+        reqLogin(username: number, gameSite?: string): void;
+        /**
+         *  ---请求注册---
+         */
+        reqLoginRegister(username: number, gameSite: string, nickname: string, heroId: number): void;
+        /**
+         *  ===返回登陆/注册成功===
+         */
+        private onRecLoginSuccess(s);
+        /**
+         *  ---请求登出---
+         */
+        reqUserLogout(playerId: number): void;
+        /**
+         *  ===收到登出成功===
+         */
+        private onRecUseLoginOut(s);
+        reqReconnect(): void;
+        reqRelogin(): void;
+        reportSdkPortRequest(url: string, p: any): void;
+        private onSdkReportResponse(s);
     }
 }
 declare module qmr {
+    /**
+     *
+     * @author coler
+     * @description 登陆数据模型
+     *
+     */
     class LoginModel {
-        constructor();
         private static _instance;
+        isReconnect: boolean;
+        isInstead: boolean;
+        isDisconnect: boolean;
+        isEnterGame: boolean;
+        constructor();
         static readonly instance: LoginModel;
+        /**
+         *  返回登陆、注册成功
+         */
+        onRecLoginSuccess(s: com.message.S_USER_LOGIN): Promise<void>;
+        private destoryLoginRes();
     }
 }
 declare module qmr {
@@ -1686,7 +1715,7 @@ declare module qmr {
          * @description 初始化事件
          */
         protected initListener(): void;
-        private onCloseClick();
+        private startLogin();
         protected addedToStage(evt: egret.Event): void;
         private onBgResBack();
         /** 加云朵 */
@@ -2132,11 +2161,6 @@ declare module qmr {
 }
 declare module qmr {
     import ByteArray = egret.ByteArray;
-    /**
-     *
-     * @description websocket的rpc回调实现
-     *
-     */
     class Rpc {
         private static instance;
         private loginSocket;
@@ -2184,13 +2208,26 @@ declare module qmr {
         * @description 当链接关闭的时候调用
         */
         private onConnectClose();
+        private showDisConnectView(msg);
+        private startReConnect();
+        private onGameServerConnect();
+        private startReLogin();
+        private onGameLoginServerConnect();
+        /**
+         *  当链接错误的时候调用
+         */
+        private onConnnectError();
         /**
         *  关闭一个socket（目前游戏使用一个socket就可以了）
         */
         close(): void;
         /**
-        *  超时检测
-        */
+         *  当发生报错
+         */
+        private fnErrorTrap();
+        /**
+         *  超时检测
+         */
         private checkTimeOut();
     }
 }
@@ -2877,11 +2914,8 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class ResPathUtil {
-        /** 获取bg图路径 */
-        static getBgUrl(resName: string): string;
-        /** 地图资源路径 */
-        static getMapUrl(mapName: string): string;
+    class RegexpUtil {
+        static isPhoneNumber(phoneNum: any): boolean;
     }
 }
 declare module qmr {
@@ -2970,11 +3004,9 @@ declare module qmr {
      */
     class SystemPath {
         static readonly loginPath: string;
-        static readonly mapPath: string;
         static readonly defaultPath: string;
         static readonly rolePath: string;
         static readonly roleUiPath: string;
-        static readonly bgPath: string;
         static readonly weaponPath: string;
         static readonly horsePath: string;
         static readonly wingPath: string;

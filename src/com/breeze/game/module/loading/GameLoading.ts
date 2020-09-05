@@ -53,6 +53,8 @@ module qmr {
             this._loadingRun = new eui.Image(RES.getRes("preloading_loading_png"));
             this.addChild(this._loadingRun);
             this._txProgress = new eui.Label;
+            // this._txProgress.textColor = 0xdd1900;
+            this._txProgress.fontFamily = "specialGameFont";
             this.addChild(this._txProgress);
             this.updateSize();
         }
