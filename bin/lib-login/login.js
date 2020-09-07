@@ -1511,7 +1511,7 @@ var qmr;
     var BaseActor = (function (_super) {
         __extends(BaseActor, _super);
         function BaseActor(resourcePath, loadCallBack, loadThisObject, defaultAct) {
-            if (defaultAct === void 0) { defaultAct = "move"; }
+            if (defaultAct === void 0) { defaultAct = "idle"; }
             var _this = _super.call(this) || this;
             var t = _this;
             t.resourcePath = resourcePath;

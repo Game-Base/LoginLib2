@@ -28,7 +28,7 @@ module qmr
         private _timeScale: number;                   //帧频速度,越大越快
         private _isNoRendering: boolean;              //是否不循环渲染，用于外面设置是否播放，级别最大
 
-        public constructor(resourcePath: string, loadCallBack: Function, loadThisObject: any, defaultAct: string = "move")
+        public constructor(resourcePath: string, loadCallBack: Function, loadThisObject: any, defaultAct: string = Status.IDLE)
         {
             super();
             let t = this;
