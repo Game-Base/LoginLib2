@@ -19,6 +19,9 @@ module qmr
 				case PlatformEnum.P_SLOGAME_DEBUG:
 					basePlatform = new CommonGamePlatform();
 					break;
+				case PlatformEnum.P_SLOGAME_WEB:
+					basePlatform = new WebGamePlatform();
+					break;
 				
 			}
 			return basePlatform;

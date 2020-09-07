@@ -44,7 +44,7 @@ module qmr
                 socketUrl = protocol + "://" + host + "/s" + GlobalConfig.sid;
                 if (PlatformConfig.isWSS)//外网debug版本 默认走wss
                 {
-                    socketUrl = "wss://" + host + "/s" + GlobalConfig.sid;
+                    socketUrl = "ws://" + host + "/s" + GlobalConfig.sid;
                 }
             }
             else

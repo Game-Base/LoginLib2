@@ -1511,7 +1511,7 @@ var qmr;
     var BaseActor = (function (_super) {
         __extends(BaseActor, _super);
         function BaseActor(resourcePath, loadCallBack, loadThisObject, defaultAct) {
-            if (defaultAct === void 0) { defaultAct = "idle"; }
+            if (defaultAct === void 0) { defaultAct = qmr.Status.IDLE; }
             var _this = _super.call(this) || this;
             var t = _this;
             t.resourcePath = resourcePath;
@@ -2887,7 +2887,7 @@ var qmr;
         /**游戏登陆账号 */
         GlobalConfig.account = 0;
         /**登录服务器 */
-        GlobalConfig.loginServer = "192.168.3.116";
+        GlobalConfig.loginServer = "192.168.3.116"; //129.226.177.253   192.168.3.116
         //登陆服务器端口
         GlobalConfig.loginPort = 8003;
         //玩家的账号             
@@ -6140,41 +6140,12 @@ var qmr;
 (function (qmr) {
     /**
      * 平台id枚举
-     * dear_H
      */
     var PlatformEnum;
     (function (PlatformEnum) {
         /**星灵互动(默认平台)*/
         PlatformEnum[PlatformEnum["P_SLOGAME_DEBUG"] = 0] = "P_SLOGAME_DEBUG";
         PlatformEnum[PlatformEnum["P_SLOGAME_WEB"] = 100] = "P_SLOGAME_WEB";
-        /**大雁互娱_IOS*/
-        PlatformEnum[PlatformEnum["P_DYHY_IOS"] = 6] = "P_DYHY_IOS";
-        /**大雁互娱_quick*/
-        PlatformEnum[PlatformEnum["P_DYHY_QUICK"] = 7] = "P_DYHY_QUICK";
-        /**大雁互娱_米壳*/
-        PlatformEnum[PlatformEnum["P_DYHY_MK"] = 8] = "P_DYHY_MK";
-        /** 西游手QQ小游戏*/
-        PlatformEnum[PlatformEnum["P_XIYOU_SQQ"] = 9] = "P_XIYOU_SQQ";
-        /**大雁互娱_IOS_WEB 和安卓apk*/
-        PlatformEnum[PlatformEnum["P_DYHY_IOS_WEB"] = 10] = "P_DYHY_IOS_WEB";
-        /** 微信小游戏 */
-        PlatformEnum[PlatformEnum["P_WX"] = 11] = "P_WX";
-        /**大雁互娱_IOS_WD*/
-        PlatformEnum[PlatformEnum["P_DYHY_IOS_WEB_crown"] = 120] = "P_DYHY_IOS_WEB_crown";
-        /** 6kw 自出安卓母包*/
-        PlatformEnum[PlatformEnum["P_6kwAndriod"] = 130] = "P_6kwAndriod";
-        /**9377 */
-        PlatformEnum[PlatformEnum["P_9377"] = 12] = "P_9377";
-        /**7477 */
-        PlatformEnum[PlatformEnum["P_7477"] = 13] = "P_7477";
-        /**西游网H5 */
-        PlatformEnum[PlatformEnum["P_XIYOU_H5"] = 14] = "P_XIYOU_H5";
-        /**游民星空 */
-        PlatformEnum[PlatformEnum["P_YMXK"] = 15] = "P_YMXK";
-        /**OPPO */
-        PlatformEnum[PlatformEnum["P_OPPO"] = 16] = "P_OPPO";
-        /** 懒猫*/
-        PlatformEnum[PlatformEnum["L_CAT"] = 1000] = "L_CAT";
     })(PlatformEnum = qmr.PlatformEnum || (qmr.PlatformEnum = {}));
 })(qmr || (qmr = {}));
 var qmr;
@@ -6190,6 +6161,9 @@ var qmr;
             switch (platformId) {
                 case qmr.PlatformEnum.P_SLOGAME_DEBUG:
                     basePlatform = new qmr.CommonGamePlatform();
+                    break;
+                case qmr.PlatformEnum.P_SLOGAME_WEB:
+                    basePlatform = new qmr.WebGamePlatform();
                     break;
             }
             return basePlatform;
@@ -6373,6 +6347,49 @@ var qmr;
     }(qmr.BasePlatform));
     qmr.CommonGamePlatform = CommonGamePlatform;
     __reflect(CommonGamePlatform.prototype, "qmr.CommonGamePlatform");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    var WebGamePlatform = (function (_super) {
+        __extends(WebGamePlatform, _super);
+        function WebGamePlatform() {
+            var _this = _super.call(this) || this;
+            /**该平台是否拥有清理缓存接口 */
+            _this.canClearResCache = false;
+            return _this;
+        }
+        //初始化平台配置参数
+        WebGamePlatform.prototype.initGetOption = function () {
+            qmr.PlatformConfig.platformSign = qmr.PlatformConfig.platform + "";
+            this.isGetPlatformInfo = true;
+        };
+        WebGamePlatform.prototype.login = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    egret.log("平台登陆");
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            _this.isGetPlatformInfo = true;
+                            resolve();
+                            egret.log("平台登陆成功:" + status);
+                        })];
+                });
+            });
+        };
+        /**请求支付 */
+        WebGamePlatform.prototype.reqPay = function (payInfo) {
+        };
+        WebGamePlatform.prototype.pay = function (payInfo) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/];
+                });
+            });
+        };
+        return WebGamePlatform;
+    }(qmr.BasePlatform));
+    qmr.WebGamePlatform = WebGamePlatform;
+    __reflect(WebGamePlatform.prototype, "qmr.WebGamePlatform");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -6865,7 +6882,7 @@ var qmr;
             if (isOutNetPlatForm) {
                 socketUrl = protocol + "://" + host + "/s" + qmr.GlobalConfig.sid;
                 if (qmr.PlatformConfig.isWSS) {
-                    socketUrl = "wss://" + host + "/s" + qmr.GlobalConfig.sid;
+                    socketUrl = "ws://" + host + "/s" + qmr.GlobalConfig.sid;
                 }
             }
             else {

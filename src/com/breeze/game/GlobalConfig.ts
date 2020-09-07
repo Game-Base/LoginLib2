@@ -10,7 +10,7 @@ module qmr
 		/**游戏登陆账号 */
 		public static account: number = 0;
 		/**登录服务器 */
-		public static loginServer: string = "192.168.3.116";
+		public static loginServer: string = "192.168.3.116";//129.226.177.253   192.168.3.116
 		//登陆服务器端口
 		public static loginPort: number = 8003;           
 		//玩家的账号             
