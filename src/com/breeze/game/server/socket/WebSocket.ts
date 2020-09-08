@@ -39,18 +39,24 @@ module qmr
             let socketUrl: string = "";
             let isOutNetPlatForm = platformManager.isOutNetPlatForm;
 
-            if (isOutNetPlatForm)//平台下不加ws后缀 Nginx做转发
-            {
-                socketUrl = protocol + "://" + host + "/s" + GlobalConfig.sid;
-                if (PlatformConfig.isWSS)//外网debug版本 默认走wss
-                {
-                    socketUrl = "ws://" + host + "/s" + GlobalConfig.sid;
-                }
-            }
-            else
-            {
-                socketUrl = "ws://" + host + ":" + port + this.WEB_KEY;
-            }
+            // if (isOutNetPlatForm)//平台下不加ws后缀 Nginx做转发
+            // {
+            //     socketUrl = protocol + "://" + host + "/s" + GlobalConfig.sid;
+            //     if (PlatformConfig.isWSS)//外网debug版本 默认走wss
+            //     {
+            //         socketUrl = "ws://" + host + "/s" + GlobalConfig.sid;
+            //     }
+            // }
+            // else
+            // {
+            //     socketUrl = "ws://" + host + ":" + port + this.WEB_KEY;
+            // }
+
+            // socketUrl = "ws://" + host + ":" + port + this.WEB_KEY;
+
+            socketUrl = "ws://129.226.177.253/s1";
+            // socketUrl = "ws://192.168.3.116:8003"+ this.WEB_KEY;
+
             this.websocket.connectByUrl(socketUrl);
             // let socketUrl = "wss://echo.websocket.org"
             // this.websocket.connect(host, port)

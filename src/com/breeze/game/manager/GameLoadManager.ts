@@ -32,30 +32,6 @@ namespace qmr
 			PlatformManager.instance.platform.setLoadingProgress(50);
         }
         
-		/**
-		* @description 加载创角资源
-		*/
-		public async loadcreateRes()
-		{
-			await this.loadResJson("createrole.res.json"); 
-			await this.loadThmJson("createrole.thm.json");
-			await this.loadCreateRoleThmJs();
-			return new Promise((resolve, reject) =>
-			{
-				let totalCount = 2;
-				let loadedCount = 0;
-				let comFunc = function(){
-					loadedCount ++;
-					if(loadedCount >= totalCount){
-						// PlatformManager.instance.platform.setLoadingStatus("");
-						resolve();
-					}
-				}
-				ResManager.loadGroup("createrole", comFunc, this, LoadPriority.IMMEDIATELY);
-				ResManager.getRes("cjbg1_jpg", comFunc, this, LoadPriority.IMMEDIATELY);
-			})
-        }
-        
 		/** 
 		 * 加载登录后游戏资源
 		*/

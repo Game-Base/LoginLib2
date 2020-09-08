@@ -1,7 +1,6 @@
 module qmr
 {
 	/**
-	 * @date 2016.12.01
 	 * @description 带动画和移动操作的角色类,默认是待机状态,idle
 	 */
     export class BaseActor extends egret.DisplayObjectContainer
@@ -100,16 +99,16 @@ module qmr
                 let t = this;
                 t.addPartTo(part, partId, partIndex, dir, isDirLoad, resPath);
                 //这里是添加转圈特效，用来在模型资源加载完成之前显示一个loading特效的功能
-                // if (part == ActorPart.BODY && isShowDefault)
-                // {
-                //     let animalClip: AnimateClip = t.partDic[ActorPart.DEFAULT];
-                //     if (!animalClip)
-                //     {
-                //         t.addPartTo(ActorPart.DEFAULT, 9999, partIndex, dir, isDirLoad, resPath);
-                //         animalClip = t.partDic[ActorPart.DEFAULT];
-                //         animalClip.offsetY = -85;
-                //     }
-                // }
+                if (part == ActorPart.BODY && isShowDefault)
+                {
+                    let animalClip: AnimateClip = t.partDic[ActorPart.DEFAULT];
+                    if (!animalClip)
+                    {
+                        t.addPartTo(ActorPart.DEFAULT, 9999, partIndex, dir, isDirLoad, resPath);
+                        animalClip = t.partDic[ActorPart.DEFAULT];
+                        animalClip.offsetY = -85;
+                    }
+                }
             }
         }
 
