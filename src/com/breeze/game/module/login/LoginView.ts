@@ -43,7 +43,7 @@ public txt_account:eui.TextInput;
                 TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
                 return;
             }
-            if(!RegexpUtil.isPhoneNumber(userName)){
+            if(!this.isPhoneNumber(userName)){
                 TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
                 return;
             }
@@ -113,6 +113,11 @@ public txt_account:eui.TextInput;
         {
             super.initData();
             this.txt_account.text = egret.localStorage.getItem("testUserid");
+        }
+
+        public isPhoneNumber(phoneNum): boolean {
+            let reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
+            return reg.test(phoneNum);
         }
 
         public dispose(): void

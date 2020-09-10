@@ -1459,48 +1459,542 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var MessageIDLogin = (function () {
-        function MessageIDLogin() {
+    /**
+     *
+     * @description 游戏loading
+     *
+     */
+    var GameLoading = (function (_super) {
+        __extends(GameLoading, _super);
+        function GameLoading() {
+            var _this = _super.call(this) || this;
+            /**
+             * @description 设置加载进度
+             */
+            _this.vitureCount = 0;
+            var t = _this;
+            t.addEventListener(egret.Event.REMOVED_FROM_STAGE, function () {
+                if (t.hasEventListener(egret.Event.ENTER_FRAME)) {
+                    t.removeEventListener(egret.Event.ENTER_FRAME, t.runLoading, t);
+                }
+            }, t);
+            t.addEventListener(egret.Event.ADDED_TO_STAGE, function () {
+                t.setProgress(0, 1);
+                t.addEventListener(egret.Event.ENTER_FRAME, t.runLoading, t);
+            }, t);
+            t.touchEnabled = true;
+            return _this;
         }
-        /** 游戏初始化调用 */
-        MessageIDLogin.init = function () {
-            var t = this;
-            var id;
-            for (var p in t) {
-                id = t[p];
-                t.MSG_KEYS.set(id, p);
+        GameLoading.prototype.onTouch = function (evt) {
+            evt.stopImmediatePropagation();
+        };
+        GameLoading.prototype.runLoading = function (evt) {
+            if (this._loadingRun) {
+                this._loadingRun.rotation += 3;
             }
         };
-        /** 通过本类的协议ID映射协议名字 */
-        MessageIDLogin.getMsgNameById = function (id) {
-            return MessageIDLogin.MSG_KEYS.get(id);
+        /**
+         * @description 获取loading单例对象
+         */
+        GameLoading.getInstance = function () {
+            if (GameLoading.inttance == null) {
+                GameLoading.inttance = new GameLoading();
+            }
+            return GameLoading.inttance;
+        };
+        GameLoading.prototype.createChildren = function () {
+            _super.prototype.createChildren.call(this);
+            this.rect = new eui.Rect();
+            this.rect.fillColor = 0x0;
+            this.rect.fillAlpha = 0.2;
+            this.addChild(this.rect);
+            this.rect.touchEnabled = true;
+            this.rect.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouch, this);
+            this._loadingRun = new eui.Image(RES.getRes("preloading_loading_png"));
+            this.addChild(this._loadingRun);
+            this._txProgress = new eui.Label;
+            // this._txProgress.textColor = 0xdd1900;
+            this._txProgress.fontFamily = "specialGameFont";
+            this.addChild(this._txProgress);
+            this.updateSize();
         };
         /**
-         *
+         * @description 更新尺寸
          */
-        /** 映射协议ID对应的协议名 */
-        MessageIDLogin.MSG_KEYS = new qmr.Dictionary();
-        /**  异常消息 */
-        MessageIDLogin.S_EXCEPTION_MSG = 900;
-        /**  登录 */
-        MessageIDLogin.C_USER_LOGIN = 1001;
-        /**  登录成功 */
-        MessageIDLogin.S_USER_LOGIN = 1002;
-        /** 注册 */
-        MessageIDLogin.C_LOGIN_REGISTER = 1005;
-        /** 登出 */
-        MessageIDLogin.C_USER_LOGOUT = 1007;
-        MessageIDLogin.S_USER_LOGOUT = 1008;
-        /** 同步时间 */
-        MessageIDLogin.C_SYNC_TIME = 2101;
-        /** 同步时间 */
-        MessageIDLogin.S_SYNC_TIME = 2102;
-        MessageIDLogin.C_SEND_SDK_DATA = 1032;
-        MessageIDLogin.S_SEND_SDK_DATA = 1033;
-        return MessageIDLogin;
+        GameLoading.prototype.updateSize = function () {
+            this._loadingRun.verticalCenter = 0;
+            this._loadingRun.horizontalCenter = 0;
+            this._txProgress.verticalCenter = 0;
+            this._txProgress.horizontalCenter = 0;
+            this._txProgress.size = 20;
+            // this._txProgress.stroke = 1;
+            // this._txProgress.strokeColor = 0;
+            this.rect.width = qmr.StageUtil.stageWidth;
+            this.rect.height = qmr.StageUtil.stageHeight;
+        };
+        GameLoading.prototype.setProgress = function (itemsLoaded, itemsTotal) {
+            qmr.LayerManager.instance.addDisplay(this, qmr.LayerConst.TOP);
+            if (this._txProgress) {
+                this._txProgress.text = Math.round(itemsLoaded / itemsTotal * 100) + "%";
+                if (itemsLoaded == 0) {
+                    this.vitureCount = 1;
+                    qmr.Ticker.getInstance().registerTick(this.onTimer, this, 50);
+                }
+                else {
+                    qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
+                }
+            }
+        };
+        GameLoading.prototype.onTimer = function () {
+            this.vitureCount++;
+            if (this.vitureCount < 100) {
+                this._txProgress.text = Math.round(this.vitureCount) + "%";
+            }
+        };
+        /**
+         * @description 设置loading提示
+         */
+        GameLoading.prototype.setLoadingTip = function (msg) {
+            qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
+            qmr.NotifyManager.registerNotify(qmr.StageUtil.STAGE_RESIZE, this.updateSize, this);
+            qmr.LayerManager.instance.addDisplay(this, qmr.LayerConst.TOP);
+            if (this._txProgress) {
+                this._txProgress.text = msg;
+            }
+        };
+        /**
+         * @description 关闭loading
+         */
+        GameLoading.prototype.close = function () {
+            qmr.NotifyManager.unRegisterNotify(qmr.StageUtil.STAGE_RESIZE, this.updateSize, this);
+            qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
+            if (this.parent) {
+                this.parent.removeChild(this);
+            }
+        };
+        return GameLoading;
+    }(eui.Group));
+    qmr.GameLoading = GameLoading;
+    __reflect(GameLoading.prototype, "qmr.GameLoading");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    /**
+     *
+     * @description 所有序列帧动画的管理器 draw到300就差不多了
+     *
+     */
+    var AnimateManager = (function () {
+        function AnimateManager() {
+            this.maxAliveTime = 10000; //30s
+            this.animaDic = {};
+        }
+        /**
+         * @descripion 获取单例
+         */
+        AnimateManager.getInstance = function () {
+            if (AnimateManager.instance == null) {
+                AnimateManager.instance = new AnimateManager();
+            }
+            return AnimateManager.instance;
+        };
+        /**
+         * @description 析对应序列帧动画
+         */
+        AnimateManager.prototype.parseSpriteSheet = function (resName, url, jsonData, texture, dir, autoParseTexture) {
+            if (dir === void 0) { dir = -1; }
+            if (autoParseTexture === void 0) { autoParseTexture = true; }
+            var spriteJson;
+            var spriteSheet = new egret.SpriteSheet(texture);
+            for (var movieClipName in jsonData.mc) {
+                if (movieClipName != null && movieClipName.length != 0) {
+                    spriteJson = jsonData.mc[movieClipName];
+                    break;
+                }
+            }
+            if (spriteJson) {
+                var obj = this.animaDic[resName];
+                if (!obj) {
+                    obj = {};
+                    this.animaDic[resName] = obj;
+                }
+                obj.url = url;
+                obj.sheet = spriteSheet;
+                var labels = spriteJson.labels;
+                var half = jsonData.harf;
+                if (labels && labels.length > 1) {
+                    for (var _i = 0, labels_1 = labels; _i < labels_1.length; _i++) {
+                        var label = labels_1[_i];
+                        var animalData = new qmr.AnimateData(jsonData.res, spriteSheet, autoParseTexture, half);
+                        animalData.parseClipByStartAndEnd(spriteJson, parseInt(label.frame), parseInt(label.end));
+                        obj[parseInt(label.name)] = animalData;
+                    }
+                }
+                else {
+                    var animalData = new qmr.AnimateData(jsonData.res, spriteSheet, autoParseTexture, half);
+                    animalData.parseClip(spriteJson);
+                    obj.data = animalData;
+                }
+            }
+        };
+        /**
+         * @description 根据对应的动画名和标名获取序列帧数据
+         * @param resName 资源名
+         * @param dir 方向
+         */
+        AnimateManager.prototype.getAnimalData = function (resName, dir) {
+            var obj = this.animaDic[resName];
+            if (!obj)
+                return null;
+            var count = obj.count;
+            if (count) {
+                count += 1;
+            }
+            else {
+                count = 1;
+            }
+            obj.count = count;
+            obj.useTime = egret.getTimer();
+            if (dir > 0 && resName.indexOf("death") == -1) {
+                return obj[dir];
+            }
+            return obj.data;
+        };
+        /**
+         * @description 释放资源，其实是释放对应animaion的引用计数
+         */
+        AnimateManager.prototype.dispos = function (resName) {
+            if (resName == "168_idle") {
+                return;
+            }
+            var obj = this.animaDic[resName];
+            if (obj) {
+                var count = obj.count;
+                if (count) {
+                    count -= 1;
+                }
+                else {
+                    count = 0;
+                }
+                if (count <= 0) {
+                    count = 0;
+                }
+                obj.count = count;
+            }
+        };
+        /**
+         * @description 清理过期资源
+         */
+        AnimateManager.prototype.clear = function (now) {
+            var animaDic = this.animaDic;
+            var maxAliveTime = this.maxAliveTime;
+            for (var key in animaDic) {
+                var item = animaDic[key];
+                if (item.count == 0 && item.useTime) {
+                    if (now - item.useTime > maxAliveTime) {
+                        if (item.sheet) {
+                            item.sheet.dispose();
+                        }
+                        var rootStr = RES.destroyRes(item.url);
+                        qmr.LogUtil.warn("AnimationManager.destroy url=" + item.url + "  " + rootStr);
+                        animaDic[key] = null;
+                        delete animaDic[key];
+                    }
+                }
+            }
+            //可能会导致内网卡，先注释了。。
+            // if (!PlatformConfig.useCdnRes){
+            //     RES.profile();
+            // }
+        };
+        return AnimateManager;
     }());
-    qmr.MessageIDLogin = MessageIDLogin;
-    __reflect(MessageIDLogin.prototype, "qmr.MessageIDLogin");
+    qmr.AnimateManager = AnimateManager;
+    __reflect(AnimateManager.prototype, "qmr.AnimateManager");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    /**
+     * @description 翅膀动画片段
+     */
+    var AnimateWing = (function (_super) {
+        __extends(AnimateWing, _super);
+        function AnimateWing(callBack, thisObject) {
+            if (callBack === void 0) { callBack = null; }
+            if (thisObject === void 0) { thisObject = null; }
+            var _this = _super.call(this, callBack, thisObject) || this;
+            _this._wingFrame = 0;
+            _this._wingFrameIndex = 0;
+            return _this;
+        }
+        /**
+         * @description 渲染第几帧 8-10[1-8,1-8]
+         */
+        AnimateWing.prototype.render = function (frame) {
+            if (this._wingFrame != frame) {
+                this._wingFrame = frame;
+                this._wingFrameIndex++;
+            }
+            frame = 1 + (this._wingFrameIndex % this.totalFrames);
+            _super.prototype.render.call(this, frame);
+        };
+        AnimateWing.prototype.reset = function () {
+            _super.prototype.reset.call(this);
+            this._wingFrame = 0;
+            this._wingFrameIndex = 0;
+        };
+        return AnimateWing;
+    }(qmr.AnimateClip));
+    qmr.AnimateWing = AnimateWing;
+    __reflect(AnimateWing.prototype, "qmr.AnimateWing");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    /**
+     *
+     * @description 序列帧动画基类,所有的序列帧动画都要继承此类
+     *
+     */
+    var MovieClip = (function (_super) {
+        __extends(MovieClip, _super);
+        function MovieClip() {
+            var _this = _super.call(this) || this;
+            _this.currentFrame = 1;
+            _this.totalFrame = 0;
+            _this.isStopped = true;
+            _this.passedTime = 0;
+            _this.lastTime = 0;
+            _this.frameRate = 30;
+            _this.eventDic = {};
+            _this._timeScale = 1;
+            _this.mainClip = new qmr.AnimateClip(_this.onLoaded, _this);
+            _this.addChild(_this.mainClip);
+            return _this;
+        }
+        /**
+         * @description 加载素材资源
+         */
+        MovieClip.prototype.load = function (path, resName, loopCallBack, thisObject, playeTimes) {
+            if (playeTimes === void 0) { playeTimes = 1; }
+            this.playeTimes = 1;
+            this.loopCallBack = loopCallBack;
+            this.thisObject = thisObject;
+            this.mainClip.load(path, resName);
+        };
+        /**
+         * @description 资源加载完毕,需被子类继承        */
+        MovieClip.prototype.onLoaded = function () {
+            this.totalFrame = this.mainClip.totalFrames;
+            this.frameRate = this.mainClip.frameRate;
+            this.currentFrame = 1;
+            this.render();
+            this.setIsStopped(false);
+            if (this.totalFrame == 1) {
+                this.gotoAndStop(1);
+            }
+        };
+        /**
+         * @description 注册一个帧事件         */
+        MovieClip.prototype.registerFrameEvent = function (frame, callBack, thisObject) {
+            this.eventDic[frame] = { callBack: callBack, thisObject: thisObject };
+        };
+        /**
+         * @description 取消一个帧事件         */
+        MovieClip.prototype.unRegisterFrameEvent = function (frame) {
+            if (this.eventDic[frame]) {
+                this.eventDic[frame] = null;
+                delete this.eventDic[frame];
+            }
+        };
+        /**
+         * @description 帧频调用         */
+        MovieClip.prototype.advanceTime = function (timeStamp) {
+            var t = this;
+            var advancedTime = timeStamp - t.lastTime;
+            t.lastTime = timeStamp;
+            var frameIntervalTime = t.frameIntervalTime;
+            var currentTime = t.passedTime + advancedTime;
+            t.passedTime = currentTime % frameIntervalTime;
+            var num = currentTime / frameIntervalTime;
+            if (num < 1) {
+                return false;
+            }
+            t.render();
+            while (num >= 1) {
+                num--;
+                t.currentFrame++;
+                t.checkFrameEvent();
+            }
+            return false;
+        };
+        /**
+         * @description 检测帧事件         */
+        MovieClip.prototype.checkFrameEvent = function () {
+            var obj = this.eventDic[this.currentFrame];
+            if (obj && obj.callBack) {
+                obj.callBack.call(obj.thisObject);
+            }
+        };
+        /**
+         * @description 清除回调
+         */
+        MovieClip.prototype.clearCallBack = function () {
+            this.loopCallBack = null;
+        };
+        /**
+         * @description 渲染 需被子类继承*/
+        MovieClip.prototype.render = function () {
+            var t = this;
+            if (t.totalFrame > 0) {
+                if (t.currentFrame > t.totalFrame) {
+                    if (t.loopCallBack) {
+                        t.loopCallBack.call(t.thisObject);
+                    }
+                    t.currentFrame = 1;
+                    if (t.playeTimes == 1) {
+                        t.setIsStopped(true);
+                        return;
+                    }
+                }
+            }
+            t.mainClip.render(t.currentFrame);
+        };
+        Object.defineProperty(MovieClip.prototype, "frameRate", {
+            /**
+             * @description 设置帧频         */
+            set: function (value) {
+                if (value > 60) {
+                    value = 60;
+                }
+                this._frameRate = value;
+                this.frameIntervalTime = 1000 / (value * this._timeScale);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MovieClip.prototype, "timeScale", {
+            /**
+             * @description 设置timescale
+             */
+            set: function (value) {
+                if (!isNaN(this.frameRate)) {
+                    this._timeScale = value;
+                    this.frameIntervalTime = 1000 / (this._frameRate * value);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MovieClip.prototype, "totalFrames", {
+            /**
+             * @description 获取总帧数
+             */
+            get: function () {
+                return this.totalFrame;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * @description 停止在某帧
+         */
+        MovieClip.prototype.gotoAndStop = function (frame) {
+            this.mainClip.render(frame);
+            this.setIsStopped(true);
+        };
+        /**
+            * @private
+            *
+            * @param value
+            */
+        MovieClip.prototype.setIsStopped = function (value) {
+            if (this.isStopped == value) {
+                return;
+            }
+            this.isStopped = value;
+            if (value) {
+                egret.stopTick(this.advanceTime, this);
+            }
+            else {
+                this.lastTime = egret.getTimer();
+                egret.startTick(this.advanceTime, this);
+            }
+        };
+        /**
+         * @description 清除
+         */
+        MovieClip.prototype.clear = function () {
+            if (this.mainClip) {
+                this.mainClip.reset();
+            }
+        };
+        /**
+         * @description 资源释放         */
+        MovieClip.prototype.dispos = function () {
+            if (this.mainClip) {
+                this.mainClip.dispos();
+            }
+            this.setIsStopped(true);
+            for (var key in this.eventDic) {
+                this.eventDic[key] = null;
+                delete this.eventDic[key];
+            }
+            if (this.parent) {
+                this.parent.removeChild(this);
+            }
+        };
+        return MovieClip;
+    }(egret.DisplayObjectContainer));
+    qmr.MovieClip = MovieClip;
+    __reflect(MovieClip.prototype, "qmr.MovieClip");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    /**
+     *
+     * @description 角色部件枚举
+     *
+     */
+    var ActorPart = (function () {
+        function ActorPart() {
+        }
+        ActorPart.BODY = 0; //裸体
+        ActorPart.WEAPON = 1; //武器
+        ActorPart.WING = 2; //翅膀
+        ActorPart.HORSE = 4; //坐骑
+        ActorPart.HORSE_UP = 5; //坐骑上的头套?
+        ActorPart.SHIELD = 6; //护盾
+        ActorPart.DEFAULT = 7; //默认特效
+        return ActorPart;
+    }());
+    qmr.ActorPart = ActorPart;
+    __reflect(ActorPart.prototype, "qmr.ActorPart");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    /**
+     * 各个部位对应的资源加载地址
+     */
+    var ActorPartResourceDic = (function () {
+        function ActorPartResourceDic() {
+            var partDic = {};
+            partDic[qmr.ActorPart.WEAPON] = qmr.SystemPath.weaponPath;
+            partDic[qmr.ActorPart.WING] = qmr.SystemPath.wingPath;
+            partDic[qmr.ActorPart.HORSE] = qmr.SystemPath.horsePath;
+            partDic[qmr.ActorPart.HORSE_UP] = qmr.SystemPath.horsePath;
+            partDic[qmr.ActorPart.DEFAULT] = qmr.SystemPath.defaultPath;
+            this.partDic = partDic;
+        }
+        ActorPartResourceDic.getInstance = function () {
+            if (ActorPartResourceDic._instance == null) {
+                ActorPartResourceDic._instance = new ActorPartResourceDic();
+            }
+            return ActorPartResourceDic._instance;
+        };
+        return ActorPartResourceDic;
+    }());
+    qmr.ActorPartResourceDic = ActorPartResourceDic;
+    __reflect(ActorPartResourceDic.prototype, "qmr.ActorPartResourceDic");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -2087,598 +2581,6 @@ var qmr;
     }());
     qmr.Status = Status;
     __reflect(Status.prototype, "qmr.Status");
-})(qmr || (qmr = {}));
-//////////////////////////////////////////////////////////////////////////////////////
-//
-//  Copyright (c) 2014-present, Egret Technology.
-//  All rights reserved.
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//
-//     * Redistributions of source code must retain the above copyright
-//       notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright
-//       notice, this list of conditions and the following disclaimer in the
-//       documentation and/or other materials provided with the distribution.
-//     * Neither the name of the Egret nor the
-//       names of its contributors may be used to endorse or promote products
-//       derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY EGRET AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
-//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL EGRET AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA,
-//  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-//  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//////////////////////////////////////////////////////////////////////////////////////
-var AssetAdapter = (function () {
-    function AssetAdapter() {
-    }
-    /**
-     * @language zh_CN
-     * 解析素材
-     * @param source 待解析的新素材标识符
-     * @param compFunc 解析完成回调函数，示例：callBack(content:any,source:string):void;
-     * @param thisObject callBack的 this 引用
-     */
-    AssetAdapter.prototype.getAsset = function (source, compFunc, thisObject) {
-        function onGetRes(data) {
-            compFunc.call(thisObject, data, source);
-        }
-        if (RES.hasRes(source)) {
-            var data = RES.getRes(source);
-            if (data) {
-                onGetRes(data);
-            }
-            else {
-                RES.getResAsync(source, onGetRes, this);
-            }
-        }
-        else {
-            RES.getResByUrl(source, onGetRes, this, RES.ResourceItem.TYPE_IMAGE);
-        }
-    };
-    return AssetAdapter;
-}());
-__reflect(AssetAdapter.prototype, "AssetAdapter", ["eui.IAssetAdapter"]);
-var qmr;
-(function (qmr) {
-    /**
-     *
-     * @description 动画片段数据，比如某个动画组中的待机动画
-     *
-     */
-    var AnimateData = (function () {
-        function AnimateData(resJson, spriteSheet, autoParseTexture, autoHalfTexture) {
-            if (autoParseTexture === void 0) { autoParseTexture = false; }
-            if (autoHalfTexture === void 0) { autoHalfTexture = false; }
-            this.resJson = resJson;
-            this.spriteSheet = spriteSheet;
-            this.autoHalfTexture = autoHalfTexture;
-            this.autoParseTexture = autoParseTexture;
-            this.framesList = [];
-        }
-        /**
-         * @description 解析数据
-         */
-        AnimateData.prototype.parseClip = function (spriteJson) {
-            var t = this;
-            var index = 0;
-            var framesList = this.framesList;
-            t._frameRate = parseInt(spriteJson.frameRate);
-            for (var _i = 0, _a = spriteJson.frames; _i < _a.length; _i++) {
-                var item = _a[_i];
-                var duraton = parseInt(item.duration);
-                if (isNaN(duraton))
-                    duraton = 1;
-                for (var i = 1; i <= duraton; i++) {
-                    index += 1;
-                    framesList.push(item);
-                }
-            }
-            if (t.autoParseTexture) {
-                var spriteSheet = t.spriteSheet;
-                var autoHalfTexture = t.autoHalfTexture;
-                for (var _b = 0, framesList_1 = framesList; _b < framesList_1.length; _b++) {
-                    var frameJson = framesList_1[_b];
-                    if (!spriteSheet.getTexture(frameJson.res)) {
-                        var rect = t.resJson[frameJson.res];
-                        if (autoHalfTexture) {
-                            spriteSheet.createTexture(frameJson.res, Math.ceil(rect.x / 2), Math.ceil(rect.y / 2), rect.w >> 1, rect.h >> 1);
-                        }
-                        else {
-                            spriteSheet.createTexture(frameJson.res, rect.x, rect.y, rect.w, rect.h);
-                        }
-                    }
-                }
-            }
-            t._totalFrames = t.framesList.length;
-        };
-        /**
-         * @description 通过起始帧解析数据
-         */
-        AnimateData.prototype.parseClipByStartAndEnd = function (spriteJson, start, end) {
-            var t = this;
-            var index = 0;
-            var framesList = t.framesList;
-            t._frameRate = parseInt(spriteJson.frameRate);
-            for (var _i = 0, _a = spriteJson.frames; _i < _a.length; _i++) {
-                var item = _a[_i];
-                var duraton = parseInt(item.duration);
-                if (isNaN(duraton))
-                    duraton = 1;
-                for (var i = 1; i <= duraton; i++) {
-                    index += 1;
-                    if (index >= start && index <= end) {
-                        framesList.push(item);
-                    }
-                }
-            }
-            //多个动作的资源，消息自己解析贴图
-            // if(t.autoParseTexture) {
-            //     for(let frameJson of framesList) {
-            //         if(!t.spriteSheet.getTexture(frameJson.res)) {
-            //          // this.spriteSheet.createTexture(frameJson.res,this.resJson[frameJson.res].x,this.resJson[frameJson.res].y,this.resJson[frameJson.res].w,this.resJson[frameJson.res].h);
-            //         }
-            //     }
-            // }
-            t._totalFrames = framesList.length;
-        };
-        /**
-         * @description 获取某一帧texture
-         */
-        AnimateData.prototype.getTextureByFrame = function (frame) {
-            var frameJson;
-            var t = this;
-            if (frame <= t.framesList.length) {
-                frameJson = t.framesList[frame - 1];
-            }
-            else {
-                return null;
-            }
-            var texture = t.spriteSheet.getTexture(frameJson.res);
-            if (!texture) {
-                var rect = t.resJson[frameJson.res];
-                texture = t.spriteSheet.createTexture(frameJson.res, rect.x, rect.y, rect.w, rect.h);
-            }
-            return texture;
-        };
-        /**
-         * @description 获取某一帧偏移值
-         */
-        AnimateData.prototype.getOffset = function (frame) {
-            var offset;
-            var framesList = this.framesList;
-            if (frame <= framesList.length) {
-                offset = framesList[frame - 1];
-            }
-            else {
-                offset = framesList[framesList.length - 1];
-            }
-            if (this.autoHalfTexture) {
-                var rect = this.resJson[offset.res];
-                var x = rect.x % 2 ? 1 : 0;
-                var y = rect.y % 2 ? 1 : 0;
-                return { x: offset.x + x, y: offset.y + y, w: (rect.w >> 1) << 1, h: (rect.h >> 1) << 1 };
-            }
-            return offset;
-        };
-        Object.defineProperty(AnimateData.prototype, "totalFrames", {
-            /**
-             * @description 获取总的帧数
-             */
-            get: function () {
-                return this._totalFrames;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(AnimateData.prototype, "halfTexture", {
-            /**
-             * 是方法一倍
-             */
-            get: function () {
-                return this.autoHalfTexture;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(AnimateData.prototype, "frameRate", {
-            /**
-             * @description 获取帧频         */
-            get: function () {
-                return this._frameRate;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * @description 资源释放
-         */
-        AnimateData.prototype.dispos = function () {
-            this.framesList.length = 0;
-            this.framesList = null;
-        };
-        return AnimateData;
-    }());
-    qmr.AnimateData = AnimateData;
-    __reflect(AnimateData.prototype, "qmr.AnimateData");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    /**
-     *
-     * @description 所有序列帧动画的管理器 draw到300就差不多了
-     *
-     */
-    var AnimateManager = (function () {
-        function AnimateManager() {
-            this.maxAliveTime = 10000; //30s
-            this.animaDic = {};
-        }
-        /**
-         * @descripion 获取单例
-         */
-        AnimateManager.getInstance = function () {
-            if (AnimateManager.instance == null) {
-                AnimateManager.instance = new AnimateManager();
-            }
-            return AnimateManager.instance;
-        };
-        /**
-         * @description 析对应序列帧动画
-         */
-        AnimateManager.prototype.parseSpriteSheet = function (resName, url, jsonData, texture, dir, autoParseTexture) {
-            if (dir === void 0) { dir = -1; }
-            if (autoParseTexture === void 0) { autoParseTexture = true; }
-            var spriteJson;
-            var spriteSheet = new egret.SpriteSheet(texture);
-            for (var movieClipName in jsonData.mc) {
-                if (movieClipName != null && movieClipName.length != 0) {
-                    spriteJson = jsonData.mc[movieClipName];
-                    break;
-                }
-            }
-            if (spriteJson) {
-                var obj = this.animaDic[resName];
-                if (!obj) {
-                    obj = {};
-                    this.animaDic[resName] = obj;
-                }
-                obj.url = url;
-                obj.sheet = spriteSheet;
-                var labels = spriteJson.labels;
-                var half = jsonData.harf;
-                if (labels && labels.length > 1) {
-                    for (var _i = 0, labels_1 = labels; _i < labels_1.length; _i++) {
-                        var label = labels_1[_i];
-                        var animalData = new qmr.AnimateData(jsonData.res, spriteSheet, autoParseTexture, half);
-                        animalData.parseClipByStartAndEnd(spriteJson, parseInt(label.frame), parseInt(label.end));
-                        obj[parseInt(label.name)] = animalData;
-                    }
-                }
-                else {
-                    var animalData = new qmr.AnimateData(jsonData.res, spriteSheet, autoParseTexture, half);
-                    animalData.parseClip(spriteJson);
-                    obj.data = animalData;
-                }
-            }
-        };
-        /**
-         * @description 根据对应的动画名和标名获取序列帧数据
-         * @param resName 资源名
-         * @param dir 方向
-         */
-        AnimateManager.prototype.getAnimalData = function (resName, dir) {
-            var obj = this.animaDic[resName];
-            if (!obj)
-                return null;
-            var count = obj.count;
-            if (count) {
-                count += 1;
-            }
-            else {
-                count = 1;
-            }
-            obj.count = count;
-            obj.useTime = egret.getTimer();
-            if (dir > 0 && resName.indexOf("death") == -1) {
-                return obj[dir];
-            }
-            return obj.data;
-        };
-        /**
-         * @description 释放资源，其实是释放对应animaion的引用计数
-         */
-        AnimateManager.prototype.dispos = function (resName) {
-            if (resName == "168_idle") {
-                return;
-            }
-            var obj = this.animaDic[resName];
-            if (obj) {
-                var count = obj.count;
-                if (count) {
-                    count -= 1;
-                }
-                else {
-                    count = 0;
-                }
-                if (count <= 0) {
-                    count = 0;
-                }
-                obj.count = count;
-            }
-        };
-        /**
-         * @description 清理过期资源
-         */
-        AnimateManager.prototype.clear = function (now) {
-            var animaDic = this.animaDic;
-            var maxAliveTime = this.maxAliveTime;
-            for (var key in animaDic) {
-                var item = animaDic[key];
-                if (item.count == 0 && item.useTime) {
-                    if (now - item.useTime > maxAliveTime) {
-                        if (item.sheet) {
-                            item.sheet.dispose();
-                        }
-                        var rootStr = RES.destroyRes(item.url);
-                        qmr.LogUtil.warn("AnimationManager.destroy url=" + item.url + "  " + rootStr);
-                        animaDic[key] = null;
-                        delete animaDic[key];
-                    }
-                }
-            }
-            //可能会导致内网卡，先注释了。。
-            // if (!PlatformConfig.useCdnRes){
-            //     RES.profile();
-            // }
-        };
-        return AnimateManager;
-    }());
-    qmr.AnimateManager = AnimateManager;
-    __reflect(AnimateManager.prototype, "qmr.AnimateManager");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    /**
-     * @description 翅膀动画片段
-     */
-    var AnimateWing = (function (_super) {
-        __extends(AnimateWing, _super);
-        function AnimateWing(callBack, thisObject) {
-            if (callBack === void 0) { callBack = null; }
-            if (thisObject === void 0) { thisObject = null; }
-            var _this = _super.call(this, callBack, thisObject) || this;
-            _this._wingFrame = 0;
-            _this._wingFrameIndex = 0;
-            return _this;
-        }
-        /**
-         * @description 渲染第几帧 8-10[1-8,1-8]
-         */
-        AnimateWing.prototype.render = function (frame) {
-            if (this._wingFrame != frame) {
-                this._wingFrame = frame;
-                this._wingFrameIndex++;
-            }
-            frame = 1 + (this._wingFrameIndex % this.totalFrames);
-            _super.prototype.render.call(this, frame);
-        };
-        AnimateWing.prototype.reset = function () {
-            _super.prototype.reset.call(this);
-            this._wingFrame = 0;
-            this._wingFrameIndex = 0;
-        };
-        return AnimateWing;
-    }(qmr.AnimateClip));
-    qmr.AnimateWing = AnimateWing;
-    __reflect(AnimateWing.prototype, "qmr.AnimateWing");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    /**
-     *
-     * @description 序列帧动画基类,所有的序列帧动画都要继承此类
-     *
-     */
-    var MovieClip = (function (_super) {
-        __extends(MovieClip, _super);
-        function MovieClip() {
-            var _this = _super.call(this) || this;
-            _this.currentFrame = 1;
-            _this.totalFrame = 0;
-            _this.isStopped = true;
-            _this.passedTime = 0;
-            _this.lastTime = 0;
-            _this.frameRate = 30;
-            _this.eventDic = {};
-            _this._timeScale = 1;
-            _this.mainClip = new qmr.AnimateClip(_this.onLoaded, _this);
-            _this.addChild(_this.mainClip);
-            return _this;
-        }
-        /**
-         * @description 加载素材资源
-         */
-        MovieClip.prototype.load = function (path, resName, loopCallBack, thisObject, playeTimes) {
-            if (playeTimes === void 0) { playeTimes = 1; }
-            this.playeTimes = 1;
-            this.loopCallBack = loopCallBack;
-            this.thisObject = thisObject;
-            this.mainClip.load(path, resName);
-        };
-        /**
-         * @description 资源加载完毕,需被子类继承        */
-        MovieClip.prototype.onLoaded = function () {
-            this.totalFrame = this.mainClip.totalFrames;
-            this.frameRate = this.mainClip.frameRate;
-            this.currentFrame = 1;
-            this.render();
-            this.setIsStopped(false);
-            if (this.totalFrame == 1) {
-                this.gotoAndStop(1);
-            }
-        };
-        /**
-         * @description 注册一个帧事件         */
-        MovieClip.prototype.registerFrameEvent = function (frame, callBack, thisObject) {
-            this.eventDic[frame] = { callBack: callBack, thisObject: thisObject };
-        };
-        /**
-         * @description 取消一个帧事件         */
-        MovieClip.prototype.unRegisterFrameEvent = function (frame) {
-            if (this.eventDic[frame]) {
-                this.eventDic[frame] = null;
-                delete this.eventDic[frame];
-            }
-        };
-        /**
-         * @description 帧频调用         */
-        MovieClip.prototype.advanceTime = function (timeStamp) {
-            var t = this;
-            var advancedTime = timeStamp - t.lastTime;
-            t.lastTime = timeStamp;
-            var frameIntervalTime = t.frameIntervalTime;
-            var currentTime = t.passedTime + advancedTime;
-            t.passedTime = currentTime % frameIntervalTime;
-            var num = currentTime / frameIntervalTime;
-            if (num < 1) {
-                return false;
-            }
-            t.render();
-            while (num >= 1) {
-                num--;
-                t.currentFrame++;
-                t.checkFrameEvent();
-            }
-            return false;
-        };
-        /**
-         * @description 检测帧事件         */
-        MovieClip.prototype.checkFrameEvent = function () {
-            var obj = this.eventDic[this.currentFrame];
-            if (obj && obj.callBack) {
-                obj.callBack.call(obj.thisObject);
-            }
-        };
-        /**
-         * @description 清除回调
-         */
-        MovieClip.prototype.clearCallBack = function () {
-            this.loopCallBack = null;
-        };
-        /**
-         * @description 渲染 需被子类继承*/
-        MovieClip.prototype.render = function () {
-            var t = this;
-            if (t.totalFrame > 0) {
-                if (t.currentFrame > t.totalFrame) {
-                    if (t.loopCallBack) {
-                        t.loopCallBack.call(t.thisObject);
-                    }
-                    t.currentFrame = 1;
-                    if (t.playeTimes == 1) {
-                        t.setIsStopped(true);
-                        return;
-                    }
-                }
-            }
-            t.mainClip.render(t.currentFrame);
-        };
-        Object.defineProperty(MovieClip.prototype, "frameRate", {
-            /**
-             * @description 设置帧频         */
-            set: function (value) {
-                if (value > 60) {
-                    value = 60;
-                }
-                this._frameRate = value;
-                this.frameIntervalTime = 1000 / (value * this._timeScale);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MovieClip.prototype, "timeScale", {
-            /**
-             * @description 设置timescale
-             */
-            set: function (value) {
-                if (!isNaN(this.frameRate)) {
-                    this._timeScale = value;
-                    this.frameIntervalTime = 1000 / (this._frameRate * value);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MovieClip.prototype, "totalFrames", {
-            /**
-             * @description 获取总帧数
-             */
-            get: function () {
-                return this.totalFrame;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * @description 停止在某帧
-         */
-        MovieClip.prototype.gotoAndStop = function (frame) {
-            this.mainClip.render(frame);
-            this.setIsStopped(true);
-        };
-        /**
-            * @private
-            *
-            * @param value
-            */
-        MovieClip.prototype.setIsStopped = function (value) {
-            if (this.isStopped == value) {
-                return;
-            }
-            this.isStopped = value;
-            if (value) {
-                egret.stopTick(this.advanceTime, this);
-            }
-            else {
-                this.lastTime = egret.getTimer();
-                egret.startTick(this.advanceTime, this);
-            }
-        };
-        /**
-         * @description 清除
-         */
-        MovieClip.prototype.clear = function () {
-            if (this.mainClip) {
-                this.mainClip.reset();
-            }
-        };
-        /**
-         * @description 资源释放         */
-        MovieClip.prototype.dispos = function () {
-            if (this.mainClip) {
-                this.mainClip.dispos();
-            }
-            this.setIsStopped(true);
-            for (var key in this.eventDic) {
-                this.eventDic[key] = null;
-                delete this.eventDic[key];
-            }
-            if (this.parent) {
-                this.parent.removeChild(this);
-            }
-        };
-        return MovieClip;
-    }(egret.DisplayObjectContainer));
-    qmr.MovieClip = MovieClip;
-    __reflect(MovieClip.prototype, "qmr.MovieClip");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -4438,7 +4340,7 @@ var qmr;
          * ===同步心跳包===
          */
         SystemController.prototype.onRecsynSystem = function (s) {
-            qmr.TimeUtil.syncServerTime(parseInt(s.time.toString()));
+            qmr.ServerTime.syncServerTime(parseInt(s.time.toString()));
             if (!this.isSyncOne) {
                 this.isSyncOne = true;
                 this.dispatch(qmr.NotifyConstLogin.SCNY_ONE_SERVER_TIME);
@@ -4860,7 +4762,7 @@ var qmr;
                 }
             }
             else {
-                qmr.DisplayUtils.removeDisplay(win);
+                ModuleManager.removeDisplay(win);
             }
             this.sendToTop();
         };
@@ -4893,6 +4795,17 @@ var qmr;
         };
         ModuleManager.getClassName = function (name) {
             return this._classAppMap[name];
+        };
+        ModuleManager.removeDisplay = function (dis, parent) {
+            if (parent === void 0) { parent = null; }
+            if (!dis)
+                return;
+            if (!parent) {
+                parent = dis.parent;
+            }
+            if (!parent)
+                return;
+            parent.removeChild(dis);
         };
         /** 映射class */
         ModuleManager._classAppMap = {};
@@ -5043,123 +4956,60 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    /**
-     *
-     * @description 游戏loading
-     *
-     */
-    var GameLoading = (function (_super) {
-        __extends(GameLoading, _super);
-        function GameLoading() {
-            var _this = _super.call(this) || this;
-            /**
-             * @description 设置加载进度
-             */
-            _this.vitureCount = 0;
-            var t = _this;
-            t.addEventListener(egret.Event.REMOVED_FROM_STAGE, function () {
-                if (t.hasEventListener(egret.Event.ENTER_FRAME)) {
-                    t.removeEventListener(egret.Event.ENTER_FRAME, t.runLoading, t);
-                }
-            }, t);
-            t.addEventListener(egret.Event.ADDED_TO_STAGE, function () {
-                t.setProgress(0, 1);
-                t.addEventListener(egret.Event.ENTER_FRAME, t.runLoading, t);
-            }, t);
-            t.touchEnabled = true;
-            return _this;
+    var GameMain = (function () {
+        function GameMain() {
         }
-        GameLoading.prototype.onTouch = function (evt) {
-            evt.stopImmediatePropagation();
+        GameMain.setup = function (stage) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            qmr.WebBrowerUtil.initSysInfo();
+                            //初始化平台配置文件
+                            return [4 /*yield*/, qmr.PlatformConfig.init()];
+                        case 1:
+                            //初始化平台配置文件
+                            _a.sent();
+                            qmr.StageUtil.init(stage);
+                            egret.ImageLoader.crossOrigin = "anonymous";
+                            //注入自定义的素材解析器
+                            egret.registerImplementation("eui.IAssetAdapter", new AssetAdapter());
+                            egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter());
+                            //在最开始将AssetsManager的默认版本控制替换掉
+                            RES.registerVersionController(new qmr.VersionController());
+                            qmr.MessageIDLogin.init();
+                            qmr.LayerManager.instance.setup(qmr.StageUtil.stage);
+                            qmr.ModuleManager.setupClass();
+                            qmr.LoginController.instance; //登录协议注册
+                            qmr.SystemController.instance; //系统协议注册
+                            qmr.GameLifecycleManger.instance.init();
+                            //this.stage.dirtyRegionPolicy = egret.DirtyRegionPolicy.OFF;
+                            this.initLocalStorage();
+                            return [4 /*yield*/, qmr.GameLoadManager.instance.loadLoginRes()];
+                        case 2:
+                            _a.sent();
+                            return [4 /*yield*/, qmr.PlatformManager.instance.platform.reqLogin()];
+                        case 3:
+                            _a.sent();
+                            qmr.LoginManager.connectGameServer();
+                            return [2 /*return*/];
+                    }
+                });
+            });
         };
-        GameLoading.prototype.runLoading = function (evt) {
-            if (this._loadingRun) {
-                this._loadingRun.rotation += 3;
-            }
+        /** 读取缓存 */
+        GameMain.initLocalStorage = function () {
+            var isCloseBgSound = egret.localStorage.getItem("bgSoundIsOpen") == "0";
+            var isCloseEffectSound = egret.localStorage.getItem("effectSoundIsOpen") == "0";
+            console.log("背景音乐是否关闭：" + isCloseBgSound);
+            console.log("音效是否关闭：" + isCloseEffectSound);
+            qmr.SoundManager.getInstance().isMusicSoundOpen = !isCloseBgSound;
+            qmr.SoundManager.getInstance().isEffectSoundOpen = !isCloseEffectSound;
         };
-        /**
-         * @description 获取loading单例对象
-         */
-        GameLoading.getInstance = function () {
-            if (GameLoading.inttance == null) {
-                GameLoading.inttance = new GameLoading();
-            }
-            return GameLoading.inttance;
-        };
-        GameLoading.prototype.createChildren = function () {
-            _super.prototype.createChildren.call(this);
-            this.rect = new eui.Rect();
-            this.rect.fillColor = 0x0;
-            this.rect.fillAlpha = 0.2;
-            this.addChild(this.rect);
-            this.rect.touchEnabled = true;
-            this.rect.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouch, this);
-            this._loadingRun = new eui.Image(RES.getRes("preloading_loading_png"));
-            this.addChild(this._loadingRun);
-            this._txProgress = new eui.Label;
-            // this._txProgress.textColor = 0xdd1900;
-            this._txProgress.fontFamily = "specialGameFont";
-            this.addChild(this._txProgress);
-            this.updateSize();
-        };
-        /**
-         * @description 更新尺寸
-         */
-        GameLoading.prototype.updateSize = function () {
-            this._loadingRun.verticalCenter = 0;
-            this._loadingRun.horizontalCenter = 0;
-            this._txProgress.verticalCenter = 0;
-            this._txProgress.horizontalCenter = 0;
-            this._txProgress.size = 20;
-            // this._txProgress.stroke = 1;
-            // this._txProgress.strokeColor = 0;
-            this.rect.width = qmr.StageUtil.stageWidth;
-            this.rect.height = qmr.StageUtil.stageHeight;
-        };
-        GameLoading.prototype.setProgress = function (itemsLoaded, itemsTotal) {
-            qmr.LayerManager.instance.addDisplay(this, qmr.LayerConst.TOP);
-            if (this._txProgress) {
-                this._txProgress.text = Math.round(itemsLoaded / itemsTotal * 100) + "%";
-                if (itemsLoaded == 0) {
-                    this.vitureCount = 1;
-                    qmr.Ticker.getInstance().registerTick(this.onTimer, this, 50);
-                }
-                else {
-                    qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
-                }
-            }
-        };
-        GameLoading.prototype.onTimer = function () {
-            this.vitureCount++;
-            if (this.vitureCount < 100) {
-                this._txProgress.text = Math.round(this.vitureCount) + "%";
-            }
-        };
-        /**
-         * @description 设置loading提示
-         */
-        GameLoading.prototype.setLoadingTip = function (msg) {
-            qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
-            qmr.NotifyManager.registerNotify(qmr.StageUtil.STAGE_RESIZE, this.updateSize, this);
-            qmr.LayerManager.instance.addDisplay(this, qmr.LayerConst.TOP);
-            if (this._txProgress) {
-                this._txProgress.text = msg;
-            }
-        };
-        /**
-         * @description 关闭loading
-         */
-        GameLoading.prototype.close = function () {
-            qmr.NotifyManager.unRegisterNotify(qmr.StageUtil.STAGE_RESIZE, this.updateSize, this);
-            qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
-            if (this.parent) {
-                this.parent.removeChild(this);
-            }
-        };
-        return GameLoading;
-    }(eui.Group));
-    qmr.GameLoading = GameLoading;
-    __reflect(GameLoading.prototype, "qmr.GameLoading");
+        return GameMain;
+    }());
+    qmr.GameMain = GameMain;
+    __reflect(GameMain.prototype, "qmr.GameMain");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -5563,7 +5413,7 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
                 return;
             }
-            if (!qmr.RegexpUtil.isPhoneNumber(userName)) {
+            if (!this.isPhoneNumber(userName)) {
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
                 return;
             }
@@ -5617,6 +5467,10 @@ var qmr;
             _super.prototype.initData.call(this);
             this.txt_account.text = egret.localStorage.getItem("testUserid");
         };
+        LoginView.prototype.isPhoneNumber = function (phoneNum) {
+            var reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
+            return reg.test(phoneNum);
+        };
         LoginView.prototype.dispose = function () {
             _super.prototype.dispose.call(this);
             egret.Tween.removeTweens(this.imgWindSlow);
@@ -5644,60 +5498,48 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var GameMain = (function () {
-        function GameMain() {
+    var MessageIDLogin = (function () {
+        function MessageIDLogin() {
         }
-        GameMain.setup = function (stage) {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            qmr.WebBrowerUtil.initSysInfo();
-                            //初始化平台配置文件
-                            return [4 /*yield*/, qmr.PlatformConfig.init()];
-                        case 1:
-                            //初始化平台配置文件
-                            _a.sent();
-                            qmr.StageUtil.init(stage);
-                            egret.ImageLoader.crossOrigin = "anonymous";
-                            //注入自定义的素材解析器
-                            egret.registerImplementation("eui.IAssetAdapter", new AssetAdapter());
-                            egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter());
-                            //在最开始将AssetsManager的默认版本控制替换掉
-                            RES.registerVersionController(new qmr.VersionController());
-                            qmr.MessageIDLogin.init();
-                            qmr.LayerManager.instance.setup(qmr.StageUtil.stage);
-                            qmr.ModuleManager.setupClass();
-                            qmr.LoginController.instance; //登录协议注册
-                            qmr.SystemController.instance; //系统协议注册
-                            qmr.GameLifecycleManger.instance.init();
-                            //this.stage.dirtyRegionPolicy = egret.DirtyRegionPolicy.OFF;
-                            this.initLocalStorage();
-                            return [4 /*yield*/, qmr.GameLoadManager.instance.loadLoginRes()];
-                        case 2:
-                            _a.sent();
-                            return [4 /*yield*/, qmr.PlatformManager.instance.platform.reqLogin()];
-                        case 3:
-                            _a.sent();
-                            qmr.LoginManager.connectGameServer();
-                            return [2 /*return*/];
-                    }
-                });
-            });
+        /** 游戏初始化调用 */
+        MessageIDLogin.init = function () {
+            var t = this;
+            var id;
+            for (var p in t) {
+                id = t[p];
+                t.MSG_KEYS.set(id, p);
+            }
         };
-        /** 读取缓存 */
-        GameMain.initLocalStorage = function () {
-            var isCloseBgSound = egret.localStorage.getItem("bgSoundIsOpen") == "0";
-            var isCloseEffectSound = egret.localStorage.getItem("effectSoundIsOpen") == "0";
-            console.log("背景音乐是否关闭：" + isCloseBgSound);
-            console.log("音效是否关闭：" + isCloseEffectSound);
-            qmr.SoundManager.getInstance().isMusicSoundOpen = !isCloseBgSound;
-            qmr.SoundManager.getInstance().isEffectSoundOpen = !isCloseEffectSound;
+        /** 通过本类的协议ID映射协议名字 */
+        MessageIDLogin.getMsgNameById = function (id) {
+            return MessageIDLogin.MSG_KEYS.get(id);
         };
-        return GameMain;
+        /**
+         *
+         */
+        /** 映射协议ID对应的协议名 */
+        MessageIDLogin.MSG_KEYS = new qmr.Dictionary();
+        /**  异常消息 */
+        MessageIDLogin.S_EXCEPTION_MSG = 900;
+        /**  登录 */
+        MessageIDLogin.C_USER_LOGIN = 1001;
+        /**  登录成功 */
+        MessageIDLogin.S_USER_LOGIN = 1002;
+        /** 注册 */
+        MessageIDLogin.C_LOGIN_REGISTER = 1005;
+        /** 登出 */
+        MessageIDLogin.C_USER_LOGOUT = 1007;
+        MessageIDLogin.S_USER_LOGOUT = 1008;
+        /** 同步时间 */
+        MessageIDLogin.C_SYNC_TIME = 2101;
+        /** 同步时间 */
+        MessageIDLogin.S_SYNC_TIME = 2102;
+        MessageIDLogin.C_SEND_SDK_DATA = 1032;
+        MessageIDLogin.S_SEND_SDK_DATA = 1033;
+        return MessageIDLogin;
     }());
-    qmr.GameMain = GameMain;
-    __reflect(GameMain.prototype, "qmr.GameMain");
+    qmr.MessageIDLogin = MessageIDLogin;
+    __reflect(MessageIDLogin.prototype, "qmr.MessageIDLogin");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -6354,28 +6196,122 @@ var qmr;
     qmr.WebGamePlatform = WebGamePlatform;
     __reflect(WebGamePlatform.prototype, "qmr.WebGamePlatform");
 })(qmr || (qmr = {}));
+//////////////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2014-present, Egret Technology.
+//  All rights reserved.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Egret nor the
+//       names of its contributors may be used to endorse or promote products
+//       derived from this software without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY EGRET AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+//  IN NO EVENT SHALL EGRET AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA,
+//  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+//  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+//  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+//  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//////////////////////////////////////////////////////////////////////////////////////
+var AssetAdapter = (function () {
+    function AssetAdapter() {
+    }
+    /**
+     * @language zh_CN
+     * 解析素材
+     * @param source 待解析的新素材标识符
+     * @param compFunc 解析完成回调函数，示例：callBack(content:any,source:string):void;
+     * @param thisObject callBack的 this 引用
+     */
+    AssetAdapter.prototype.getAsset = function (source, compFunc, thisObject) {
+        function onGetRes(data) {
+            compFunc.call(thisObject, data, source);
+        }
+        if (RES.hasRes(source)) {
+            var data = RES.getRes(source);
+            if (data) {
+                onGetRes(data);
+            }
+            else {
+                RES.getResAsync(source, onGetRes, this);
+            }
+        }
+        else {
+            RES.getResByUrl(source, onGetRes, this, RES.ResourceItem.TYPE_IMAGE);
+        }
+    };
+    return AssetAdapter;
+}());
+__reflect(AssetAdapter.prototype, "AssetAdapter", ["eui.IAssetAdapter"]);
 var qmr;
 (function (qmr) {
-    /**
-     *
-     * @description 角色部件枚举
-     *
-     */
-    var ActorPart = (function () {
-        function ActorPart() {
+    var ServerTime = (function () {
+        function ServerTime() {
         }
-        ActorPart.BODY = 0; //裸体
-        ActorPart.WEAPON = 1; //武器
-        ActorPart.WING = 2; //翅膀
-        ActorPart.HORSE = 4; //坐骑
-        ActorPart.HORSE_UP = 5; //坐骑上的头套?
-        ActorPart.SHIELD = 6; //护盾
-        ActorPart.DEFAULT = 7; //默认特效
-        return ActorPart;
+        /**
+         * 获取服务器时间，返回当前秒数(本机时间，所有活动计算时差请用getZoneOffsetSeverSecond方法)
+         * @return
+         *
+         */
+        ServerTime.getServerSecond = function () {
+            return Math.floor((egret.getTimer() + this.tickOffset) / 1000);
+        };
+        Object.defineProperty(ServerTime, "serverTime", {
+            /**
+             *  获取服务器时间，返回毫秒
+             * @return
+             */
+            get: function () {
+                return (egret.getTimer() + this.tickOffset);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 获得服务器Unix时间，返回Date
+         */
+        ServerTime.getSeverDate = function () {
+            return (new Date(this.getServerSecond() * 1000));
+        };
+        /**
+         * 获得服务器显示时间
+         */
+        ServerTime.getZoneOffsetSeverDate = function () {
+            return new Date(this.getZoneOffsetSeverSecond() * 1000);
+        };
+        /**
+         * 获得服务器，显示秒
+         */
+        ServerTime.getZoneOffsetSeverSecond = function () {
+            return this.getServerSecond();
+        };
+        ServerTime.syncServerTime = function (timeStamp) {
+            this.tickOffset = timeStamp - egret.getTimer();
+            // console.log("tickOffset:",this.tickOffset);
+            // console.log("serverTime:",new Date(timeStamp).toString());
+            // console.log("ServerSecond:",this.getServerSecond());
+        };
+        /**
+         *时间误差，精确到毫秒
+         */
+        ServerTime.tickOffset = 0;
+        return ServerTime;
     }());
-    qmr.ActorPart = ActorPart;
-    __reflect(ActorPart.prototype, "qmr.ActorPart");
+    qmr.ServerTime = ServerTime;
+    __reflect(ServerTime.prototype, "qmr.ServerTime");
 })(qmr || (qmr = {}));
+var ServerTime = qmr.ServerTime;
 var qmr;
 (function (qmr) {
     /*
@@ -6854,9 +6790,8 @@ var qmr;
             // {
             //     socketUrl = "ws://" + host + ":" + port + this.WEB_KEY;
             // }
-            // socketUrl = "ws://" + host + ":" + port + this.WEB_KEY;
-            socketUrl = "ws://129.226.177.253/s1";
-            // socketUrl = "ws://192.168.3.116:8003"+ this.WEB_KEY;
+            // socketUrl = "ws://129.226.177.253/s1";
+            socketUrl = "ws://192.168.3.116:8004" + this.WEB_KEY;
             this.websocket.connectByUrl(socketUrl);
             // let socketUrl = "wss://echo.websocket.org"
             // this.websocket.connect(host, port)
@@ -7886,67 +7821,6 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var ColorUtil = (function () {
-        function ColorUtil() {
-        }
-        /**
-         * @desc 根据品质返回对应颜色
-         */
-        ColorUtil.getColorByQuality = function (quality) {
-            switch (quality) {
-                case 1:
-                    return qmr.ColorQualityConst.COLOR_G; //默认颜色改成默认颜色试试
-                //return ColorConst.COLOR_WHITE;
-                case 2:
-                    return qmr.ColorQualityConst.COLOR_GREEN;
-                case 3:
-                    return qmr.ColorQualityConst.COLOR_BLUE;
-                case 4:
-                    return qmr.ColorQualityConst.COLOR_VIOLET;
-                case 5:
-                    return qmr.ColorQualityConst.COLOR_CADMIUM;
-                case 6:
-                    return qmr.ColorQualityConst.COLOR_RED;
-                case 7:
-                    return qmr.ColorQualityConst.COLOR_DIAMOND;
-            }
-            return qmr.ColorQualityConst.COLOR_G;
-        };
-        /**
-         * 若类型为8，则1=绿品，2=蓝品，3=紫品，4=金品，5=红品
-         * @desc 根据subType返回日常任务品质颜色
-         */
-        ColorUtil.getColorBySubType = function (subType) {
-            switch (subType) {
-                case 2:
-                    return qmr.ColorQualityConst.COLOR_GREEN;
-                case 3:
-                    return qmr.ColorQualityConst.COLOR_BLUE;
-                case 4:
-                    return qmr.ColorQualityConst.COLOR_VIOLET;
-                case 5:
-                    return qmr.ColorQualityConst.COLOR_CADMIUM;
-                case 6:
-                    return qmr.ColorQualityConst.COLOR_RED;
-            }
-            return qmr.ColorQualityConst.COLOR_G;
-        };
-        ColorUtil.getTipColorByType = function (colorType) {
-            switch (colorType) {
-                case 0:
-                    return 0xFF0000; //红色
-                case 1:
-                    return 0x09a608; //绿色
-            }
-            return 0xffffff; //白色
-        };
-        return ColorUtil;
-    }());
-    qmr.ColorUtil = ColorUtil;
-    __reflect(ColorUtil.prototype, "qmr.ColorUtil");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
     var CommonTool = (function () {
         function CommonTool() {
         }
@@ -7970,66 +7844,165 @@ var qmr;
 var qmr;
 (function (qmr) {
     /**
-     * 各个部位对应的资源加载地址
+     *
+     * @description 动画片段数据，比如某个动画组中的待机动画
+     *
      */
-    var ActorPartResourceDic = (function () {
-        function ActorPartResourceDic() {
-            var partDic = {};
-            partDic[qmr.ActorPart.WEAPON] = qmr.SystemPath.weaponPath;
-            partDic[qmr.ActorPart.WING] = qmr.SystemPath.wingPath;
-            partDic[qmr.ActorPart.HORSE] = qmr.SystemPath.horsePath;
-            partDic[qmr.ActorPart.HORSE_UP] = qmr.SystemPath.horsePath;
-            partDic[qmr.ActorPart.DEFAULT] = qmr.SystemPath.defaultPath;
-            this.partDic = partDic;
-        }
-        ActorPartResourceDic.getInstance = function () {
-            if (ActorPartResourceDic._instance == null) {
-                ActorPartResourceDic._instance = new ActorPartResourceDic();
-            }
-            return ActorPartResourceDic._instance;
-        };
-        return ActorPartResourceDic;
-    }());
-    qmr.ActorPartResourceDic = ActorPartResourceDic;
-    __reflect(ActorPartResourceDic.prototype, "qmr.ActorPartResourceDic");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var DirtyWordsUtils = (function () {
-        function DirtyWordsUtils() {
+    var AnimateData = (function () {
+        function AnimateData(resJson, spriteSheet, autoParseTexture, autoHalfTexture) {
+            if (autoParseTexture === void 0) { autoParseTexture = false; }
+            if (autoHalfTexture === void 0) { autoHalfTexture = false; }
+            this.resJson = resJson;
+            this.spriteSheet = spriteSheet;
+            this.autoHalfTexture = autoHalfTexture;
+            this.autoParseTexture = autoParseTexture;
+            this.framesList = [];
         }
         /**
-         * 是否有敏感词
-         * @param content    要检测的文字
-         * @return        true为有敏感词，false为没有敏感词
+         * @description 解析数据
          */
-        DirtyWordsUtils.hasDirtywords = function (content, callbackF, thisObj) {
-            var time = (new Date().getTime() / 1000 | 0);
-            var contentEncode = encodeURI(content);
-            var sign = encodeURI(qmr.Md5Util.getInstance().hex_md5(content + time));
-            var url = qmr.PlatformManager.instance.platform.dirtyWordCheckUrl
-                + "?time=" + time + "&content=" + contentEncode + "&sign=" + sign;
-            qmr.LogUtil.log("url=", url);
-            qmr.HttpRequest.sendGet(url, function (res) {
-                qmr.LogUtil.log("dirtywords", res);
-                var hasDirty = true;
-                if (res) {
-                    var data = JSON.parse(res);
-                    if (data) {
-                        if (data.ret == 1) {
-                            hasDirty = false;
+        AnimateData.prototype.parseClip = function (spriteJson) {
+            var t = this;
+            var index = 0;
+            var framesList = this.framesList;
+            t._frameRate = parseInt(spriteJson.frameRate);
+            for (var _i = 0, _a = spriteJson.frames; _i < _a.length; _i++) {
+                var item = _a[_i];
+                var duraton = parseInt(item.duration);
+                if (isNaN(duraton))
+                    duraton = 1;
+                for (var i = 1; i <= duraton; i++) {
+                    index += 1;
+                    framesList.push(item);
+                }
+            }
+            if (t.autoParseTexture) {
+                var spriteSheet = t.spriteSheet;
+                var autoHalfTexture = t.autoHalfTexture;
+                for (var _b = 0, framesList_1 = framesList; _b < framesList_1.length; _b++) {
+                    var frameJson = framesList_1[_b];
+                    if (!spriteSheet.getTexture(frameJson.res)) {
+                        var rect = t.resJson[frameJson.res];
+                        if (autoHalfTexture) {
+                            spriteSheet.createTexture(frameJson.res, Math.ceil(rect.x / 2), Math.ceil(rect.y / 2), rect.w >> 1, rect.h >> 1);
+                        }
+                        else {
+                            spriteSheet.createTexture(frameJson.res, rect.x, rect.y, rect.w, rect.h);
                         }
                     }
                 }
-                if (callbackF) {
-                    callbackF.call(thisObj, hasDirty, res.content);
-                }
-            }, this);
+            }
+            t._totalFrames = t.framesList.length;
         };
-        return DirtyWordsUtils;
+        /**
+         * @description 通过起始帧解析数据
+         */
+        AnimateData.prototype.parseClipByStartAndEnd = function (spriteJson, start, end) {
+            var t = this;
+            var index = 0;
+            var framesList = t.framesList;
+            t._frameRate = parseInt(spriteJson.frameRate);
+            for (var _i = 0, _a = spriteJson.frames; _i < _a.length; _i++) {
+                var item = _a[_i];
+                var duraton = parseInt(item.duration);
+                if (isNaN(duraton))
+                    duraton = 1;
+                for (var i = 1; i <= duraton; i++) {
+                    index += 1;
+                    if (index >= start && index <= end) {
+                        framesList.push(item);
+                    }
+                }
+            }
+            //多个动作的资源，消息自己解析贴图
+            // if(t.autoParseTexture) {
+            //     for(let frameJson of framesList) {
+            //         if(!t.spriteSheet.getTexture(frameJson.res)) {
+            //          // this.spriteSheet.createTexture(frameJson.res,this.resJson[frameJson.res].x,this.resJson[frameJson.res].y,this.resJson[frameJson.res].w,this.resJson[frameJson.res].h);
+            //         }
+            //     }
+            // }
+            t._totalFrames = framesList.length;
+        };
+        /**
+         * @description 获取某一帧texture
+         */
+        AnimateData.prototype.getTextureByFrame = function (frame) {
+            var frameJson;
+            var t = this;
+            if (frame <= t.framesList.length) {
+                frameJson = t.framesList[frame - 1];
+            }
+            else {
+                return null;
+            }
+            var texture = t.spriteSheet.getTexture(frameJson.res);
+            if (!texture) {
+                var rect = t.resJson[frameJson.res];
+                texture = t.spriteSheet.createTexture(frameJson.res, rect.x, rect.y, rect.w, rect.h);
+            }
+            return texture;
+        };
+        /**
+         * @description 获取某一帧偏移值
+         */
+        AnimateData.prototype.getOffset = function (frame) {
+            var offset;
+            var framesList = this.framesList;
+            if (frame <= framesList.length) {
+                offset = framesList[frame - 1];
+            }
+            else {
+                offset = framesList[framesList.length - 1];
+            }
+            if (this.autoHalfTexture) {
+                var rect = this.resJson[offset.res];
+                var x = rect.x % 2 ? 1 : 0;
+                var y = rect.y % 2 ? 1 : 0;
+                return { x: offset.x + x, y: offset.y + y, w: (rect.w >> 1) << 1, h: (rect.h >> 1) << 1 };
+            }
+            return offset;
+        };
+        Object.defineProperty(AnimateData.prototype, "totalFrames", {
+            /**
+             * @description 获取总的帧数
+             */
+            get: function () {
+                return this._totalFrames;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(AnimateData.prototype, "halfTexture", {
+            /**
+             * 是方法一倍
+             */
+            get: function () {
+                return this.autoHalfTexture;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(AnimateData.prototype, "frameRate", {
+            /**
+             * @description 获取帧频         */
+            get: function () {
+                return this._frameRate;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * @description 资源释放
+         */
+        AnimateData.prototype.dispos = function () {
+            this.framesList.length = 0;
+            this.framesList = null;
+        };
+        return AnimateData;
     }());
-    qmr.DirtyWordsUtils = DirtyWordsUtils;
-    __reflect(DirtyWordsUtils.prototype, "qmr.DirtyWordsUtils");
+    qmr.AnimateData = AnimateData;
+    __reflect(AnimateData.prototype, "qmr.AnimateData");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -8061,325 +8034,6 @@ var qmr;
     }());
     qmr.DirUtil = DirUtil;
     __reflect(DirUtil.prototype, "qmr.DirUtil");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var DisplayUtils = (function () {
-        function DisplayUtils() {
-        }
-        DisplayUtils.removeAllChild = function (dis) {
-            if (!dis)
-                return;
-            while (dis.numChildren) {
-                var c = dis.removeChildAt(0);
-            }
-        };
-        DisplayUtils.removeDisplay = function (dis, parent) {
-            if (parent === void 0) { parent = null; }
-            if (!dis)
-                return;
-            if (!parent) {
-                parent = dis.parent;
-            }
-            if (!parent)
-                return;
-            parent.removeChild(dis);
-        };
-        DisplayUtils.addDisplayToTop = function (dis, parent) {
-            if (parent === void 0) { parent = null; }
-            if (!dis)
-                return;
-            if (!parent) {
-                parent = dis.parent;
-            }
-            if (!parent)
-                return;
-            parent.addChild(dis);
-        };
-        DisplayUtils.removeClick = function (target) {
-            var tempEvent;
-            for (var name_3 in this.eventDic) {
-                tempEvent = this.eventDic[name_3];
-                if (tempEvent.target == target) {
-                    tempEvent.target.removeEventListener(tempEvent.type, tempEvent.callBack, tempEvent.thisObject);
-                    tempEvent.target.removeEventListener(tempEvent.type, tempEvent.callFunc, tempEvent.thisCall);
-                    delete this.eventDic[name_3];
-                    break;
-                }
-            }
-        };
-        DisplayUtils.removeAllEvent = function (target) {
-            var code = target.hashCode;
-            delete this.eventDic[code + egret.TouchEvent.TOUCH_BEGIN];
-            delete this.eventDic[code + egret.TouchEvent.TOUCH_END];
-            delete this.eventDic[code + egret.TouchEvent.TOUCH_CANCEL];
-            delete this.eventDic[code + egret.TouchEvent.TOUCH_RELEASE_OUTSIDE];
-        };
-        DisplayUtils.addClick = function (target, callBack, thisObject, longPressCallBack) {
-            if (longPressCallBack === void 0) { longPressCallBack = null; }
-            if (!target)
-                return;
-            if (this.eventDic == null) {
-                this.eventDic = {};
-            }
-            if (target instanceof eui.Group) {
-                target.touchChildren = false;
-            }
-            var eventParams = {};
-            eventParams.target = target;
-            eventParams.type = egret.TouchEvent.TOUCH_BEGIN;
-            eventParams.thisObject = thisObject;
-            eventParams.callFunc = this.onTouchBegin;
-            eventParams.longPressCallBack = longPressCallBack;
-            eventParams.thisCall = this;
-            if (target && !this.eventDic[target.hashCode + eventParams.type]) {
-                target.addEventListener(eventParams.type, this.onTouchBegin, this);
-                this.eventDic[target.hashCode + eventParams.type] = eventParams;
-            }
-            var eventParamsEnd = {};
-            eventParamsEnd.target = target;
-            eventParamsEnd.type = egret.TouchEvent.TOUCH_END;
-            eventParamsEnd.callBack = callBack;
-            eventParamsEnd.thisObject = thisObject;
-            eventParamsEnd.callFunc = this.onTouchEnd;
-            eventParamsEnd.thisCall = this;
-            if (target && !this.eventDic[target.hashCode + eventParamsEnd.type]) {
-                target.addEventListener(eventParamsEnd.type, this.onTouchEnd, this);
-                this.eventDic[target.hashCode + eventParamsEnd.type] = eventParamsEnd;
-            }
-            var eventParamsCancel = {};
-            eventParamsCancel.target = target;
-            eventParamsCancel.type = egret.TouchEvent.TOUCH_CANCEL;
-            eventParamsCancel.callBack = callBack;
-            eventParamsCancel.thisObject = thisObject;
-            eventParamsCancel.callFunc = this.onTouchReleaseCancel;
-            eventParamsCancel.thisCall = this;
-            if (target && !this.eventDic[target.hashCode + eventParamsCancel.type]) {
-                target.addEventListener(eventParamsCancel.type, this.onTouchReleaseCancel, this);
-                this.eventDic[target.hashCode + eventParamsCancel.type] = eventParamsCancel;
-            }
-            var eventParamsOutSide = {};
-            eventParamsOutSide.target = target;
-            eventParamsOutSide.type = egret.TouchEvent.TOUCH_RELEASE_OUTSIDE;
-            eventParamsOutSide.thisObject = thisObject;
-            eventParamsOutSide.callFunc = this.onTouchReleaseOutSide;
-            eventParamsOutSide.thisCall = this;
-            if (target && !this.eventDic[target.hashCode + eventParamsOutSide.type]) {
-                target.addEventListener(eventParamsOutSide.type, this.onTouchReleaseOutSide, this);
-                this.eventDic[target.hashCode + eventParamsOutSide.type] = eventParamsOutSide;
-            }
-        };
-        /**
-         * @description 当点击开始
-         */
-        DisplayUtils.onTouchBegin = function (evt) {
-            if (this.touchBeginTaret && this.touchBeginTaret == evt.target) {
-                return;
-            }
-            if ((egret.getTimer() - this.lastTime) < 300) {
-                return;
-            }
-            this.touchBeginTaret = evt.target;
-            this.lastTime = egret.getTimer();
-            egret.Tween.get(evt.target).to({ scaleX: 1.1, scaleY: 1.1 }, 50);
-            qmr.Ticker.getInstance().registerTick(this.longPress, this, 300);
-        };
-        /**
-         * @description 当点击结束
-         */
-        DisplayUtils.onTouchEnd = function (evt) {
-            var t = this;
-            var target = evt.target;
-            if (this.touchBeginTaret != target)
-                return;
-            this.touchBeginTaret = null;
-            egret.Tween.get(target).to({ scaleX: 1, scaleY: 1 }, 50).call(function () {
-                for (var key in t.eventDic) {
-                    var eventParams = t.eventDic[key];
-                    if (eventParams.target == target && eventParams.type == egret.TouchEvent.TOUCH_END) {
-                        eventParams.callBack.call(eventParams.thisObject);
-                    }
-                }
-            }, this);
-            qmr.Ticker.getInstance().unRegisterTick(this.longPress, this);
-        };
-        /**
-         * @description 当点击结束的时候，按钮不在被点击的对象上
-         */
-        DisplayUtils.onTouchReleaseCancel = function (evt) {
-            if (this.touchBeginTaret != evt.currentTarget)
-                return;
-            this.touchBeginTaret && egret.Tween.removeTweens(this.touchBeginTaret);
-            this.touchBeginTaret = null;
-            evt.currentTarget.scaleX = 1;
-            evt.currentTarget.scaleY = 1;
-        };
-        /**
-         * @description 当点击结束的时候，按钮不在被点击的对象上
-         */
-        DisplayUtils.onTouchReleaseOutSide = function (evt) {
-            if (this.touchBeginTaret != evt.target)
-                return;
-            this.touchBeginTaret && egret.Tween.removeTweens(this.touchBeginTaret);
-            this.touchBeginTaret = null;
-            evt.target.scaleX = 1;
-            evt.target.scaleY = 1;
-        };
-        DisplayUtils.longPress = function () {
-            var t = this;
-            for (var key in t.eventDic) {
-                var eventParams = t.eventDic[key];
-                if (eventParams.target == this.touchBeginTaret && eventParams.longPressCallBack) {
-                    eventParams.longPressCallBack.call(eventParams.thisObject);
-                }
-            }
-        };
-        /**
-         * 发光某个对象
-         */
-        DisplayUtils.setGlow = function (obj, isGrey) {
-            if (isGrey) {
-                if (!obj.filters || obj.filters.length == 0) {
-                    obj.filters = [qmr.FilterUtil.glowFilter];
-                }
-            }
-            else {
-                obj.filters = [];
-            }
-        };
-        /**
-         * 置灰某个对象,设置按钮不用滤镜了，用setBtnGray 方法
-         */
-        DisplayUtils.setGrey = function (obj, isGrey, isSetEnabled) {
-            if (isSetEnabled === void 0) { isSetEnabled = true; }
-            if (obj instanceof eui.Button && isSetEnabled) {
-                obj.enabled = !isGrey;
-                return;
-            }
-            if (isGrey) {
-                if (!obj.filters || obj.filters.length == 0) {
-                    obj.filters = [qmr.FilterUtil.grayFilter];
-                }
-                if (isSetEnabled)
-                    obj.touchEnabled = false;
-            }
-            else {
-                obj.filters = [];
-                if (isSetEnabled)
-                    obj.touchEnabled = true;
-            }
-        };
-        /**
-         * 置灰某个对象
-         */
-        DisplayUtils.setBtnGray = function (obj, isGray, isSetEnabled, btnSkinType) {
-            if (isSetEnabled === void 0) { isSetEnabled = true; }
-            if (btnSkinType === void 0) { btnSkinType = 1; }
-            if (isGray) {
-                if (isSetEnabled) {
-                    obj.currentState = "disabled";
-                    obj.touchEnabled = false;
-                }
-                else
-                    obj.skinName = DisplayUtils.getBtnSkin(btnSkinType, isGray);
-            }
-            else {
-                if (isSetEnabled)
-                    obj.currentState = "up";
-                else
-                    obj.skinName = DisplayUtils.getBtnSkin(btnSkinType, isGray);
-                obj.touchEnabled = true;
-            }
-        };
-        DisplayUtils.getBtnSkin = function (btnSkinType, isGray) {
-            var skin = "ButtonYellowSkin";
-            switch (btnSkinType) {
-                case qmr.BtnSkinType.Type_1:
-                    skin = isGray ? "ButtonYellowDisabledSkin" : "ButtonYellowSkin";
-                    break;
-                case qmr.BtnSkinType.Type_2:
-                    skin = isGray ? "ButtonYellowDisabledSkin1" : "ButtonYellowSkin1";
-                    break;
-            }
-            return skin;
-        };
-        /**
-          * 置灰一组对象
-          */
-        DisplayUtils.setGreyGoup = function (objGoup, isGrey) {
-            var _this = this;
-            objGoup.forEach(function (element) {
-                _this.setGrey(element, isGrey);
-            });
-        };
-        /**
-         * 设置不可选
-         */
-        DisplayUtils.setDisable = function (obj, isDisable) {
-            this.setGrey(obj, isDisable);
-            obj.touchEnabled = !isDisable;
-        };
-        //设置一个对象为相对于上个容器位置
-        DisplayUtils.LoadResByNameAndWH = function (obj, objParent, width, height, x, y) {
-            if (x === void 0) { x = 50; }
-            if (y === void 0) { y = 50; }
-            obj.width = width;
-            obj.height = height;
-            obj.anchorOffsetX = obj.width / 2;
-            obj.anchorOffsetY = obj.height / 2;
-            obj.x = (objParent.width / 100) * x;
-            obj.y = (objParent.height / 100) * y;
-            return obj;
-        };
-        /**
-         * 更新星星方法
-         * max-星星组
-         * lightNum-当前要亮的星数
-         */
-        DisplayUtils.updateStar = function (starGroup, lightNum) {
-            var num = starGroup.numChildren;
-            var star;
-            for (var i = 0; i < num; i++) {
-                star = starGroup.getChildAt(i);
-                if (i < lightNum)
-                    star.imgStar.visible = true;
-                else
-                    star.imgStar.visible = false;
-            }
-        };
-        /**
-         * 获取一个对象全局坐标点
-         */
-        DisplayUtils.getGlobelPoint = function (target) {
-            if (target.parent) {
-                return target.parent.localToGlobal(target.x, target.y);
-            }
-            return null;
-        };
-        return DisplayUtils;
-    }());
-    qmr.DisplayUtils = DisplayUtils;
-    __reflect(DisplayUtils.prototype, "qmr.DisplayUtils");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var FilterUtil = (function () {
-        function FilterUtil() {
-        }
-        /**
-         * 灰态
-         */
-        FilterUtil.grayFilter = new egret.ColorMatrixFilter([
-            0.3, 0.6, 0, 0, 0,
-            0.3, 0.6, 0, 0, 0,
-            0.3, 0.6, 0, 0, 0,
-            0, 0, 0, 1, 0
-        ]);
-        FilterUtil.glowFilter = new egret.GlowFilter(0xfff200, 0.8, 35, 35, 2, 3 /* HIGH */, false, false);
-        return FilterUtil;
-    }());
-    qmr.FilterUtil = FilterUtil;
-    __reflect(FilterUtil.prototype, "qmr.FilterUtil");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -8552,10 +8206,6 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    /**
-     * coler
-     * int64方法
-     */
     var Int64Util = (function () {
         function Int64Util() {
         }
@@ -8600,218 +8250,6 @@ var qmr;
         return "S" + server + "." + name;
     }
     qmr.getServerNickName = getServerNickName;
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var JsUtil = (function () {
-        function JsUtil() {
-        }
-        //获取QueryString的数组 
-        JsUtil.getQueryString = function () {
-            var result = location.search.match(new RegExp("[\?\&][^\?\&]+=[^\?\&]+", "g"));
-            for (var i = 0; i < result.length; i++) {
-                result[i] = result[i].substring(1);
-            }
-            return result;
-        };
-        //根据QueryString参数名称获取值
-        JsUtil.getQueryStringByName = function (name) {
-            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
-            if (result == null || result.length < 1) {
-                return "";
-            }
-            return result[1];
-        };
-        //根据QueryString参数索引获取值 
-        JsUtil.getQueryStringByIndex = function (index) {
-            if (index == null) {
-                return "";
-            }
-            var queryStringList = JsUtil.getQueryString();
-            if (index >= queryStringList.length) {
-                return "";
-            }
-            var result = queryStringList[index];
-            var startIndex = result.indexOf("=") + 1;
-            result = result.substring(startIndex);
-            return result;
-        };
-        /**
-         * limit=1&h5limit=2
-         * @param valueName
-         * @param params
-         */
-        JsUtil.getValueFromParams = function (valueName, params) {
-            var reg = new RegExp("(^|&)" + valueName + "=([^&]*)(&|$)", "i");
-            if (params) {
-                var r = params.match(reg);
-                if (r) {
-                    return decodeURIComponent(r[2]); //unescape
-                }
-            }
-            return null;
-        };
-        return JsUtil;
-    }());
-    qmr.JsUtil = JsUtil;
-    __reflect(JsUtil.prototype, "qmr.JsUtil");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var LabelTip = (function () {
-        function LabelTip() {
-        }
-        LabelTip.getInstance = function () {
-            if (!LabelTip.instance) {
-                LabelTip.instance = new LabelTip();
-            }
-            return LabelTip.instance;
-        };
-        return LabelTip;
-    }());
-    qmr.LabelTip = LabelTip;
-    __reflect(LabelTip.prototype, "qmr.LabelTip");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var LabelUtil = (function () {
-        function LabelUtil() {
-        }
-        LabelUtil.addInputListener = function (textInput, thisObject) {
-            textInput.addEventListener(egret.FocusEvent.FOCUS_IN, LabelUtil.focusInTxtHandler, thisObject);
-            textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, LabelUtil.focusInTxtHandler, thisObject);
-        };
-        LabelUtil.removeInputListener = function (textInput, thisObject) {
-            textInput.addEventListener(egret.FocusEvent.FOCUS_IN, LabelUtil.focusInTxtHandler, thisObject);
-            textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, LabelUtil.focusInTxtHandler, thisObject);
-        };
-        LabelUtil.focusInTxtHandler = function () {
-            var inputFocus = function () {
-                if (document && document.body) {
-                    setTimeout(function () {
-                        if (window.scrollTo) {
-                            window.scrollTo(0, document.body.clientHeight);
-                        }
-                    }, 400);
-                }
-            };
-            inputFocus();
-        };
-        return LabelUtil;
-    }());
-    qmr.LabelUtil = LabelUtil;
-    __reflect(LabelUtil.prototype, "qmr.LabelUtil");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    /**
-     * 实现一个简单的链表结构
-     */
-    var LinkedList = (function () {
-        function LinkedList() {
-            this.nodeLen = 0; //节点长度
-        }
-        /**
-         * 添加一个节点
-         */
-        LinkedList.prototype.append = function (element) {
-            var node = new LinkNode(element);
-            var current;
-            if (!this._head) {
-                this._head = node;
-            }
-            else {
-                current = this._head;
-                while (current.next) {
-                    current = current.next;
-                }
-                current.next = node; //放到链表尾
-            }
-            this.nodeLen += 1;
-        };
-        /**获取节点索引*/
-        LinkedList.prototype.indexOf = function (element) {
-            if (!this._head)
-                return -1;
-            var index = -1;
-            var current = this._head;
-            while (current) {
-                index += 1;
-                if (current.current === element) {
-                    return index;
-                }
-                current = current.next;
-            }
-            return -1;
-        };
-        /**
-         * 移除某个索引位置的节点
-         */
-        LinkedList.prototype.removeAt = function (pos) {
-            if (!this._head)
-                return;
-            if (pos > -1 && pos < this.size) {
-                if (pos == 0) {
-                    this._head = this._head.next;
-                }
-                else {
-                    var currentNode = this.getNodeAt(pos);
-                    var prevNode = this.getNodeAt(pos - 1);
-                    if (currentNode && prevNode) {
-                        prevNode.next = currentNode.next;
-                    }
-                }
-                this.nodeLen -= 1;
-            }
-        };
-        /**
-         * 获取某个索引下的节点
-         */
-        LinkedList.prototype.getNodeAt = function (index) {
-            if (!this._head)
-                return null;
-            var current = this._head;
-            var ind = -1;
-            while (current) {
-                ind += 1;
-                if (ind === index) {
-                    return current;
-                }
-                current = current.next;
-            }
-            return null;
-        };
-        Object.defineProperty(LinkedList.prototype, "head", {
-            /**获取一个头节点*/
-            get: function () {
-                return this._head;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(LinkedList.prototype, "size", {
-            /**节点长度*/
-            get: function () {
-                return this.nodeLen;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return LinkedList;
-    }());
-    qmr.LinkedList = LinkedList;
-    __reflect(LinkedList.prototype, "qmr.LinkedList");
-    /**
-     * 链表中的节点
-     */
-    var LinkNode = (function () {
-        function LinkNode(element) {
-            this.current = element;
-        }
-        return LinkNode;
-    }());
-    qmr.LinkNode = LinkNode;
-    __reflect(LinkNode.prototype, "qmr.LinkNode");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -8871,130 +8309,6 @@ var qmr;
     }());
     qmr.LogUtil = LogUtil;
     __reflect(LogUtil.prototype, "qmr.LogUtil");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var MathUtil = (function () {
-        function MathUtil() {
-        }
-        /**
-         * 曼哈顿启发函数<br/>
-         * 用此启发函数在八向寻路中找到的并不是最优路径,因为它的运算结果可能远远大于开始结点到目标结点的距离,
-         * 但是此启发函数的运算速度非常快
-         * @param x1 节点1x
-         * @param y1 节点1y
-         * @param x2 节点2x
-         * @param y2 节点2y
-         * @return
-         *
-         */
-        MathUtil.manhattan = function (x1, y1, x2, y2) {
-            return ((x1 > x2 ? x1 - x2 : x2 - x1)
-                +
-                    (y1 > y2 ? y1 - y2 : y2 - y1)) * 100;
-        };
-        /**
-         * @description 获取两个对象之间的直线距离
-         */
-        MathUtil.distance = function (source, target) {
-            if (target && source) {
-                return Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2));
-            }
-            return 0;
-        };
-        /**获取2点的角度 item -> ItemPre*/
-        MathUtil.getAngle = function (itemPre, item) {
-            var dx = item.x - itemPre.x;
-            var dy = item.y - itemPre.y;
-            return Math.atan2(dy, dx) * 180 / Math.PI;
-        };
-        /**
-         * @description 比较两个64位的数字是否相等
-         */
-        MathUtil.equal = function (a, b) {
-            if (a && b) {
-                if (a["high"] && b["high"]) {
-                    if (a.high == b.high && a.low == b.low) {
-                        return true;
-                    }
-                }
-                else {
-                    if (a * 1000 / 1000 == b * 1000 / 1000) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        };
-        /**
-         * @description 获取两个数之间的
-         */
-        MathUtil.randomCount = function (min, max) {
-            return min + Math.round(Math.random() * (max - min));
-        };
-        /**
-         * @description 获取目标对象相对源对象之间的方向,八方向
-         */
-        MathUtil.dir = function (source, target) {
-            if (target) {
-                if (Math.abs(target.y - source.y) < 10) {
-                    if (target.x > source.x) {
-                        return qmr.DirUtil.RIGHT;
-                    }
-                    else {
-                        return qmr.DirUtil.LEFT;
-                    }
-                }
-                else {
-                    if (target.y < source.y) {
-                        if (Math.abs(target.x - source.x) < 10) {
-                            return qmr.DirUtil.UP;
-                        }
-                        else {
-                            if (target.x > source.x) {
-                                return qmr.DirUtil.RIGHT_UP;
-                            }
-                            else {
-                                return qmr.DirUtil.LEFT_UP;
-                            }
-                        }
-                    }
-                    else {
-                        if (Math.abs(target.x - source.x) < 10) {
-                            return qmr.DirUtil.DOWN;
-                        }
-                        else {
-                            if (target.x > source.x) {
-                                return qmr.DirUtil.RIGHT_DOWN;
-                            }
-                            else {
-                                return qmr.DirUtil.LEFT_DOWN;
-                            }
-                        }
-                    }
-                }
-            }
-            return 1;
-        };
-        //@description 定义几个随机点，用于温泉泡澡的ab区域游泳
-        MathUtil.getRodomPos = function (area) {
-            var arrayA = [[1040, 1122], [997, 1283], [870, 1033], [1124, 969], [1216, 1407]];
-            var arrayB = [[1470, 1260], [1394, 1068], [1432, 1241], [1537, 1035,], [1473, 1308]];
-            var array = (area == 1) ? arrayA : arrayB;
-            var random = Math.round(Math.random() * (array.length - 1));
-            return { x: array[random][0], y: array[random][1] };
-        };
-        /** 获得一定范围的高斯随机数 */
-        MathUtil.getGaussianPoint = function (xRange, yRange) {
-            var res = new egret.Point();
-            res.x = Math.random() * (xRange / 2) + Math.random() * (xRange / 2);
-            res.y = Math.random() * (yRange / 2) + Math.random() * (yRange / 2);
-            return res;
-        };
-        return MathUtil;
-    }());
-    qmr.MathUtil = MathUtil;
-    __reflect(MathUtil.prototype, "qmr.MathUtil");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -9455,85 +8769,6 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var RegexpUtil = (function () {
-        function RegexpUtil() {
-        }
-        // 手机号校验
-        RegexpUtil.isPhoneNumber = function (phoneNum) {
-            // let let reg = /^[1][3,4,5,7,8,9][0-9]{9}$/;
-            /*
-            * 移动号码包括的号段：134/135/136/137,138,139；
-            *                     147/148(物联卡号)；
-            *                     150/151/152/157/158/159；
-            *                     165（虚拟运营商）；
-            *                     1703/1705/1706（虚拟运营商）、178；
-            *                     182/183/184/187/188
-            *                     198
-
-            * 联通号段包括：130/131
-            *               145
-            *               155/156
-            *               166/167(虚拟运营商)
-            *               1704/1707/1708/1709、171
-            *               186/186
-            *
-            * 电信号段包括： 133
-            *                153
-            *                162(虚拟运营商)
-            *                1700/1701/1702(虚拟运营商)
-            *                180/181/189
-            *                191/199
-            * */
-            var reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
-            return reg.test(phoneNum);
-        };
-        return RegexpUtil;
-    }());
-    qmr.RegexpUtil = RegexpUtil;
-    __reflect(RegexpUtil.prototype, "qmr.RegexpUtil");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    /**
-     * @description 系统设置的一个工具类
-     */
-    var SettingUtil = (function () {
-        function SettingUtil() {
-            this.sVariantType = 0;
-            var flag = egret.localStorage.getItem(qmr.PlatformConfig.channelId + "zgmrsetting" + qmr.GlobalConfig.userId);
-            if (flag && flag != "undefined") {
-                this.sVariantType = parseInt(flag);
-            }
-        }
-        /**
-         * @description 获取单例对象
-         */
-        SettingUtil.getInstance = function () {
-            if (SettingUtil.instance == null) {
-                SettingUtil.instance = new SettingUtil();
-            }
-            return SettingUtil.instance;
-        };
-        /**
-         * @description 根据类型获取是否是屏蔽状态
-         */
-        SettingUtil.prototype.getForbidState = function (bit) {
-            return qmr.BitUtil.checkAvalibe(this.sVariantType, bit);
-        };
-        /**
-         * @description 设置某一位的屏蔽状态
-         */
-        SettingUtil.prototype.setForbidState = function (bit, value) {
-            this.sVariantType = qmr.BitUtil.changeBit(this.sVariantType, bit, value);
-            egret.localStorage.setItem(qmr.PlatformConfig.channelId + "zgmrsetting" + qmr.GlobalConfig.userId, this.sVariantType + "");
-        };
-        return SettingUtil;
-    }());
-    qmr.SettingUtil = SettingUtil;
-    __reflect(SettingUtil.prototype, "qmr.SettingUtil");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
     var StageUtil = (function () {
         function StageUtil() {
         }
@@ -9665,32 +8900,6 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var StringUtilsBase = (function () {
-        function StringUtilsBase() {
-        }
-        /**
-         * {0}{1}....
-         *
-         */
-        StringUtilsBase.getmsg = function () {
-            var arg = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                arg[_i] = arguments[_i];
-            }
-            var s = arg.shift();
-            for (var key in arg) {
-                var value = arg[key];
-                s = s.replace(/\{\d+\}/, value);
-            }
-            return s;
-        };
-        return StringUtilsBase;
-    }());
-    qmr.StringUtilsBase = StringUtilsBase;
-    __reflect(StringUtilsBase.prototype, "qmr.StringUtilsBase");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
     /**
      *
      * @description 系统路径类枚举
@@ -9771,849 +8980,6 @@ var qmr;
     qmr.SystemPath = SystemPath;
     __reflect(SystemPath.prototype, "qmr.SystemPath");
 })(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    /**
-     * 功能：文本框显示宽度固定。
-     * 根据字符数量控制文本框的宽度和scale
-     */
-    var TextFixWidthUtil = (function () {
-        function TextFixWidthUtil() {
-        }
-        TextFixWidthUtil.getInstance = function () {
-            if (this._instance == null) {
-                this._instance = new TextFixWidthUtil();
-            }
-            return this._instance;
-        };
-        TextFixWidthUtil.prototype.strlen = function (str) {
-            var len = 0;
-            for (var i = 0; i < str.length; i++) {
-                var c = str.charCodeAt(i);
-                //单字节加1   
-                if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
-                    len++;
-                }
-                else {
-                    len += 2;
-                }
-            }
-            return len;
-        };
-        TextFixWidthUtil.prototype.fixTextBox = function (fixWidth, label) {
-            if (label.textWidth > fixWidth) {
-                var scale = (fixWidth) / label.textWidth;
-                label.width = Math.ceil(label.textWidth);
-                label.scaleX = scale;
-                return true;
-            }
-            return false;
-        };
-        return TextFixWidthUtil;
-    }());
-    qmr.TextFixWidthUtil = TextFixWidthUtil;
-    __reflect(TextFixWidthUtil.prototype, "qmr.TextFixWidthUtil");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var TickTool = (function () {
-        /**
-         * label 更改的文本
-         * des 描述
-         * thisObj 对象
-         */
-        function TickTool(label, des, thisObj) {
-            if (label === void 0) { label = null; }
-            if (des === void 0) { des = null; }
-            this.label = label;
-            this.des = des;
-            this.thisObj = thisObj;
-        }
-        /** 按钮描述 */
-        TickTool.prototype.setDes = function (des) {
-            this.des = des;
-        };
-        TickTool.prototype.startTick = function (count, gap) {
-            if (gap === void 0) { gap = 1000; }
-            this.runing = true;
-            this.count = count;
-            qmr.Ticker.getInstance().registerTick(this.tick, this, gap);
-            this.showMsg();
-        };
-        TickTool.prototype.tick = function () {
-            if (this.count-- < 1) {
-                this.stopTick();
-                if (this.backFun) {
-                    this.backFun.call(this.thisObj);
-                }
-                return;
-            }
-            if (this.updateFun) {
-                this.updateFun.call(this.thisObj);
-            }
-            this.showMsg();
-        };
-        TickTool.prototype.showMsg = function () {
-            if (this.label) {
-                if (this.des) {
-                    this.label.text = qmr.CommonTool.getMsg(this.des, this.count);
-                }
-            }
-            if (this.btn) {
-                if (this.des) {
-                    this.btn.label = qmr.CommonTool.getMsg(this.des, this.count);
-                }
-            }
-        };
-        TickTool.prototype.stopTick = function () {
-            if (!this.runing) {
-                return;
-            }
-            this.runing = false;
-            qmr.Ticker.getInstance().unRegisterTick(this.tick, this);
-        };
-        return TickTool;
-    }());
-    qmr.TickTool = TickTool;
-    __reflect(TickTool.prototype, "qmr.TickTool");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    /*
-    * name;
-    */
-    var TimeUtil = (function () {
-        function TimeUtil() {
-        }
-        /**
-         * 获取服务器时间，返回当前秒数(本机时间，所有活动计算时差请用getZoneOffsetSeverSecond方法)
-         * @return
-         *
-         */
-        TimeUtil.getServerSecond = function () {
-            return Math.floor((egret.getTimer() + this.tickOffset) / 1000);
-        };
-        Object.defineProperty(TimeUtil, "serverTime", {
-            /**
-             *  获取服务器时间，返回毫秒
-             * @return
-             */
-            get: function () {
-                return (egret.getTimer() + this.tickOffset);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * 获得服务器Unix时间，返回Date
-         */
-        TimeUtil.getSeverDate = function () {
-            return (new Date(this.getServerSecond() * 1000));
-        };
-        /**
-         * 获得服务器显示时间
-         */
-        TimeUtil.getZoneOffsetSeverDate = function () {
-            return new Date(this.getZoneOffsetSeverSecond() * 1000);
-        };
-        /**
-         * 获得服务器，显示秒
-         */
-        TimeUtil.getZoneOffsetSeverSecond = function () {
-            return this.getServerSecond();
-        };
-        TimeUtil.syncServerTime = function (timeStamp) {
-            this.tickOffset = timeStamp - egret.getTimer();
-            // console.log("tickOffset:",this.tickOffset);
-            // console.log("serverTime:",new Date(timeStamp).toString());
-            // console.log("ServerSecond:",this.getServerSecond());
-        };
-        /**
-         * 根据时间返回字符串时间
-         * */
-        TimeUtil.getTimeBySecond = function (second) {
-            var str = "";
-            if (second >= 60) {
-                str = this.dateStringFillZero(Math.floor(second / 60)) + ":";
-            }
-            str += this.dateStringFillZero(Math.floor(second % 60));
-            return str;
-        };
-        TimeUtil.getDateByTimer = function (time) {
-            if (!TimeUtil.date) {
-                TimeUtil.date = new Date();
-            }
-            TimeUtil.date.setTime(time);
-            var year = TimeUtil.date.getFullYear();
-            var month = TimeUtil.date.getMonth() + 1;
-            var day = TimeUtil.date.getDate();
-            var hour = TimeUtil.date.getHours();
-            var min = TimeUtil.date.getMinutes();
-            var sec = TimeUtil.date.getSeconds();
-            var monthStr = month < 10 ? ("0" + month) : month.toString();
-            var dayStr = day < 10 ? ("0" + day) : day.toString();
-            var hourStr = hour < 10 ? ("0" + hour) : hour.toString();
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            return year + "-" + month + "-" + day + " " + hourStr + ":" + minStr + ":" + secStr;
-        };
-        /**
-         * 根据时间戳返回字符串 xxxx-xx-xx 00:00:00
-         * @time 秒
-         */
-        TimeUtil.getDateByTimerSecond = function (time) {
-            return TimeUtil.getDateByTimer(time * 1000);
-        };
-        /**
-         * 获取当前时间到明天00:00:00还有多少秒
-         */
-        TimeUtil.getDayOverTime = function () {
-            var date = this.getSeverDate();
-            var toDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-            return (toDate.getTime() - date.getTime()) / 1000;
-        };
-        /**
-         * 获取当前时间点
-         */
-        TimeUtil.getDayTime = function () {
-            var date = this.getSeverDate();
-            var toDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            return (date.getTime() - toDate.getTime()) / 1000;
-        };
-        /**
-         * 转换成今天的时间点
-         */
-        TimeUtil.getTimeToNow = function (time) {
-            var date = new Date(time);
-            var toDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            return (date.getTime() - toDate.getTime()) / 1000;
-        };
-        /**
-         * 根据时间返回字符串 00:00:00
-         */
-        TimeUtil.formatDate = function (date) {
-            var hour = date.getHours();
-            var min = date.getMinutes();
-            var sec = date.getMilliseconds();
-            var hourStr = hour < 10 ? ("0" + hour) : hour.toString();
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            return hourStr + ":" + minStr + ":" + secStr;
-        };
-        /**
-         * 根据时间返回字符串 00:00:00,超过24小时，只会显示超过的时间
-         */
-        TimeUtil.formatTime = function (second) {
-            var hour = Math.floor(second / 60 / 60) % 24;
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            var hourStr = hour < 10 ? ("0" + hour) : hour.toString();
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            return hourStr + ":" + minStr + ":" + secStr;
-        };
-        /**
-         * 根据时间返回字符串 00:00:00
-         */
-        TimeUtil.formatTime1 = function (second) {
-            var hour = Math.floor(second / 60 / 60);
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            var hourStr = hour < 10 ? ("0" + hour) : hour.toString();
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            return hourStr + ":" + minStr + ":" + secStr;
-        };
-        /**
-         * 小时分钟
-         * @param second
-         * @return
-         */
-        TimeUtil.formatTime4 = function (second) {
-            var hour = Math.floor(second / 60 / 60) % 24;
-            var min = Math.floor(second / 60) % 60;
-            var hourStr = hour < 10 ? ("" + hour) : hour.toString();
-            var minStr = min < 10 ? ("" + min) : min.toString();
-            return hourStr + this.CN_HOUR + minStr + this.CN_MIN;
-        };
-        /**
-             *根据时间返回字符串 00分00秒
-         */
-        TimeUtil.formatTime5 = function (second) {
-            var hour = Math.floor(second / 60 / 60) % 24;
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            var hourStr = hour < 10 ? ("0" + hour) : hour.toString();
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            if (hour > 0) {
-                return hourStr + this.CN_HOUR + minStr + this.CN_MIN + secStr + this.CN_SEC;
-            }
-            return minStr + this.CN_MIN + " " + secStr + this.CN_SEC;
-        };
-        /**
-         * 根据时间返回字符串 00:00
-         */
-        TimeUtil.formatTime2 = function (second) {
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            return (minStr + ":" + secStr);
-        };
-        /**
-         * 根据时间返回字符串 00:00:00
-         */
-        TimeUtil.formatTime3 = function (second) {
-            var day = Math.floor(second / 60 / 60 / 24);
-            var hour = Math.floor(second / 60 / 60) % 24 + day * 24;
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            var hourStr = hour < 10 ? ("0" + hour) : hour.toString();
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            return hourStr + ":" + minStr + ":" + secStr;
-        };
-        /**
-         * 根据时间返回字符串 xx分xx秒
-         */
-        TimeUtil.formatTime6 = function (second) {
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            return (minStr + "分" + secStr + "秒");
-        };
-        /** 00:00 一天当中的多少小时分钟 */
-        TimeUtil.formatTime7 = function (second) {
-            var date = new Date(second);
-            var min = date.getMinutes();
-            var hour = date.getHours();
-            var hourStr = hour < 10 ? ("0" + hour) : hour.toString();
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            return hourStr + ":" + minStr;
-        };
-        /**
-         * 格式化数据网格列日期 MM-DD JJ:NN
-         */
-        TimeUtil.formatColumnDate = function (tempDate) {
-            var m = ((tempDate.getMonth() + 1 < 10) ? "0" : "") + (tempDate.getMonth() + 1);
-            var day = ((tempDate.getDate() < 10) ? "0" : "") + tempDate.getDate();
-            var rect = "";
-            rect += m + "-" + day + " ";
-            rect += ((tempDate.getHours() < 10) ? "0" : "") + tempDate.getHours();
-            rect += ":";
-            rect += ((tempDate.getMinutes() < 10) ? "0" : "") + tempDate.getMinutes();
-            return rect;
-        };
-        /**
-         *
-         * @param date
-         * @return
-         * 2012/12/12 12:12
-         */
-        TimeUtil.formatDate1 = function (date) {
-            var year = date.getFullYear().toString();
-            var month = ((date.getMonth() + 1 < 10) ? "0" : "") + (date.getMonth() + 1);
-            var day = ((date.getDate() < 10) ? "0" : "") + date.getDate();
-            var hour = date.getHours() < 10 ? ("0" + date.getHours()) : date.getHours().toString();
-            var min = date.getMinutes() < 10 ? ("0" + date.getMinutes()) : date.getMinutes().toString();
-            return year + "/" + month + "/" + day + " " + hour + ":" + min;
-        };
-        /**
-         * XX年XX月XX日
-         */
-        TimeUtil.formatYMD = function (date) {
-            var time = date.getFullYear() + this.CN_YEAR
-                + (date.getMonth() + 1) + this.CN_MONTH
-                + date.getDate() + this.CN_SUN;
-            return time;
-        };
-        /**
-         * 显示时间（英文格式）月/日/年
-         * @return
-         */
-        TimeUtil.formatYMDForEn = function (date) {
-            var time = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
-            return time;
-        };
-        /**
-         * 年/月/日（例：2012/12/12）
-         */
-        TimeUtil.formatYMD1 = function (date) {
-            var time = date.getFullYear() + "/"
-                + (date.getMonth() + 1) + "/"
-                + date.getDate() + "/";
-            return time;
-        };
-        /**
-         * XX天XX时XX分XX秒
-         */
-        TimeUtil.formatRemain = function (second) {
-            var day = Math.floor(second / 60 / 60 / 24);
-            var hour = Math.floor(second / 60 / 60) % 24;
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            return day + this.CN_DAY + " " + hour + this.CN_HOUR + " " + min + this.CN_MIN + " " + sec + this.CN_SEC;
-        };
-        /**
-         * XX天XX时XX分
-         */
-        TimeUtil.formatRemain1 = function (second) {
-            var day = Math.floor(second / 60 / 60 / 24);
-            var hour = Math.floor(second / 60 / 60) % 24;
-            var min = Math.floor(second / 60) % 60;
-            return day + this.CN_DAY + hour + this.CN_HOUR + min + this.CN_MIN;
-        };
-        TimeUtil.formatRemain3 = function (second) {
-            var hour = Math.floor(second / 60 / 60) % 24;
-            var min = Math.floor(second / 60) % 60;
-            return hour + " " + this.CN_HOUR + " " + min + " " + this.CN_MIN;
-        };
-        /**
-         *
-         * @param second
-         * @return [day,hour,min]
-         *
-         */
-        TimeUtil.formatRemain2 = function (second) {
-            var day = Math.floor(second / 60 / 60 / 24);
-            var hour = Math.floor(second / 60 / 60) % 24;
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            return [day, hour, min];
-        };
-        /**
-         * 返回不为0的格式
-         */
-        TimeUtil.formatRemain4 = function (second) {
-            var str = "";
-            var getZeroize = TimeUtil.getZeroize;
-            var day = Math.floor(second / 60 / 60 / 24);
-            if (day != 0) {
-                str += getZeroize(day) + this.CN_DAY;
-            }
-            var hour = Math.floor(second / 60 / 60) % 24;
-            if (hour != 0) {
-                str += getZeroize(hour) + this.CN_HOUR;
-            }
-            var min = Math.floor(second / 60) % 60;
-            if (min != 0) {
-                str += getZeroize(min) + this.CN_MIN;
-            }
-            var sec = Math.floor(second % 60);
-            if (sec != 0) {
-                str += getZeroize(sec) + this.CN_SEC;
-            }
-            return str;
-        };
-        /**
-         * xxd,xxh,xxm,xxs
-         */
-        TimeUtil.formatRemain5 = function (second) {
-            var day = Math.floor(second / 60 / 60 / 24);
-            if (day != 0) {
-                return day + "d";
-            }
-            var hour = Math.floor(second / 60 / 60) % 24;
-            if (hour != 0) {
-                return hour + "h";
-            }
-            var min = Math.floor(second / 60) % 60;
-            if (min != 0) {
-                return min + "m";
-            }
-            var sec = Math.floor(second % 60);
-            if (sec != 0) {
-                return sec + "s";
-            }
-            return "";
-        };
-        /**
-         *  xd 00:00:00
-         */
-        TimeUtil.formatRemain6 = function (second) {
-            var str = "";
-            var getZeroize = TimeUtil.getZeroize;
-            var day = Math.floor(second / 60 / 60 / 24);
-            if (day != 0) {
-                str += day + this.CN_DAY + " ";
-            }
-            var hour = Math.floor(second / 60 / 60) % 24;
-            if (hour != 0) {
-                str += getZeroize(hour) + ":";
-            }
-            else {
-                str += "00" + ":";
-            }
-            var min = Math.floor(second / 60) % 60;
-            if (min != 0) {
-                str += getZeroize(min) + ":";
-            }
-            else {
-                str += "00" + ":";
-            }
-            var sec = Math.floor(second % 60);
-            if (sec != 0) {
-                str += getZeroize(sec);
-            }
-            else {
-                str += "00";
-            }
-            return str;
-        };
-        /**
-         *  xd 00:00:00 / 00:00
-         */
-        TimeUtil.formatRemain7 = function (second) {
-            var str = "";
-            var getZeroize = TimeUtil.getZeroize;
-            var day = Math.floor(second / 60 / 60 / 24);
-            if (day != 0) {
-                str += day + this.CN_DAY + " ";
-            }
-            var hour = Math.floor(second / 60 / 60) % 24;
-            if (hour != 0) {
-                str += getZeroize(hour) + ":";
-            }
-            var min = Math.floor(second / 60) % 60;
-            if (min != 0) {
-                str += getZeroize(min) + ":";
-            }
-            else {
-                str += "00" + ":";
-            }
-            var sec = Math.floor(second % 60);
-            if (sec != 0) {
-                str += getZeroize(sec);
-            }
-            else {
-                str += "00";
-            }
-            return str;
-        };
-        /**
-         * 返回不为0的格式X天X小时X分钟X秒
-         */
-        TimeUtil.formatRemain8 = function (second) {
-            var str = "";
-            var getZeroize = TimeUtil.getZeroize;
-            var day = Math.floor(second / 60 / 60 / 24);
-            if (day != 0) {
-                str += day + this.CN_DAY;
-            }
-            var hour = Math.floor(second / 60 / 60) % 24;
-            if (hour != 0) {
-                str += hour + this.CN_HOUR;
-            }
-            var min = Math.floor(second / 60) % 60;
-            if (min != 0) {
-                str += min + this.CN_MIN + "钟";
-            }
-            var sec = Math.floor(second % 60);
-            if (sec != 0) {
-                str += sec + this.CN_SEC;
-            }
-            return str;
-        };
-        /**
-         * 00:00:00
-         */
-        TimeUtil.formatRemainForEn = function (second) {
-            var day = Math.floor(second / 60 / 60 / 24);
-            var hour = Math.floor(second / 60 / 60) % 24;
-            var totalH = (day * 24 + hour);
-            var min = Math.floor(second / 60) % 60;
-            var sec = Math.floor(second % 60);
-            var hourStr = totalH < 10 ? ("0" + totalH) : totalH.toString();
-            var minStr = min < 10 ? ("0" + min) : min.toString();
-            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
-            return hourStr + ":" + minStr + ":" + secStr;
-        };
-        /**
-         * 获取两个时间之间的相差（天、时、分、秒）
-         * @param time1:Number 时间1(ms)
-         * @param time2:Number 时间2(ms)
-         * @return Array = [天,时,分,秒]
-         */
-        TimeUtil.getTimeDifference = function (time1, time2) {
-            var res = [0, 0, 0, 0];
-            var val = time2 - time1;
-            res[0] = Math.floor(val / 86400000);
-            res[1] = Math.floor(val % 86400000 / 3600000);
-            res[2] = Math.floor(val % 86400000 % 3600000 / 60000);
-            res[3] = Math.floor(val % 86400000 % 3600000 % 60000 / 1000);
-            return res;
-        };
-        TimeUtil.prototype.timeStrToDate = function (timeStr) {
-            var arr = timeStr.split(" ");
-            var yearArr = (arr[0]).split("-");
-            var timeArr = (arr[1]).split("-");
-            var date = new Date(yearArr[0], yearArr[1], yearArr[2], timeArr[0], timeArr[1], timeArr[2]);
-            return date;
-        };
-        /**
-         * 不够两位的补零
-         */
-        TimeUtil.dateStringFillZero = function (num) {
-            return (num >= 10 ? ((num * 0.1) >> 0).toString() : "0") + (num % 10).toString();
-        };
-        TimeUtil.gettodayTimeByHour = function (hour) {
-            var data = this.getZoneOffsetSeverDate();
-            data.setHours(hour);
-            data.setMinutes(0);
-            data.setSeconds(0);
-            return data.getTime() / 1000;
-        };
-        /**
-         * 获取时分秒
-         * @param _second
-         * @return
-         *
-         */
-        TimeUtil.changeServerTimeToSeconds = function (_second) {
-            var date = new Date(_second);
-            var seconds = (date.getHours() * 3600) + (date.getMinutes() * 60) + date.getSeconds();
-            return seconds;
-        };
-        /**
-         * 将当日时间(非时间戳)转为毫秒
-         * @param hours 小时
-         * @param minutes 分钟
-         * @param seconds 秒
-         * @return 当日时间毫秒数
-         */
-        TimeUtil.timeToMilSeconds = function (hours, minutes, seconds) {
-            if (hours === void 0) { hours = 0; }
-            if (minutes === void 0) { minutes = 0; }
-            if (seconds === void 0) { seconds = 0; }
-            var time = (hours * 3600 + minutes * 60 + seconds) * 1000;
-            return time;
-        };
-        /**
-         * 获取一个指定月日时分秒时间戳（毫秒）
-         */
-        TimeUtil.getTimeStamp2 = function (month, day, hours, minutes, seconds) {
-            if (month === void 0) { month = 0; }
-            if (day === void 0) { day = 0; }
-            if (hours === void 0) { hours = 0; }
-            if (minutes === void 0) { minutes = 0; }
-            if (seconds === void 0) { seconds = 0; }
-            var date = new Date(TimeUtil.serverTime);
-            date.setMonth(month - 1);
-            date.setDate(day);
-            date.setHours(hours);
-            date.setMinutes(minutes);
-            date.setSeconds(seconds);
-            date.setMilliseconds(0);
-            return date.getTime();
-        };
-        /**
-         * 获取一个指定年月日时分秒时间戳（毫秒）
-         */
-        TimeUtil.getTimeStamp3 = function (year, month, day, hours, minutes, seconds) {
-            if (year === void 0) { year = 0; }
-            if (month === void 0) { month = 0; }
-            if (day === void 0) { day = 0; }
-            if (hours === void 0) { hours = 0; }
-            if (minutes === void 0) { minutes = 0; }
-            if (seconds === void 0) { seconds = 0; }
-            var date = new Date();
-            date.setFullYear(year);
-            date.setMonth(month - 1);
-            date.setDate(day);
-            date.setHours(hours);
-            date.setMinutes(minutes);
-            date.setSeconds(seconds);
-            date.setMilliseconds(0);
-            return date.getTime();
-        };
-        /**
-         * 获取当前服务器时间是周几
-         */
-        TimeUtil.getCurDay = function () {
-            var date = new Date(TimeUtil.serverTime);
-            var day = date.getDay();
-            if (day == 0)
-                day = 7;
-            return day;
-        };
-        /**
-        * 获取指定时 分 服务器所在的时间戳(毫秒)
-        * @param hour
-        * @param minutes
-        */
-        TimeUtil.getTimeStamp = function (hour, minutes) {
-            var date = new Date(TimeUtil.serverTime);
-            date.setHours(hour);
-            date.setMinutes(minutes);
-            date.setSeconds(0);
-            date.setMilliseconds(0);
-            return date.getTime();
-        };
-        /**
-         * 获取距离当前时间间隔天数的时间戳
-         */
-        TimeUtil.getDayTimeStamp = function (addDay) {
-            var timeStamp = TimeUtil.serverTime + addDay * 24 * 60 * 60 * 1000;
-            return timeStamp;
-        };
-        /**
-        * 获取指定时 分 指定时间点所在的时间戳(毫秒)
-        * @param hour
-        * @param minutes
-        */
-        TimeUtil.getTimeStampByTime = function (timeStamp, hour, minutes) {
-            var date = new Date(timeStamp);
-            date.setHours(hour);
-            date.setMinutes(minutes);
-            date.setSeconds(0);
-            date.setMilliseconds(0);
-            return date.getTime();
-        };
-        /**
-         *获取日期之间相距的天数
-         * @param startDate
-         * @param endDate
-         * @return
-         *
-         */
-        TimeUtil.getBetweenDays = function (endTime, startTime) {
-            return this.getTotalDaysByTime(endTime) - this.getTotalDaysByTime(startTime);
-        };
-        /**
-        *获取经过的总天数。距离 1970 年 1 月 1 日
-        * @param date
-        * @return
-        *
-        */
-        TimeUtil.getTotalDays = function (date) {
-            var localTimeZone = -8;
-            return Math.floor(date.getTime() - localTimeZone * 60 * 60 * 1000) / (24 * 60 * 60 * 1000);
-        };
-        /**
-         *获取经过的总天数。距离 1970 年 1 月 1 日
-         * @param time	毫秒级时间
-         * @return
-         *
-         */
-        TimeUtil.getTotalDaysByTime = function (time) {
-            var localTimeZone = -8;
-            return Math.floor((time - localTimeZone * 60 * 60 * 1000) / (24 * 60 * 60 * 1000));
-        };
-        /**
-         * 把一个时间戳转化为年月日
-         */
-        TimeUtil.getTimeNoHourSecond = function (time) {
-            var date = new Date(time);
-            var toDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            return toDate.getTime();
-        };
-        /** 不足两位补0 */
-        TimeUtil.getZeroize = function (time) {
-            return (time < 10) ? "0" + time : time + "";
-        };
-        /** 去掉小时，分，秒今天的时间戳 */
-        TimeUtil.getTodayStartTime = function () {
-            return TimeUtil.getTimeNoHourSecond(TimeUtil.serverTime);
-        };
-        /**
-         * 时间格式拆分返回
-         * timeStr  --"2018-10-19 19:07:00"
-         */
-        TimeUtil.getTimesplit = function (timeStr) {
-            var timeObj = {};
-            var timeArr = timeStr.split(" ");
-            var timeStr1 = timeArr[0];
-            var timeStr2 = timeArr[1];
-            var timeStr1Arr = timeStr1.split("-");
-            timeObj["year"] = parseInt(timeStr1Arr[0]);
-            timeObj["month"] = parseInt(timeStr1Arr[1]);
-            timeObj["day"] = parseInt(timeStr1Arr[2]);
-            var timeStr2Arr = timeStr2.split(":");
-            timeObj["hour"] = parseInt(timeStr2Arr[0]);
-            timeObj["minute"] = parseInt(timeStr2Arr[1]);
-            timeObj["second"] = parseInt(timeStr2Arr[2]);
-            return timeObj;
-        };
-        /**
-         * 获取今天凌晨的时间戳（昨晚12点）
-         */
-        TimeUtil.fun10 = function () {
-            var today = new Date();
-            return today.getTime() - today.getHours() * 60 * 60 * 1000 - today.getMinutes() * 60 * 1000 - today.getSeconds() * 1000 - today.getMilliseconds();
-        };
-        /** 根据年月日获取星期几 0表示星期日,1表示星期一*/
-        TimeUtil.getWeekByTime = function (year, month, day) {
-            if (month == 1 || month == 2) {
-                month += 12;
-                --year;
-            }
-            var week = (day + 2 * month + Math.floor(3 * (month + 1) / 5) + year +
-                Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + 1) % 7;
-            return week;
-        };
-        /** 根据年月日获取星期几 0表示星期日,1表示星期一*/
-        TimeUtil.getWeekByTimeStr = function (year, month, day) {
-            var week = TimeUtil.getWeekByTime(year, month, day);
-            var weekStr = "";
-            switch (week) {
-                case 1:
-                    weekStr = "星期一";
-                    break;
-                case 2:
-                    weekStr = "星期二";
-                    break;
-                case 3:
-                    weekStr = "星期三";
-                    break;
-                case 4:
-                    weekStr = "星期四";
-                    break;
-                case 5:
-                    weekStr = "星期五";
-                    break;
-                case 6:
-                    weekStr = "星期六";
-                    break;
-                case 0:
-                    weekStr = "星期日";
-                    break;
-            }
-            return weekStr;
-        };
-        /** 一天的毫秒数 **/
-        TimeUtil.DAY_MICRO_SECONDS = 24 * 3600 * 1000;
-        /** 一小时的毫秒数 **/
-        TimeUtil.HOUR_MICRO_SECONDS = 3600 * 1000;
-        /** 一分钟的毫秒数 **/
-        TimeUtil.MINUTE_MICRO_SECONDS = 60 * 1000;
-        /** 一秒钟的毫秒数 **/
-        TimeUtil.SECOND_MICRO_SECONDS = 1000;
-        /** 年 **/
-        TimeUtil.CN_YEAR = "年";
-        /** 月 **/
-        TimeUtil.CN_MONTH = "月";
-        /** 日 **/
-        TimeUtil.CN_SUN = "日";
-        /** 天 **/
-        TimeUtil.CN_DAY = "天";
-        /** 小时 **/
-        TimeUtil.CN_HOUR = "小时";
-        /** 分 **/
-        TimeUtil.CN_MIN = "分";
-        /** 秒 **/
-        TimeUtil.CN_SEC = "秒";
-        /**
-         *时间误差，精确到毫秒
-         */
-        TimeUtil.tickOffset = 0;
-        return TimeUtil;
-    }());
-    qmr.TimeUtil = TimeUtil;
-    __reflect(TimeUtil.prototype, "qmr.TimeUtil");
-})(qmr || (qmr = {}));
-var TimeUtil = qmr.TimeUtil;
 var qmr;
 (function (qmr) {
     /**

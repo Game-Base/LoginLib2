@@ -267,7 +267,7 @@ namespace qmr
             }
             else
             {
-                DisplayUtils.removeDisplay(win);
+                ModuleManager.removeDisplay(win);
             }
             this.sendToTop();
 
@@ -316,5 +316,16 @@ namespace qmr
         {
             return this._classAppMap[name];
         }
+
+        public static removeDisplay(dis: egret.DisplayObject, parent: egret.DisplayObjectContainer = null): void
+		{
+			if (!dis) return;
+			if (!parent)
+			{
+				parent = dis.parent;
+			}
+			if (!parent) return;
+			parent.removeChild(dis);
+		}
     }
 }

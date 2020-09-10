@@ -505,33 +505,196 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class MessageIDLogin {
+    /**
+     *
+     * @description 游戏loading
+     *
+     */
+    class GameLoading extends eui.Group {
+        private static inttance;
+        private _txProgress;
+        private _loadingRun;
+        private rect;
+        constructor();
+        private onTouch(evt);
+        private runLoading(evt);
         /**
-         *
+         * @description 获取loading单例对象
          */
-        /** 映射协议ID对应的协议名 */
-        private static MSG_KEYS;
-        /** 游戏初始化调用 */
-        static init(): void;
-        /** 通过本类的协议ID映射协议名字 */
-        static getMsgNameById(id: number): string;
-        /**  异常消息 */
-        static S_EXCEPTION_MSG: number;
-        /**  登录 */
-        static C_USER_LOGIN: number;
-        /**  登录成功 */
-        static S_USER_LOGIN: number;
-        /** 注册 */
-        static C_LOGIN_REGISTER: number;
-        /** 登出 */
-        static C_USER_LOGOUT: number;
-        static S_USER_LOGOUT: number;
-        /** 同步时间 */
-        static C_SYNC_TIME: number;
-        /** 同步时间 */
-        static S_SYNC_TIME: number;
-        static C_SEND_SDK_DATA: number;
-        static S_SEND_SDK_DATA: number;
+        static getInstance(): GameLoading;
+        createChildren(): void;
+        /**
+         * @description 更新尺寸
+         */
+        private updateSize();
+        /**
+         * @description 设置加载进度
+         */
+        private vitureCount;
+        setProgress(itemsLoaded: number, itemsTotal: number): void;
+        private onTimer();
+        /**
+         * @description 设置loading提示
+         */
+        setLoadingTip(msg: string): void;
+        /**
+         * @description 关闭loading
+         */
+        close(): void;
+    }
+}
+declare module qmr {
+    /**
+     *
+     * @description 所有序列帧动画的管理器 draw到300就差不多了
+     *
+     */
+    class AnimateManager {
+        private static instance;
+        private animaDic;
+        private maxAliveTime;
+        constructor();
+        /**
+         * @descripion 获取单例
+         */
+        static getInstance(): AnimateManager;
+        /**
+         * @description 析对应序列帧动画
+         */
+        parseSpriteSheet(resName: string, url: string, jsonData: any, texture: egret.Texture, dir?: number, autoParseTexture?: boolean): void;
+        /**
+         * @description 根据对应的动画名和标名获取序列帧数据
+         * @param resName 资源名
+         * @param dir 方向
+         */
+        getAnimalData(resName: string, dir: number): AnimateData;
+        /**
+         * @description 释放资源，其实是释放对应animaion的引用计数
+         */
+        dispos(resName: string): void;
+        /**
+         * @description 清理过期资源
+         */
+        clear(now: number): void;
+    }
+}
+declare module qmr {
+    /**
+     * @description 翅膀动画片段
+     */
+    class AnimateWing extends AnimateClip {
+        private _wingFrame;
+        private _wingFrameIndex;
+        constructor(callBack?: Function, thisObject?: any);
+        /**
+         * @description 渲染第几帧 8-10[1-8,1-8]
+         */
+        render(frame: number): void;
+        reset(): void;
+    }
+}
+declare module qmr {
+    /**
+     *
+     * @description 序列帧动画基类,所有的序列帧动画都要继承此类
+     *
+     */
+    class MovieClip extends egret.DisplayObjectContainer {
+        protected currentFrame: number;
+        protected totalFrame: number;
+        private isStopped;
+        private passedTime;
+        private frameIntervalTime;
+        private lastTime;
+        private eventDic;
+        private _frameRate;
+        private playeTimes;
+        private mainClip;
+        private loopCallBack;
+        private thisObject;
+        private _timeScale;
+        constructor();
+        /**
+         * @description 加载素材资源
+         */
+        load(path: string, resName: string, loopCallBack: Function, thisObject: any, playeTimes?: number): void;
+        /**
+         * @description 资源加载完毕,需被子类继承        */
+        protected onLoaded(): void;
+        /**
+         * @description 注册一个帧事件         */
+        registerFrameEvent(frame: number, callBack: Function, thisObject: any): void;
+        /**
+         * @description 取消一个帧事件         */
+        unRegisterFrameEvent(frame: number): void;
+        /**
+         * @description 帧频调用         */
+        private advanceTime(timeStamp);
+        /**
+         * @description 检测帧事件         */
+        private checkFrameEvent();
+        /**
+         * @description 清除回调
+         */
+        clearCallBack(): void;
+        /**
+         * @description 渲染 需被子类继承*/
+        protected render(): void;
+        /**
+         * @description 设置帧频         */
+        frameRate: number;
+        /**
+         * @description 设置timescale
+         */
+        timeScale: number;
+        /**
+         * @description 获取总帧数
+         */
+        readonly totalFrames: number;
+        /**
+         * @description 停止在某帧
+         */
+        gotoAndStop(frame: number): void;
+        /**
+            * @private
+            *
+            * @param value
+            */
+        setIsStopped(value: boolean): void;
+        /**
+         * @description 清除
+         */
+        clear(): void;
+        /**
+         * @description 资源释放         */
+        dispos(): void;
+    }
+}
+declare module qmr {
+    /**
+     *
+     * @description 角色部件枚举
+     *
+     */
+    class ActorPart {
+        static BODY: number;
+        static WEAPON: number;
+        static WING: number;
+        static HORSE: number;
+        static HORSE_UP: number;
+        static SHIELD: number;
+        static DEFAULT: number;
+    }
+}
+declare module qmr {
+    /**
+     * 各个部位对应的资源加载地址
+     */
+    class ActorPartResourceDic {
+        partDic: any;
+        constructor();
+        private static _instance;
+        static getInstance(): ActorPartResourceDic;
     }
 }
 declare module qmr {
@@ -698,191 +861,6 @@ declare module qmr {
         static UI_SHOW: string;
         static UI_SHOW1: string;
         static UI_IDLE: string;
-    }
-}
-declare class AssetAdapter implements eui.IAssetAdapter {
-    /**
-     * @language zh_CN
-     * 解析素材
-     * @param source 待解析的新素材标识符
-     * @param compFunc 解析完成回调函数，示例：callBack(content:any,source:string):void;
-     * @param thisObject callBack的 this 引用
-     */
-    getAsset(source: string, compFunc: Function, thisObject: any): void;
-}
-declare module qmr {
-    /**
-     *
-     * @description 动画片段数据，比如某个动画组中的待机动画
-     *
-     */
-    class AnimateData {
-        private _totalFrames;
-        private _frameRate;
-        private framesList;
-        private resJson;
-        private spriteSheet;
-        private autoParseTexture;
-        private autoHalfTexture;
-        constructor(resJson: any, spriteSheet: egret.SpriteSheet, autoParseTexture?: boolean, autoHalfTexture?: boolean);
-        /**
-         * @description 解析数据
-         */
-        parseClip(spriteJson: any): void;
-        /**
-         * @description 通过起始帧解析数据
-         */
-        parseClipByStartAndEnd(spriteJson: any, start: number, end: number): void;
-        /**
-         * @description 获取某一帧texture
-         */
-        getTextureByFrame(frame: number): egret.Texture;
-        /**
-         * @description 获取某一帧偏移值
-         */
-        getOffset(frame: number): any;
-        /**
-         * @description 获取总的帧数
-         */
-        readonly totalFrames: number;
-        /**
-         * 是方法一倍
-         */
-        readonly halfTexture: boolean;
-        /**
-         * @description 获取帧频         */
-        readonly frameRate: number;
-        /**
-         * @description 资源释放
-         */
-        dispos(): void;
-    }
-}
-declare module qmr {
-    /**
-     *
-     * @description 所有序列帧动画的管理器 draw到300就差不多了
-     *
-     */
-    class AnimateManager {
-        private static instance;
-        private animaDic;
-        private maxAliveTime;
-        constructor();
-        /**
-         * @descripion 获取单例
-         */
-        static getInstance(): AnimateManager;
-        /**
-         * @description 析对应序列帧动画
-         */
-        parseSpriteSheet(resName: string, url: string, jsonData: any, texture: egret.Texture, dir?: number, autoParseTexture?: boolean): void;
-        /**
-         * @description 根据对应的动画名和标名获取序列帧数据
-         * @param resName 资源名
-         * @param dir 方向
-         */
-        getAnimalData(resName: string, dir: number): AnimateData;
-        /**
-         * @description 释放资源，其实是释放对应animaion的引用计数
-         */
-        dispos(resName: string): void;
-        /**
-         * @description 清理过期资源
-         */
-        clear(now: number): void;
-    }
-}
-declare module qmr {
-    /**
-     * @description 翅膀动画片段
-     */
-    class AnimateWing extends AnimateClip {
-        private _wingFrame;
-        private _wingFrameIndex;
-        constructor(callBack?: Function, thisObject?: any);
-        /**
-         * @description 渲染第几帧 8-10[1-8,1-8]
-         */
-        render(frame: number): void;
-        reset(): void;
-    }
-}
-declare module qmr {
-    /**
-     *
-     * @description 序列帧动画基类,所有的序列帧动画都要继承此类
-     *
-     */
-    class MovieClip extends egret.DisplayObjectContainer {
-        protected currentFrame: number;
-        protected totalFrame: number;
-        private isStopped;
-        private passedTime;
-        private frameIntervalTime;
-        private lastTime;
-        private eventDic;
-        private _frameRate;
-        private playeTimes;
-        private mainClip;
-        private loopCallBack;
-        private thisObject;
-        private _timeScale;
-        constructor();
-        /**
-         * @description 加载素材资源
-         */
-        load(path: string, resName: string, loopCallBack: Function, thisObject: any, playeTimes?: number): void;
-        /**
-         * @description 资源加载完毕,需被子类继承        */
-        protected onLoaded(): void;
-        /**
-         * @description 注册一个帧事件         */
-        registerFrameEvent(frame: number, callBack: Function, thisObject: any): void;
-        /**
-         * @description 取消一个帧事件         */
-        unRegisterFrameEvent(frame: number): void;
-        /**
-         * @description 帧频调用         */
-        private advanceTime(timeStamp);
-        /**
-         * @description 检测帧事件         */
-        private checkFrameEvent();
-        /**
-         * @description 清除回调
-         */
-        clearCallBack(): void;
-        /**
-         * @description 渲染 需被子类继承*/
-        protected render(): void;
-        /**
-         * @description 设置帧频         */
-        frameRate: number;
-        /**
-         * @description 设置timescale
-         */
-        timeScale: number;
-        /**
-         * @description 获取总帧数
-         */
-        readonly totalFrames: number;
-        /**
-         * @description 停止在某帧
-         */
-        gotoAndStop(frame: number): void;
-        /**
-            * @private
-            *
-            * @param value
-            */
-        setIsStopped(value: boolean): void;
-        /**
-         * @description 清除
-         */
-        clear(): void;
-        /**
-         * @description 资源释放         */
-        dispos(): void;
     }
 }
 declare module qmr {
@@ -1488,6 +1466,7 @@ declare namespace qmr {
         static setupClass(): void;
         static registerClass(name: string, appClass: any): void;
         private static getClassName(name);
+        static removeDisplay(dis: egret.DisplayObject, parent?: egret.DisplayObjectContainer): void;
     }
 }
 declare module qmr {
@@ -1533,42 +1512,10 @@ declare module qmr {
     }
 }
 declare module qmr {
-    /**
-     *
-     * @description 游戏loading
-     *
-     */
-    class GameLoading extends eui.Group {
-        private static inttance;
-        private _txProgress;
-        private _loadingRun;
-        private rect;
-        constructor();
-        private onTouch(evt);
-        private runLoading(evt);
-        /**
-         * @description 获取loading单例对象
-         */
-        static getInstance(): GameLoading;
-        createChildren(): void;
-        /**
-         * @description 更新尺寸
-         */
-        private updateSize();
-        /**
-         * @description 设置加载进度
-         */
-        private vitureCount;
-        setProgress(itemsLoaded: number, itemsTotal: number): void;
-        private onTimer();
-        /**
-         * @description 设置loading提示
-         */
-        setLoadingTip(msg: string): void;
-        /**
-         * @description 关闭loading
-         */
-        close(): void;
+    class GameMain {
+        static setup(stage: any): Promise<void>;
+        /** 读取缓存 */
+        private static initLocalStorage();
     }
 }
 declare module qmr {
@@ -1719,6 +1666,7 @@ declare module qmr {
         * @description 初始化数据,需被子类继承
         */
         protected initData(): void;
+        isPhoneNumber(phoneNum: any): boolean;
         dispose(): void;
     }
 }
@@ -1733,10 +1681,33 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class GameMain {
-        static setup(stage: any): Promise<void>;
-        /** 读取缓存 */
-        private static initLocalStorage();
+    class MessageIDLogin {
+        /**
+         *
+         */
+        /** 映射协议ID对应的协议名 */
+        private static MSG_KEYS;
+        /** 游戏初始化调用 */
+        static init(): void;
+        /** 通过本类的协议ID映射协议名字 */
+        static getMsgNameById(id: number): string;
+        /**  异常消息 */
+        static S_EXCEPTION_MSG: number;
+        /**  登录 */
+        static C_USER_LOGIN: number;
+        /**  登录成功 */
+        static S_USER_LOGIN: number;
+        /** 注册 */
+        static C_LOGIN_REGISTER: number;
+        /** 登出 */
+        static C_USER_LOGOUT: number;
+        static S_USER_LOGOUT: number;
+        /** 同步时间 */
+        static C_SYNC_TIME: number;
+        /** 同步时间 */
+        static S_SYNC_TIME: number;
+        static C_SEND_SDK_DATA: number;
+        static S_SEND_SDK_DATA: number;
     }
 }
 declare module qmr {
@@ -2031,22 +2002,50 @@ declare module qmr {
         protected pay(payInfo: any): Promise<void>;
     }
 }
-declare module qmr {
+declare class AssetAdapter implements eui.IAssetAdapter {
     /**
-     *
-     * @description 角色部件枚举
-     *
+     * @language zh_CN
+     * 解析素材
+     * @param source 待解析的新素材标识符
+     * @param compFunc 解析完成回调函数，示例：callBack(content:any,source:string):void;
+     * @param thisObject callBack的 this 引用
      */
-    class ActorPart {
-        static BODY: number;
-        static WEAPON: number;
-        static WING: number;
-        static HORSE: number;
-        static HORSE_UP: number;
-        static SHIELD: number;
-        static DEFAULT: number;
+    getAsset(source: string, compFunc: Function, thisObject: any): void;
+}
+declare module qmr {
+    class ServerTime {
+        /**
+         *时间误差，精确到毫秒
+         */
+        private static tickOffset;
+        constructor();
+        /**
+         * 获取服务器时间，返回当前秒数(本机时间，所有活动计算时差请用getZoneOffsetSeverSecond方法)
+         * @return
+         *
+         */
+        static getServerSecond(): number;
+        /**
+         *  获取服务器时间，返回毫秒
+         * @return
+         */
+        static readonly serverTime: number;
+        /**
+         * 获得服务器Unix时间，返回Date
+         */
+        static getSeverDate(): Date;
+        /**
+         * 获得服务器显示时间
+         */
+        static getZoneOffsetSeverDate(): Date;
+        /**
+         * 获得服务器，显示秒
+         */
+        static getZoneOffsetSeverSecond(): number;
+        static syncServerTime(timeStamp: number): void;
     }
 }
+import ServerTime = qmr.ServerTime;
 declare module qmr {
     import ByteArray = egret.ByteArray;
     class BufferGid {
@@ -2474,20 +2473,6 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class ColorUtil {
-        /**
-         * @desc 根据品质返回对应颜色
-         */
-        static getColorByQuality(quality: number): number;
-        /**
-         * 若类型为8，则1=绿品，2=蓝品，3=紫品，4=金品，5=红品
-         * @desc 根据subType返回日常任务品质颜色
-         */
-        static getColorBySubType(subType: number): number;
-        static getTipColorByType(colorType: number): number;
-    }
-}
-declare module qmr {
     class CommonTool {
         constructor();
         static getMsg(...arg: any[]): string;
@@ -2495,23 +2480,50 @@ declare module qmr {
 }
 declare module qmr {
     /**
-     * 各个部位对应的资源加载地址
+     *
+     * @description 动画片段数据，比如某个动画组中的待机动画
+     *
      */
-    class ActorPartResourceDic {
-        partDic: any;
-        constructor();
-        private static _instance;
-        static getInstance(): ActorPartResourceDic;
-    }
-}
-declare module qmr {
-    class DirtyWordsUtils {
+    class AnimateData {
+        private _totalFrames;
+        private _frameRate;
+        private framesList;
+        private resJson;
+        private spriteSheet;
+        private autoParseTexture;
+        private autoHalfTexture;
+        constructor(resJson: any, spriteSheet: egret.SpriteSheet, autoParseTexture?: boolean, autoHalfTexture?: boolean);
         /**
-         * 是否有敏感词
-         * @param content    要检测的文字
-         * @return        true为有敏感词，false为没有敏感词
+         * @description 解析数据
          */
-        static hasDirtywords(content: string, callbackF: Function, thisObj: any): void;
+        parseClip(spriteJson: any): void;
+        /**
+         * @description 通过起始帧解析数据
+         */
+        parseClipByStartAndEnd(spriteJson: any, start: number, end: number): void;
+        /**
+         * @description 获取某一帧texture
+         */
+        getTextureByFrame(frame: number): egret.Texture;
+        /**
+         * @description 获取某一帧偏移值
+         */
+        getOffset(frame: number): any;
+        /**
+         * @description 获取总的帧数
+         */
+        readonly totalFrames: number;
+        /**
+         * 是方法一倍
+         */
+        readonly halfTexture: boolean;
+        /**
+         * @description 获取帧频         */
+        readonly frameRate: number;
+        /**
+         * @description 资源释放
+         */
+        dispos(): void;
     }
 }
 declare module qmr {
@@ -2529,77 +2541,6 @@ declare module qmr {
          * @description 获取真实的5方向
          */
         static getDir(dir: number): number;
-    }
-}
-declare module qmr {
-    class DisplayUtils {
-        static removeAllChild(dis: egret.DisplayObjectContainer): void;
-        static removeDisplay(dis: egret.DisplayObject, parent?: egret.DisplayObjectContainer): void;
-        static addDisplayToTop(dis: egret.DisplayObject, parent?: egret.DisplayObjectContainer): void;
-        static removeClick(target: egret.EventDispatcher): void;
-        private static eventDic;
-        private static touchBeginTaret;
-        private static lastTime;
-        static removeAllEvent(target: egret.EventDispatcher): void;
-        static addClick(target: egret.EventDispatcher, callBack: Function, thisObject: any, longPressCallBack?: Function): void;
-        /**
-         * @description 当点击开始
-         */
-        private static onTouchBegin(evt);
-        /**
-         * @description 当点击结束
-         */
-        private static onTouchEnd(evt);
-        /**
-         * @description 当点击结束的时候，按钮不在被点击的对象上
-         */
-        private static onTouchReleaseCancel(evt);
-        /**
-         * @description 当点击结束的时候，按钮不在被点击的对象上
-         */
-        private static onTouchReleaseOutSide(evt);
-        private static longPress();
-        /**
-         * 发光某个对象
-         */
-        static setGlow(obj: egret.DisplayObject, isGrey: boolean): void;
-        /**
-         * 置灰某个对象,设置按钮不用滤镜了，用setBtnGray 方法
-         */
-        static setGrey(obj: egret.DisplayObject, isGrey: boolean, isSetEnabled?: boolean): void;
-        /**
-         * 置灰某个对象
-         */
-        static setBtnGray(obj: eui.Button, isGray: boolean, isSetEnabled?: boolean, btnSkinType?: BtnSkinType): void;
-        private static getBtnSkin(btnSkinType, isGray);
-        /**
-          * 置灰一组对象
-          */
-        static setGreyGoup(objGoup: egret.DisplayObject[], isGrey: boolean): void;
-        /**
-         * 设置不可选
-         */
-        static setDisable(obj: egret.DisplayObject, isDisable: boolean): void;
-        static LoadResByNameAndWH(obj: egret.DisplayObject, objParent: egret.DisplayObject, width: number, height: number, x?: number, y?: number): egret.DisplayObject;
-        /**
-         * 更新星星方法
-         * max-星星组
-         * lightNum-当前要亮的星数
-         */
-        static updateStar(starGroup: eui.Group, lightNum: number): void;
-        /**
-         * 获取一个对象全局坐标点
-         */
-        static getGlobelPoint(target: any): egret.Point;
-    }
-}
-declare module qmr {
-    class FilterUtil {
-        /**
-         * 灰态
-         */
-        static grayFilter: egret.ColorMatrixFilter;
-        static glowFilter: egret.GlowFilter;
     }
 }
 declare module qmr {
@@ -2649,10 +2590,6 @@ declare module qmr {
     }
 }
 declare module qmr {
-    /**
-     * coler
-     * int64方法
-     */
     class Int64Util {
         static getNumber(d: any): number;
         static getNumberArr(any: (any)[]): number[];
@@ -2660,72 +2597,6 @@ declare module qmr {
     function getNumber(d: any): number;
     function getServerNumber(playerId: number): number;
     function getServerNickName(playerId: any, name: string): string;
-}
-declare module qmr {
-    class JsUtil {
-        static getQueryString(): RegExpMatchArray;
-        static getQueryStringByName(name: any): string;
-        static getQueryStringByIndex(index: any): string;
-        /**
-         * limit=1&h5limit=2
-         * @param valueName
-         * @param params
-         */
-        static getValueFromParams(valueName: any, params: any): string;
-    }
-}
-declare module qmr {
-    class LabelTip {
-        private label;
-        private static instance;
-        private constructor();
-        static getInstance(): LabelTip;
-    }
-}
-declare module qmr {
-    class LabelUtil {
-        static addInputListener(textInput: eui.TextInput, thisObject: any): void;
-        static removeInputListener(textInput: eui.TextInput, thisObject: any): void;
-        static focusInTxtHandler(): void;
-    }
-}
-declare module qmr {
-    /**
-     * 实现一个简单的链表结构
-     */
-    class LinkedList {
-        private _head;
-        private nodeLen;
-        constructor();
-        /**
-         * 添加一个节点
-         */
-        append(element: any): void;
-        /**获取节点索引*/
-        indexOf(element: any): number;
-        /**
-         * 移除某个索引位置的节点
-         */
-        removeAt(pos: number): void;
-        /**
-         * 获取某个索引下的节点
-         */
-        getNodeAt(index: number): LinkNode;
-        /**获取一个头节点*/
-        readonly head: LinkNode;
-        /**节点长度*/
-        readonly size: number;
-    }
-    /**
-     * 链表中的节点
-     */
-    class LinkNode {
-        /**当前自身信息*/
-        current: any;
-        /**下个节点*/
-        next: LinkNode;
-        constructor(element: any);
-    }
 }
 declare module qmr {
     class LogUtil {
@@ -2752,46 +2623,6 @@ declare module qmr {
         static error(msg: any): void;
         /**  @description 打印Slow 添加的log日志, */
         static slowLog(msg: any): void;
-    }
-}
-declare module qmr {
-    class MathUtil {
-        /**
-         * 曼哈顿启发函数<br/>
-         * 用此启发函数在八向寻路中找到的并不是最优路径,因为它的运算结果可能远远大于开始结点到目标结点的距离,
-         * 但是此启发函数的运算速度非常快
-         * @param x1 节点1x
-         * @param y1 节点1y
-         * @param x2 节点2x
-         * @param y2 节点2y
-         * @return
-         *
-         */
-        static manhattan(x1: number, y1: number, x2: number, y2: number): number;
-        /**
-         * @description 获取两个对象之间的直线距离
-         */
-        static distance(source: any, target: any): number;
-        /**获取2点的角度 item -> ItemPre*/
-        static getAngle(itemPre: any, item: any): number;
-        /**
-         * @description 比较两个64位的数字是否相等
-         */
-        static equal(a: any, b: any): boolean;
-        /**
-         * @description 获取两个数之间的
-         */
-        static randomCount(min: number, max: number): number;
-        /**
-         * @description 获取目标对象相对源对象之间的方向,八方向
-         */
-        static dir(source: any, target: any): number;
-        static getRodomPos(area: number): {
-            x: number;
-            y: number;
-        };
-        /** 获得一定范围的高斯随机数 */
-        static getGaussianPoint(xRange: number, yRange: number): egret.Point;
     }
 }
 declare module qmr {
@@ -2892,33 +2723,6 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class RegexpUtil {
-        static isPhoneNumber(phoneNum: any): boolean;
-    }
-}
-declare module qmr {
-    /**
-     * @description 系统设置的一个工具类
-     */
-    class SettingUtil {
-        private static instance;
-        private sVariantType;
-        constructor();
-        /**
-         * @description 获取单例对象
-         */
-        static getInstance(): SettingUtil;
-        /**
-         * @description 根据类型获取是否是屏蔽状态
-         */
-        getForbidState(bit: number): boolean;
-        /**
-         * @description 设置某一位的屏蔽状态
-         */
-        setForbidState(bit: number, value: number): void;
-    }
-}
-declare module qmr {
     class StageUtil {
         /**游戏帧频 */
         static FRAME_RATE: number;
@@ -2966,15 +2770,6 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class StringUtilsBase {
-        /**
-         * {0}{1}....
-         *
-         */
-        static getmsg(...arg: any[]): string;
-    }
-}
-declare module qmr {
     /**
      *
      * @description 系统路径类枚举
@@ -2993,325 +2788,6 @@ declare module qmr {
         static readonly itemIcon: string;
     }
 }
-declare module qmr {
-    /**
-     * 功能：文本框显示宽度固定。
-     * 根据字符数量控制文本框的宽度和scale
-     */
-    class TextFixWidthUtil {
-        private static _instance;
-        constructor();
-        static getInstance(): TextFixWidthUtil;
-        strlen(str: string): number;
-        fixTextBox(fixWidth: number, label: eui.Label): boolean;
-    }
-}
-declare module qmr {
-    class TickTool {
-        backFun: Function;
-        updateFun: Function;
-        thisObj: any;
-        private label;
-        private des;
-        private count;
-        private runing;
-        btn: eui.Button;
-        /**
-         * label 更改的文本
-         * des 描述
-         * thisObj 对象
-         */
-        constructor(label: eui.Label, des: string, thisObj: any);
-        /** 按钮描述 */
-        setDes(des: string): void;
-        startTick(count: number, gap?: number): void;
-        private tick();
-        private showMsg();
-        stopTick(): void;
-    }
-}
-declare module qmr {
-    class TimeUtil {
-        /** 一天的毫秒数 **/
-        static DAY_MICRO_SECONDS: number;
-        /** 一小时的毫秒数 **/
-        static HOUR_MICRO_SECONDS: number;
-        /** 一分钟的毫秒数 **/
-        static MINUTE_MICRO_SECONDS: number;
-        /** 一秒钟的毫秒数 **/
-        static SECOND_MICRO_SECONDS: number;
-        /** 年 **/
-        static readonly CN_YEAR: string;
-        /** 月 **/
-        static readonly CN_MONTH: string;
-        /** 日 **/
-        static readonly CN_SUN: string;
-        /** 天 **/
-        static readonly CN_DAY: string;
-        /** 小时 **/
-        static readonly CN_HOUR: string;
-        /** 分 **/
-        static readonly CN_MIN: string;
-        /** 秒 **/
-        static readonly CN_SEC: string;
-        /**
-         *时间误差，精确到毫秒
-         */
-        private static tickOffset;
-        constructor();
-        /**
-         * 获取服务器时间，返回当前秒数(本机时间，所有活动计算时差请用getZoneOffsetSeverSecond方法)
-         * @return
-         *
-         */
-        static getServerSecond(): number;
-        /**
-         *  获取服务器时间，返回毫秒
-         * @return
-         */
-        static readonly serverTime: number;
-        /**
-         * 获得服务器Unix时间，返回Date
-         */
-        static getSeverDate(): Date;
-        /**
-         * 获得服务器显示时间
-         */
-        static getZoneOffsetSeverDate(): Date;
-        /**
-         * 获得服务器，显示秒
-         */
-        static getZoneOffsetSeverSecond(): number;
-        static syncServerTime(timeStamp: number): void;
-        /**
-         * 根据时间返回字符串时间
-         * */
-        static getTimeBySecond(second: number): string;
-        /**
-         * 根据时间戳返回字符串 xxxx-xx-xx 00:00:00
-         * @time 毫秒
-         */
-        private static date;
-        static getDateByTimer(time: number): string;
-        /**
-         * 根据时间戳返回字符串 xxxx-xx-xx 00:00:00
-         * @time 秒
-         */
-        static getDateByTimerSecond(time: number): string;
-        /**
-         * 获取当前时间到明天00:00:00还有多少秒
-         */
-        static getDayOverTime(): number;
-        /**
-         * 获取当前时间点
-         */
-        static getDayTime(): number;
-        /**
-         * 转换成今天的时间点
-         */
-        static getTimeToNow(time: number): number;
-        /**
-         * 根据时间返回字符串 00:00:00
-         */
-        static formatDate(date: Date): string;
-        /**
-         * 根据时间返回字符串 00:00:00,超过24小时，只会显示超过的时间
-         */
-        static formatTime(second: number): string;
-        /**
-         * 根据时间返回字符串 00:00:00
-         */
-        static formatTime1(second: number): string;
-        /**
-         * 小时分钟
-         * @param second
-         * @return
-         */
-        static formatTime4(second: number): string;
-        /**
-             *根据时间返回字符串 00分00秒
-         */
-        static formatTime5(second: number): string;
-        /**
-         * 根据时间返回字符串 00:00
-         */
-        static formatTime2(second: number): string;
-        /**
-         * 根据时间返回字符串 00:00:00
-         */
-        static formatTime3(second: number): string;
-        /**
-         * 根据时间返回字符串 xx分xx秒
-         */
-        static formatTime6(second: number): string;
-        /** 00:00 一天当中的多少小时分钟 */
-        static formatTime7(second: number): string;
-        /**
-         * 格式化数据网格列日期 MM-DD JJ:NN
-         */
-        static formatColumnDate(tempDate: Date): string;
-        /**
-         *
-         * @param date
-         * @return
-         * 2012/12/12 12:12
-         */
-        static formatDate1(date: Date): string;
-        /**
-         * XX年XX月XX日
-         */
-        static formatYMD(date: Date): string;
-        /**
-         * 显示时间（英文格式）月/日/年
-         * @return
-         */
-        static formatYMDForEn(date: Date): string;
-        /**
-         * 年/月/日（例：2012/12/12）
-         */
-        static formatYMD1(date: Date): string;
-        /**
-         * XX天XX时XX分XX秒
-         */
-        static formatRemain(second: number): string;
-        /**
-         * XX天XX时XX分
-         */
-        static formatRemain1(second: number): string;
-        static formatRemain3(second: number): string;
-        /**
-         *
-         * @param second
-         * @return [day,hour,min]
-         *
-         */
-        static formatRemain2(second: number): Array<any>;
-        /**
-         * 返回不为0的格式
-         */
-        static formatRemain4(second: number): string;
-        /**
-         * xxd,xxh,xxm,xxs
-         */
-        static formatRemain5(second: number): string;
-        /**
-         *  xd 00:00:00
-         */
-        static formatRemain6(second: number): string;
-        /**
-         *  xd 00:00:00 / 00:00
-         */
-        static formatRemain7(second: number): string;
-        /**
-         * 返回不为0的格式X天X小时X分钟X秒
-         */
-        static formatRemain8(second: number): string;
-        /**
-         * 00:00:00
-         */
-        static formatRemainForEn(second: number): string;
-        /**
-         * 获取两个时间之间的相差（天、时、分、秒）
-         * @param time1:Number 时间1(ms)
-         * @param time2:Number 时间2(ms)
-         * @return Array = [天,时,分,秒]
-         */
-        static getTimeDifference(time1: number, time2: number): Array<any>;
-        timeStrToDate(timeStr: string): Date;
-        /**
-         * 不够两位的补零
-         */
-        static dateStringFillZero(num: number): string;
-        static gettodayTimeByHour(hour: number): number;
-        /**
-         * 获取时分秒
-         * @param _second
-         * @return
-         *
-         */
-        static changeServerTimeToSeconds(_second: number): number;
-        /**
-         * 将当日时间(非时间戳)转为毫秒
-         * @param hours 小时
-         * @param minutes 分钟
-         * @param seconds 秒
-         * @return 当日时间毫秒数
-         */
-        static timeToMilSeconds(hours?: number, minutes?: number, seconds?: number): number;
-        /**
-         * 获取一个指定月日时分秒时间戳（毫秒）
-         */
-        static getTimeStamp2(month?: number, day?: number, hours?: number, minutes?: number, seconds?: number): number;
-        /**
-         * 获取一个指定年月日时分秒时间戳（毫秒）
-         */
-        static getTimeStamp3(year?: number, month?: number, day?: number, hours?: number, minutes?: number, seconds?: number): number;
-        /**
-         * 获取当前服务器时间是周几
-         */
-        static getCurDay(): number;
-        /**
-        * 获取指定时 分 服务器所在的时间戳(毫秒)
-        * @param hour
-        * @param minutes
-        */
-        static getTimeStamp(hour: number, minutes: number): number;
-        /**
-         * 获取距离当前时间间隔天数的时间戳
-         */
-        static getDayTimeStamp(addDay: number): number;
-        /**
-        * 获取指定时 分 指定时间点所在的时间戳(毫秒)
-        * @param hour
-        * @param minutes
-        */
-        static getTimeStampByTime(timeStamp: number, hour: number, minutes: number): number;
-        /**
-         *获取日期之间相距的天数
-         * @param startDate
-         * @param endDate
-         * @return
-         *
-         */
-        static getBetweenDays(endTime: number, startTime: number): number;
-        /**
-        *获取经过的总天数。距离 1970 年 1 月 1 日
-        * @param date
-        * @return
-        *
-        */
-        static getTotalDays(date: Date): number;
-        /**
-         *获取经过的总天数。距离 1970 年 1 月 1 日
-         * @param time	毫秒级时间
-         * @return
-         *
-         */
-        static getTotalDaysByTime(time: number): number;
-        /**
-         * 把一个时间戳转化为年月日
-         */
-        static getTimeNoHourSecond(time: number): number;
-        /** 不足两位补0 */
-        static getZeroize(time: number): string;
-        /** 去掉小时，分，秒今天的时间戳 */
-        static getTodayStartTime(): number;
-        /**
-         * 时间格式拆分返回
-         * timeStr  --"2018-10-19 19:07:00"
-         */
-        static getTimesplit(timeStr: string): Object;
-        /**
-         * 获取今天凌晨的时间戳（昨晚12点）
-         */
-        static fun10(): number;
-        /** 根据年月日获取星期几 0表示星期日,1表示星期一*/
-        static getWeekByTime(year: number, month: number, day: number): number;
-        /** 根据年月日获取星期几 0表示星期日,1表示星期一*/
-        static getWeekByTimeStr(year: number, month: number, day: number): string;
-    }
-}
-import TimeUtil = qmr.TimeUtil;
 declare module qmr {
     /**
      * @description 浏览器工具类

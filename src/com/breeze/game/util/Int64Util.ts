@@ -1,8 +1,4 @@
 module qmr {
-	/**
-	 * coler
-	 * int64方法
-	 */
 	export class Int64Util {
 		public static getNumber(d:any):number
 		{

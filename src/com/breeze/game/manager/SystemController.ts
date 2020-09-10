@@ -66,7 +66,7 @@ module qmr
 		 */
 		private onRecsynSystem(s: com.message.S_SYNC_TIME): void
 		{
-			TimeUtil.syncServerTime(parseInt(s.time.toString()));
+			ServerTime.syncServerTime(parseInt(s.time.toString()));
 			if (!this.isSyncOne)
 			{
 				this.isSyncOne = true;
