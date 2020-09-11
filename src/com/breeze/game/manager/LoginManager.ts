@@ -15,7 +15,6 @@ module qmr {
 				console.log("==========================服务器socket连接成功==========================");
 				ModuleManager.showModule(ModuleNameLogin.LOGIN_VIEW);
 			}
-			// PlatformManager.instance.platform.setLoadingStatus("登录中...");
         	GameLoading.getInstance().setLoadingTip("正在连接服务器...");
         	Rpc.getInstance().connect(GlobalConfig.loginServer, GlobalConfig.loginPort, onConnect, t);
 		}

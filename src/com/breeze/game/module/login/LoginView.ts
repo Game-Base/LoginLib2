@@ -69,7 +69,7 @@ public txt_account:eui.TextInput;
             }
             
             GameLoading.getInstance().close();
-            PlatformManager.instance.platform.setLoadingStatus("");
+            WebLoadingManager.setLoadingStatus("");
             GameLoadManager.instance.loadGameResAfterLogin();
 
             this.onBgResBack();

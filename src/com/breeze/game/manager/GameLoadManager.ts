@@ -24,7 +24,7 @@ namespace qmr
         /**加载基础资源*/
 		public async loadLoginRes()
 		{
-			PlatformManager.instance.platform.setLoadingStatus("玩命加载中...");
+			WebLoadingManager.setLoadingStatus("玩命加载中...");
 			await this.loadResJson("login.res.json", "resourceLogin/");
 			await this.loadThmJson("login.thm.json");
 			//游戏配置文件、屏蔽字、随机名字都是在这个地方加载
@@ -42,6 +42,7 @@ namespace qmr
 			}
 			this.isGameResAfterLoginLoading = true;
 			this.isGameResAfterLoginLoaded = false;
+			await this.loadLoadingViewRes();
 			this.setLoadingViewParams("加载资源配置...", true, 0.05, 0.1, false);
 			this.setLoadingViewParams("加载皮肤配置...", true, 0.1, 0.2, true);
 			await this.loadResJson("default.res.json");
@@ -62,6 +63,20 @@ namespace qmr
 		public async waiGameResAfterLoginLoaded()
 		{
 
+		}
+
+		private async loadLoadingViewRes(){
+			return new Promise((resolve, reject) =>{
+				let totalCount = 1;
+				let loadedCount = 0;
+				let comFunc = function(){
+					loadedCount ++;
+					if(loadedCount >= totalCount){
+						resolve();
+					}
+				}
+				ResManager.getRes(WebLoadingManager.getBgName(), comFunc, this, LoadPriority.IMMEDIATELY);
+			})
 		}
 
 		/**等待资源加载完成 */

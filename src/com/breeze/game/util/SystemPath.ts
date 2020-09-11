@@ -38,5 +38,13 @@ module qmr
         public static get itemIcon(): string {
             return PlatformConfig.webRoot + "icon/item/"; 
         }
+        public static getLoginResDir(): string
+        {
+            let dirUrl: string = "resourceLogin/";
+            if(PlatformConfig.useCdnRes){
+                dirUrl = PlatformConfig.webUrl + "resourceLogin/";
+            }
+            return dirUrl;
+        }
     }
 }

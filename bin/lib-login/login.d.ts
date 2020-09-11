@@ -386,7 +386,6 @@ declare module qmr {
          * @returns void
          */
         reloadGame(clearCache?: boolean): void;
-        setLoadingStatus(msg?: string): void;
     }
 }
 declare module qmr {
@@ -505,42 +504,15 @@ declare module qmr {
     }
 }
 declare module qmr {
-    /**
-     *
-     * @description 游戏loading
-     *
-     */
-    class GameLoading extends eui.Group {
-        private static inttance;
-        private _txProgress;
-        private _loadingRun;
-        private rect;
+    class GameLoadingProgressBar extends eui.Component {
+        imgProgressBg: eui.Image;
+        imgProgress: eui.Image;
+        imgCloud: eui.Image;
+        labHint: eui.Label;
         constructor();
-        private onTouch(evt);
-        private runLoading(evt);
-        /**
-         * @description 获取loading单例对象
-         */
-        static getInstance(): GameLoading;
-        createChildren(): void;
-        /**
-         * @description 更新尺寸
-         */
-        private updateSize();
-        /**
-         * @description 设置加载进度
-         */
-        private vitureCount;
-        setProgress(itemsLoaded: number, itemsTotal: number): void;
-        private onTimer();
-        /**
-         * @description 设置loading提示
-         */
-        setLoadingTip(msg: string): void;
-        /**
-         * @description 关闭loading
-         */
-        close(): void;
+        showProgressRate(rateNum: number, isShowTween?: boolean): void;
+        setLoadingTip(txt: string): void;
+        dispose(): void;
     }
 }
 declare module qmr {
@@ -1243,6 +1215,7 @@ declare namespace qmr {
         loadGameResAfterLogin(): Promise<void>;
         /**等待登录界面后台资源加载完成 */
         waiGameResAfterLoginLoaded(): Promise<void>;
+        private loadLoadingViewRes();
         /**等待资源加载完成 */
         waitGameResLoaded(): Promise<{}>;
         private setLoadingViewParams(...arg);
@@ -1512,22 +1485,49 @@ declare module qmr {
     }
 }
 declare module qmr {
+    /**
+     *
+     * @description 游戏loading
+     *
+     */
+    class GameLoading extends eui.Group {
+        private static inttance;
+        private _txProgress;
+        private _loadingRun;
+        private rect;
+        constructor();
+        private onTouch(evt);
+        private runLoading(evt);
+        /**
+         * @description 获取loading单例对象
+         */
+        static getInstance(): GameLoading;
+        createChildren(): void;
+        /**
+         * @description 更新尺寸
+         */
+        private updateSize();
+        /**
+         * @description 设置加载进度
+         */
+        private vitureCount;
+        setProgress(itemsLoaded: number, itemsTotal: number): void;
+        private onTimer();
+        /**
+         * @description 设置loading提示
+         */
+        setLoadingTip(msg: string): void;
+        /**
+         * @description 关闭loading
+         */
+        close(): void;
+    }
+}
+declare module qmr {
     class GameMain {
         static setup(stage: any): Promise<void>;
         /** 读取缓存 */
         private static initLocalStorage();
-    }
-}
-declare module qmr {
-    class GameLoadingProgressBar extends eui.Component {
-        imgProgressBg: eui.Image;
-        imgProgress: eui.Image;
-        imgCloud: eui.Image;
-        labHint: eui.Label;
-        constructor();
-        showProgressRate(rateNum: number, isShowTween?: boolean): void;
-        setLoadingTip(txt: string): void;
-        dispose(): void;
     }
 }
 declare module qmr {
@@ -1537,7 +1537,6 @@ declare module qmr {
     class GameLoadingView extends SuperBaseModule {
         private static _instance;
         static getInstance(): GameLoadingView;
-        private static bgName;
         progressBar1: qmr.GameLoadingProgressBar;
         progressBar2: qmr.GameLoadingProgressBar;
         labRefresh: eui.Label;
@@ -1582,6 +1581,14 @@ declare module qmr {
          *  资源释放
          */
         dispose(): void;
+    }
+}
+declare module qmr {
+    class WebLoadingManager {
+        static setLoadingStatus(msg?: string): void;
+        private static bgName;
+        private static bgArray;
+        static getBgName(): string;
     }
 }
 declare module qmr {
@@ -2786,6 +2793,7 @@ declare module qmr {
         static readonly bg_music: string;
         static getEffect_musicUrl(musicName: string): string;
         static readonly itemIcon: string;
+        static getLoginResDir(): string;
     }
 }
 declare module qmr {

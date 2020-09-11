@@ -1158,7 +1158,7 @@ var qmr;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            this.setLoadingStatus("验证账号...");
+                            qmr.WebLoadingManager.setLoadingStatus("验证账号...");
                             console.log("开始平台登录");
                             return [4 /*yield*/, this.login()];
                         case 1:
@@ -1210,17 +1210,6 @@ var qmr;
             }
             else {
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请重启游戏");
-            }
-        };
-        BasePlatform.prototype.setLoadingStatus = function (msg) {
-            msg = msg || "";
-            var showLoading = window["showPreLoading"];
-            if (showLoading) {
-                showLoading(msg);
-            }
-            if (!msg && !this.firstLoadBgHide && window["EgretSubPackageLoading"]) {
-                this.firstLoadBgHide = true;
-                window["EgretSubPackageLoading"].instance.removePreLoading();
             }
         };
         return BasePlatform;
@@ -1459,123 +1448,41 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    /**
-     *
-     * @description 游戏loading
-     *
-     */
-    var GameLoading = (function (_super) {
-        __extends(GameLoading, _super);
-        function GameLoading() {
+    var GameLoadingProgressBar = (function (_super) {
+        __extends(GameLoadingProgressBar, _super);
+        function GameLoadingProgressBar() {
             var _this = _super.call(this) || this;
-            /**
-             * @description 设置加载进度
-             */
-            _this.vitureCount = 0;
-            var t = _this;
-            t.addEventListener(egret.Event.REMOVED_FROM_STAGE, function () {
-                if (t.hasEventListener(egret.Event.ENTER_FRAME)) {
-                    t.removeEventListener(egret.Event.ENTER_FRAME, t.runLoading, t);
-                }
-            }, t);
-            t.addEventListener(egret.Event.ADDED_TO_STAGE, function () {
-                t.setProgress(0, 1);
-                t.addEventListener(egret.Event.ENTER_FRAME, t.runLoading, t);
-            }, t);
-            t.touchEnabled = true;
+            _this.skinName = "GameLoadingProgressBarSkin";
+            _this.touchEnabled = _this.touchChildren = false;
             return _this;
         }
-        GameLoading.prototype.onTouch = function (evt) {
-            evt.stopImmediatePropagation();
-        };
-        GameLoading.prototype.runLoading = function (evt) {
-            if (this._loadingRun) {
-                this._loadingRun.rotation += 3;
+        GameLoadingProgressBar.prototype.showProgressRate = function (rateNum, isShowTween) {
+            if (isShowTween === void 0) { isShowTween = false; }
+            var rate = rateNum;
+            if (rate <= 0)
+                rate = 0;
+            if (rate >= 1)
+                rate = 1;
+            var progressWidth = rate * 528;
+            egret.Tween.removeTweens(this.imgProgress);
+            if (!isShowTween) {
+                this.imgProgress.width = progressWidth;
             }
-        };
-        /**
-         * @description 获取loading单例对象
-         */
-        GameLoading.getInstance = function () {
-            if (GameLoading.inttance == null) {
-                GameLoading.inttance = new GameLoading();
+            else {
+                egret.Tween.get(this.imgProgress).to({ width: progressWidth }, 300);
             }
-            return GameLoading.inttance;
+            this.imgCloud.x = progressWidth;
         };
-        GameLoading.prototype.createChildren = function () {
-            _super.prototype.createChildren.call(this);
-            this.rect = new eui.Rect();
-            this.rect.fillColor = 0x0;
-            this.rect.fillAlpha = 0.2;
-            this.addChild(this.rect);
-            this.rect.touchEnabled = true;
-            this.rect.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouch, this);
-            this._loadingRun = new eui.Image(RES.getRes("preloading_loading_png"));
-            this.addChild(this._loadingRun);
-            this._txProgress = new eui.Label;
-            // this._txProgress.textColor = 0xdd1900;
-            this._txProgress.fontFamily = "specialGameFont";
-            this.addChild(this._txProgress);
-            this.updateSize();
+        GameLoadingProgressBar.prototype.setLoadingTip = function (txt) {
+            this.labHint.text = txt;
         };
-        /**
-         * @description 更新尺寸
-         */
-        GameLoading.prototype.updateSize = function () {
-            this._loadingRun.verticalCenter = 0;
-            this._loadingRun.horizontalCenter = 0;
-            this._txProgress.verticalCenter = 0;
-            this._txProgress.horizontalCenter = 0;
-            this._txProgress.size = 20;
-            // this._txProgress.stroke = 1;
-            // this._txProgress.strokeColor = 0;
-            this.rect.width = qmr.StageUtil.stageWidth;
-            this.rect.height = qmr.StageUtil.stageHeight;
+        GameLoadingProgressBar.prototype.dispose = function () {
+            egret.Tween.removeTweens(this.imgProgress);
         };
-        GameLoading.prototype.setProgress = function (itemsLoaded, itemsTotal) {
-            qmr.LayerManager.instance.addDisplay(this, qmr.LayerConst.TOP);
-            if (this._txProgress) {
-                this._txProgress.text = Math.round(itemsLoaded / itemsTotal * 100) + "%";
-                if (itemsLoaded == 0) {
-                    this.vitureCount = 1;
-                    qmr.Ticker.getInstance().registerTick(this.onTimer, this, 50);
-                }
-                else {
-                    qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
-                }
-            }
-        };
-        GameLoading.prototype.onTimer = function () {
-            this.vitureCount++;
-            if (this.vitureCount < 100) {
-                this._txProgress.text = Math.round(this.vitureCount) + "%";
-            }
-        };
-        /**
-         * @description 设置loading提示
-         */
-        GameLoading.prototype.setLoadingTip = function (msg) {
-            qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
-            qmr.NotifyManager.registerNotify(qmr.StageUtil.STAGE_RESIZE, this.updateSize, this);
-            qmr.LayerManager.instance.addDisplay(this, qmr.LayerConst.TOP);
-            if (this._txProgress) {
-                this._txProgress.text = msg;
-            }
-        };
-        /**
-         * @description 关闭loading
-         */
-        GameLoading.prototype.close = function () {
-            qmr.NotifyManager.unRegisterNotify(qmr.StageUtil.STAGE_RESIZE, this.updateSize, this);
-            qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
-            if (this.parent) {
-                this.parent.removeChild(this);
-            }
-        };
-        return GameLoading;
-    }(eui.Group));
-    qmr.GameLoading = GameLoading;
-    __reflect(GameLoading.prototype, "qmr.GameLoading");
+        return GameLoadingProgressBar;
+    }(eui.Component));
+    qmr.GameLoadingProgressBar = GameLoadingProgressBar;
+    __reflect(GameLoadingProgressBar.prototype, "qmr.GameLoadingProgressBar");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -3718,7 +3625,7 @@ var qmr;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            qmr.PlatformManager.instance.platform.setLoadingStatus("玩命加载中...");
+                            qmr.WebLoadingManager.setLoadingStatus("玩命加载中...");
                             return [4 /*yield*/, this.loadResJson("login.res.json", "resourceLogin/")];
                         case 1:
                             _a.sent();
@@ -3749,24 +3656,27 @@ var qmr;
                             }
                             this.isGameResAfterLoginLoading = true;
                             this.isGameResAfterLoginLoaded = false;
+                            return [4 /*yield*/, this.loadLoadingViewRes()];
+                        case 1:
+                            _a.sent();
                             this.setLoadingViewParams("加载资源配置...", true, 0.05, 0.1, false);
                             this.setLoadingViewParams("加载皮肤配置...", true, 0.1, 0.2, true);
                             return [4 /*yield*/, this.loadResJson("default.res.json")];
-                        case 1:
-                            _a.sent();
-                            return [4 /*yield*/, this.loadDefaultThmJs()];
                         case 2:
                             _a.sent();
-                            return [4 /*yield*/, this.loadThmJson("default.thm.json")];
+                            return [4 /*yield*/, this.loadDefaultThmJs()];
                         case 3:
+                            _a.sent();
+                            return [4 /*yield*/, this.loadThmJson("default.thm.json")];
+                        case 4:
                             _a.sent();
                             this.setLoadingViewParams("加载游戏配置...", true, 0.2, 0.5, true);
                             return [4 /*yield*/, this.loadConfigGroup()];
-                        case 4:
+                        case 5:
                             _a.sent();
                             this.setLoadingViewParams("加载公共资源...", true, 0.5, 0.9, true);
                             return [4 /*yield*/, this.loadCommonGroup()];
-                        case 5:
+                        case 6:
                             _a.sent();
                             this.isGameResAfterLoginLoaded = true;
                             if (this.gameResAfterLoginLoadedCall) {
@@ -3782,6 +3692,24 @@ var qmr;
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     return [2 /*return*/];
+                });
+            });
+        };
+        GameLoadManager.prototype.loadLoadingViewRes = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            var totalCount = 1;
+                            var loadedCount = 0;
+                            var comFunc = function () {
+                                loadedCount++;
+                                if (loadedCount >= totalCount) {
+                                    resolve();
+                                }
+                            };
+                            qmr.ResManager.getRes(qmr.WebLoadingManager.getBgName(), comFunc, _this, qmr.LoadPriority.IMMEDIATELY);
+                        })];
                 });
             });
         };
@@ -4275,7 +4203,6 @@ var qmr;
                 console.log("==========================服务器socket连接成功==========================");
                 qmr.ModuleManager.showModule(qmr.ModuleNameLogin.LOGIN_VIEW);
             };
-            // PlatformManager.instance.platform.setLoadingStatus("登录中...");
             qmr.GameLoading.getInstance().setLoadingTip("正在连接服务器...");
             qmr.Rpc.getInstance().connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, onConnect, t);
         };
@@ -4956,6 +4883,126 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
+    /**
+     *
+     * @description 游戏loading
+     *
+     */
+    var GameLoading = (function (_super) {
+        __extends(GameLoading, _super);
+        function GameLoading() {
+            var _this = _super.call(this) || this;
+            /**
+             * @description 设置加载进度
+             */
+            _this.vitureCount = 0;
+            var t = _this;
+            t.addEventListener(egret.Event.REMOVED_FROM_STAGE, function () {
+                if (t.hasEventListener(egret.Event.ENTER_FRAME)) {
+                    t.removeEventListener(egret.Event.ENTER_FRAME, t.runLoading, t);
+                }
+            }, t);
+            t.addEventListener(egret.Event.ADDED_TO_STAGE, function () {
+                t.setProgress(0, 1);
+                t.addEventListener(egret.Event.ENTER_FRAME, t.runLoading, t);
+            }, t);
+            t.touchEnabled = true;
+            return _this;
+        }
+        GameLoading.prototype.onTouch = function (evt) {
+            evt.stopImmediatePropagation();
+        };
+        GameLoading.prototype.runLoading = function (evt) {
+            if (this._loadingRun) {
+                this._loadingRun.rotation += 3;
+            }
+        };
+        /**
+         * @description 获取loading单例对象
+         */
+        GameLoading.getInstance = function () {
+            if (GameLoading.inttance == null) {
+                GameLoading.inttance = new GameLoading();
+            }
+            return GameLoading.inttance;
+        };
+        GameLoading.prototype.createChildren = function () {
+            _super.prototype.createChildren.call(this);
+            this.rect = new eui.Rect();
+            this.rect.fillColor = 0x0;
+            this.rect.fillAlpha = 0.2;
+            this.addChild(this.rect);
+            this.rect.touchEnabled = true;
+            this.rect.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouch, this);
+            this._loadingRun = new eui.Image(RES.getRes("preloading_loading_png"));
+            this.addChild(this._loadingRun);
+            this._txProgress = new eui.Label;
+            // this._txProgress.textColor = 0xdd1900;
+            this._txProgress.fontFamily = "specialGameFont";
+            this.addChild(this._txProgress);
+            this.updateSize();
+        };
+        /**
+         * @description 更新尺寸
+         */
+        GameLoading.prototype.updateSize = function () {
+            this._loadingRun.verticalCenter = 0;
+            this._loadingRun.horizontalCenter = 0;
+            this._txProgress.verticalCenter = 0;
+            this._txProgress.horizontalCenter = 0;
+            this._txProgress.size = 20;
+            // this._txProgress.stroke = 1;
+            // this._txProgress.strokeColor = 0;
+            this.rect.width = qmr.StageUtil.stageWidth;
+            this.rect.height = qmr.StageUtil.stageHeight;
+        };
+        GameLoading.prototype.setProgress = function (itemsLoaded, itemsTotal) {
+            qmr.LayerManager.instance.addDisplay(this, qmr.LayerConst.TOP);
+            if (this._txProgress) {
+                this._txProgress.text = Math.round(itemsLoaded / itemsTotal * 100) + "%";
+                if (itemsLoaded == 0) {
+                    this.vitureCount = 1;
+                    qmr.Ticker.getInstance().registerTick(this.onTimer, this, 50);
+                }
+                else {
+                    qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
+                }
+            }
+        };
+        GameLoading.prototype.onTimer = function () {
+            this.vitureCount++;
+            if (this.vitureCount < 100) {
+                this._txProgress.text = Math.round(this.vitureCount) + "%";
+            }
+        };
+        /**
+         * @description 设置loading提示
+         */
+        GameLoading.prototype.setLoadingTip = function (msg) {
+            qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
+            qmr.NotifyManager.registerNotify(qmr.StageUtil.STAGE_RESIZE, this.updateSize, this);
+            qmr.LayerManager.instance.addDisplay(this, qmr.LayerConst.TOP);
+            if (this._txProgress) {
+                this._txProgress.text = msg;
+            }
+        };
+        /**
+         * @description 关闭loading
+         */
+        GameLoading.prototype.close = function () {
+            qmr.NotifyManager.unRegisterNotify(qmr.StageUtil.STAGE_RESIZE, this.updateSize, this);
+            qmr.Ticker.getInstance().unRegisterTick(this.onTimer, this);
+            if (this.parent) {
+                this.parent.removeChild(this);
+            }
+        };
+        return GameLoading;
+    }(eui.Group));
+    qmr.GameLoading = GameLoading;
+    __reflect(GameLoading.prototype, "qmr.GameLoading");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
     var GameMain = (function () {
         function GameMain() {
         }
@@ -5013,44 +5060,6 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
-    var GameLoadingProgressBar = (function (_super) {
-        __extends(GameLoadingProgressBar, _super);
-        function GameLoadingProgressBar() {
-            var _this = _super.call(this) || this;
-            _this.skinName = "GameLoadingProgressBarSkin";
-            _this.touchEnabled = _this.touchChildren = false;
-            return _this;
-        }
-        GameLoadingProgressBar.prototype.showProgressRate = function (rateNum, isShowTween) {
-            if (isShowTween === void 0) { isShowTween = false; }
-            var rate = rateNum;
-            if (rate <= 0)
-                rate = 0;
-            if (rate >= 1)
-                rate = 1;
-            var progressWidth = rate * 528;
-            egret.Tween.removeTweens(this.imgProgress);
-            if (!isShowTween) {
-                this.imgProgress.width = progressWidth;
-            }
-            else {
-                egret.Tween.get(this.imgProgress).to({ width: progressWidth }, 300);
-            }
-            this.imgCloud.x = progressWidth;
-        };
-        GameLoadingProgressBar.prototype.setLoadingTip = function (txt) {
-            this.labHint.text = txt;
-        };
-        GameLoadingProgressBar.prototype.dispose = function () {
-            egret.Tween.removeTweens(this.imgProgress);
-        };
-        return GameLoadingProgressBar;
-    }(eui.Component));
-    qmr.GameLoadingProgressBar = GameLoadingProgressBar;
-    __reflect(GameLoadingProgressBar.prototype, "qmr.GameLoadingProgressBar");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
     /**
      * 游戏大加载进度条
      */
@@ -5095,6 +5104,7 @@ var qmr;
         };
         GameLoadingView.prototype.addedToStage = function (evt) {
             _super.prototype.addedToStage.call(this, evt);
+            this.imgBg.source = qmr.WebLoadingManager.getBgName();
         };
         GameLoadingView.prototype.showSelf = function (msg, showVitureProgress, fromProgress, toProgress, isShowTween) {
             if (showVitureProgress === void 0) { showVitureProgress = true; }
@@ -5202,6 +5212,31 @@ var qmr;
     }(qmr.SuperBaseModule));
     qmr.GameLoadingView = GameLoadingView;
     __reflect(GameLoadingView.prototype, "qmr.GameLoadingView");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    var WebLoadingManager = (function () {
+        function WebLoadingManager() {
+        }
+        WebLoadingManager.setLoadingStatus = function (msg) {
+            msg = msg || "";
+            var showLoading = window["showPreLoading"];
+            if (showLoading) {
+                showLoading(msg);
+            }
+        };
+        WebLoadingManager.getBgName = function () {
+            if (!WebLoadingManager.bgName) {
+                var i = Math.floor(Math.random() * WebLoadingManager.bgArray.length);
+                WebLoadingManager.bgName = qmr.SystemPath.getLoginResDir() + "unpack/" + WebLoadingManager.bgArray[i];
+            }
+            return WebLoadingManager.bgName;
+        };
+        WebLoadingManager.bgArray = ["1022_map.jpg"];
+        return WebLoadingManager;
+    }());
+    qmr.WebLoadingManager = WebLoadingManager;
+    __reflect(WebLoadingManager.prototype, "qmr.WebLoadingManager");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -5433,7 +5468,7 @@ var qmr;
                 styleSpan.parentNode.removeChild(styleSpan);
             }
             qmr.GameLoading.getInstance().close();
-            qmr.PlatformManager.instance.platform.setLoadingStatus("");
+            qmr.WebLoadingManager.setLoadingStatus("");
             qmr.GameLoadManager.instance.loadGameResAfterLogin();
             this.onBgResBack();
             this.addWindEffect();
@@ -8975,6 +9010,13 @@ var qmr;
             enumerable: true,
             configurable: true
         });
+        SystemPath.getLoginResDir = function () {
+            var dirUrl = "resourceLogin/";
+            if (qmr.PlatformConfig.useCdnRes) {
+                dirUrl = qmr.PlatformConfig.webUrl + "resourceLogin/";
+            }
+            return dirUrl;
+        };
         return SystemPath;
     }());
     qmr.SystemPath = SystemPath;

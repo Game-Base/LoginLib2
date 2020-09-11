@@ -65,7 +65,7 @@ module qmr {
 		
 		/**请求登录 *///基类函数不可修改
 		public async reqLogin() {
-			this.setLoadingStatus("验证账号...");
+			WebLoadingManager.setLoadingStatus("验证账号...");
 			console.log("开始平台登录");
 			await this.login();
 			console.log("平台登录完成");
@@ -108,19 +108,6 @@ module qmr {
 				window.location.reload();
 			} else {
 				TipManagerCommon.getInstance().createCommonColorTip("请重启游戏");
-			}
-		}
-
-		public setLoadingStatus(msg?: string)
-		{
-			msg = msg || "";
-			var showLoading = window["showPreLoading"];
-			if(showLoading){
-				showLoading(msg);
-			}
-			if(!msg && !this.firstLoadBgHide&& window["EgretSubPackageLoading"]){
-				this.firstLoadBgHide = true;
-				window["EgretSubPackageLoading"].instance.removePreLoading();
 			}
 		}
 	}

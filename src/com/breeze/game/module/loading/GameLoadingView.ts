@@ -14,8 +14,6 @@ module qmr
 			return GameLoadingView._instance;
 		}
 
-		private static bgName: string; 
-
 		public progressBar1: qmr.GameLoadingProgressBar;
 		public progressBar2: qmr.GameLoadingProgressBar;
 		public labRefresh: eui.Label;
@@ -62,6 +60,7 @@ module qmr
 		protected addedToStage(evt: egret.Event): void
 		{
 			super.addedToStage(evt);
+			this.imgBg.source = WebLoadingManager.getBgName();
 		}
 
 		public showSelf(msg: string, showVitureProgress: boolean = true, fromProgress: number = 0, toProgress: number = 1, isShowTween: boolean = true): void {
