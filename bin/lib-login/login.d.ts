@@ -1,5 +1,7 @@
 declare module qmr {
     class UIComponent extends eui.Component {
+        /**同一个模块的View和page子类设置模块名称为ModuleNameConst中的值，防止设置标题和ruleid后影响同时打开的其他面板 */
+        moduleName: string;
         protected isSkinLoaded: boolean;
         private _data;
         private _eventDic;
