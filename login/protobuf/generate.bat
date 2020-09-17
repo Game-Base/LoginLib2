@@ -1,1 +1,0 @@
-pb-egret generate
