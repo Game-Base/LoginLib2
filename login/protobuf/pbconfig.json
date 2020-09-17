@@ -1,0 +1,10 @@
+{
+	"options": {
+		"no-create": false,
+		"no-verify": false,
+		"no-convert": true,
+		"no-delimited": false
+	},
+	"sourceRoot": "protofile",
+	"outputFile": "../../game/protobuf-bundles-login/protobuf-bundles-login.js"
+}

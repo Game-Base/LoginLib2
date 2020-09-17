@@ -5269,6 +5269,8 @@ var qmr;
             if (gameSite === void 0) { gameSite = "1"; }
             qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
             egret.log("登陆账号:" + username, "区服:" + gameSite);
+            qmr.TipManagerCommon.getInstance().createCommonColorTip("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..." + com.message.C_USER_LOGIN);
+            qmr.TipManagerCommon.getInstance().createCommonColorTip("ddddddddddddddddddddddddddddd..." + new com.message.C_USER_LOGIN());
             var c = new com.message.C_USER_LOGIN();
             c.username = username;
             c.gameSite = gameSite;
