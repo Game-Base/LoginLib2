@@ -11,6 +11,7 @@ module qmr
 		public static S_ERROR_CODE: string = "S_ERROR_CODE";//错误码事件
 		
 		/*-------------------------------登录--------------------------------------*/
+		public static S_LOGIN_REGISTER:string = "S_LOGIN_REGISTER";							// 注册返回
 		public static S_USER_LOGIN: string = "S_USER_LOGIN";                 				//登陆成功
 		public static S_USER_LOGIN_REPEAT: string = "S_USER_LOGIN_REPEAT";                 	//角色名重复
 		public static S_LOGIN_OFFLINE_HANGUP_PUSH: string = "S_LOGIN_OFFLINE_HANGUP_PUSH";  //服务器返回离线信息

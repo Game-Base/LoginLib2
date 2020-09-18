@@ -3,8 +3,15 @@ package com.message;
 
 // 登录
 message C_USER_LOGIN {
-	int64 username=1; // 账号
-	string gameSite=2; // 区服
+	string mobile=1; // 手机号码
+	string password=2; // 密码
+	string sparam = 3; //预留参数
+}
+
+// 短信登录
+message C_USER_LOGIN_VERIFY_CODE {
+	string mobile=1; // 手机号码
+	string verifyCode=2; //短信验证码
 	string sparam = 3; //预留参数
 }
 
@@ -15,17 +22,25 @@ message S_USER_LOGIN {
 
 // 注册
 message C_LOGIN_REGISTER {
-	int64 username=1; // 账号
-	string gameSite=2; // 区服
-	string nickname=3; // 玩家昵称
-	int32 heroId=4;  //所选角色
-	string sparam = 5;			//后端透传参数
+	string mobile=1; // 手机号码
+	string inviteCode=2; // 邀请码
+	string password=3; // 密码
+	string rePassword=4; // 重复密码
+	string verifyCode=5; //短信验证码
+	string sparam = 6; //预留参数
+}
+
+
+// 注册返回
+message S_LOGIN_REGISTER {
+	int64 playerId=1; // 玩家编号
 }
 
 //登出
 message C_USER_LOGOUT {
 	int64 playerId=1; // 玩家编号
 }
+
 //登出返回，踢人下线
 message S_USER_LOGOUT {
 	int64 playerId=1; // 玩家编号

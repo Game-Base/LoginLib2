@@ -8,5 +8,5 @@
     "no-decode": false
   	},
 	"sourceRoot": "protofile",
-	"outputFile": "bundles/protobuf-bundles.js"
+	"outputFile": "bundles/protobuf-login.js"
 }

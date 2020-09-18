@@ -2,7 +2,6 @@ module qmr
 {
 	/**
 	 *
-	 * @author coler
 	 * @description 登陆数据模型
 	 *
 	 */

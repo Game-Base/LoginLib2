@@ -3,16 +3,38 @@ module qmr
     export class LoginView extends SuperBaseModule
     {
         public groupWind:eui.Group;
-public imgWindSlow:eui.Image;
-public imgWindFast:eui.Image;
-public imgWindMiddle:eui.Image;
-public gpRead:eui.Group;
-public lbUserBook:eui.Label;
-public lbPrivacyPolicy:eui.Label;
-public cbRead:eui.CheckBox;
-public btn_login:eui.Image;
-public groupAccount:eui.Group;
-public txt_account:eui.TextInput;
+        public imgWindSlow:eui.Image;
+        public imgWindFast:eui.Image;
+        public imgWindMiddle:eui.Image;
+        public group_login:eui.Group;
+        public gpRead:eui.Group;
+        public lbUserBook:eui.Label;
+        public lbPrivacyPolicy:eui.Label;
+        public groupAccount:eui.Group;
+        public txt_account:eui.TextInput;
+        public groupAccount0:eui.Group;
+        public txt_password:eui.TextInput;
+        public btn_login:eui.Image;
+        public btn_register_back:eui.Image;
+        public group_register:eui.Group;
+        public gpRead0:eui.Group;
+        public lbUserBook0:eui.Label;
+        public lbPrivacyPolicy0:eui.Label;
+        public groupAccount1:eui.Group;
+        public txt_register_tel:eui.TextInput;
+        public groupAccount2:eui.Group;
+        public txt_register_invitecode:eui.TextInput;
+        public groupAccount3:eui.Group;
+        public txt_register_pwd:eui.TextInput;
+        public groupAccount4:eui.Group;
+        public txt_register_repwd:eui.TextInput;
+        public groupAccount5:eui.Group;
+        public txt_register_verifycode:eui.TextInput;
+        public btn_register:eui.Image;
+        public btn_login_back:eui.Image;
+        
+
+
 
 
 
@@ -30,6 +52,32 @@ public txt_account:eui.TextInput;
             super.initListener();
 
             this.addClickEvent(this.btn_login, this.startLogin, this);
+            this.addClickEvent(this.btn_register_back, this.gotoRegisterView, this);
+            this.addClickEvent(this.btn_register, this.startRegister, this);
+            this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
+        }
+
+        private gotoRegisterView():void
+        {
+            this.group_login.visible = false;
+            this.group_register.visible = true;
+        }
+
+        private gotoLoginView():void
+        {
+            this.group_login.visible = true;
+            this.group_register.visible = false;
+        }
+
+        private startRegister():void
+        {
+            let tel: string = this.txt_account.text.trim();
+            let inviteCode:string = this.txt_register_invitecode.text;
+            let pwd:string = this.txt_register_pwd.text;
+            let repwd:string = this.txt_register_repwd.text;
+            let verifycode:string = this.txt_register_verifycode.text;
+
+            LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
         }
 
         private startLogin():void{
@@ -47,10 +95,26 @@ public txt_account:eui.TextInput;
                 TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
                 return;
             }
-            let telNum:number = Number(userName);
-            GlobalConfig.account = telNum;
-            LoginController.instance.reqLogin(telNum);
-            egret.localStorage.setItem("testUserid", GlobalConfig.account+"");
+
+            let password:string = this.txt_password.text.trim();
+            if (password.length == 0)
+            {
+                TipManagerCommon.getInstance().createCommonColorTip("请输入密码");
+                return;
+            }
+            if(!LoginManager.isConnected){
+                TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                return;
+            }
+            if(password.length < 0){
+                TipManagerCommon.getInstance().createCommonColorTip("密码不能少于六位数...");
+                return;
+            }
+
+            GlobalConfig.account = userName;
+            GlobalConfig.pwd = password;
+            LoginController.instance.reqLogin(userName, password);
+            egret.localStorage.setItem("testUserid", GlobalConfig.account);
         }
 
         protected addedToStage(evt: egret.Event): void
@@ -113,6 +177,8 @@ public txt_account:eui.TextInput;
         {
             super.initData();
             this.txt_account.text = egret.localStorage.getItem("testUserid");
+            this.group_login.visible = true;
+            this.group_register.visible = false;
         }
 
         public isPhoneNumber(phoneNum): boolean {

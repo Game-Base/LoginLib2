@@ -887,7 +887,8 @@ declare module qmr {
         static loginInitFinish: boolean;
         static isDebugF: boolean;
         /**游戏登陆账号 */
-        static account: number;
+        static account: string;
+        static pwd: string;
         /**登录服务器 */
         static loginServer: string;
         static loginPort: number;
@@ -901,6 +902,7 @@ declare module qmr {
         static clientIp: string;
         /**登录时间 */
         static logintime: number;
+        LOGIN_KEY: string;
         /**
          * 是否ios系统
          */
@@ -1001,6 +1003,7 @@ declare module qmr {
     class NotifyConstLogin {
         /** 错误日志 */
         static S_ERROR_CODE: string;
+        static S_LOGIN_REGISTER: string;
         static S_USER_LOGIN: string;
         static S_USER_LOGIN_REPEAT: string;
         static S_LOGIN_OFFLINE_HANGUP_PUSH: string;
@@ -1603,11 +1606,20 @@ declare module qmr {
         /**
          *  ---请求登陆---
          */
-        reqLogin(username: number, gameSite?: string): void;
+        reqLogin(tel: string, pwd: string): void;
         /**
-         *  ---请求注册---
+         * 请求注册
+         * @param mobile 手机号码
+         * @param inviteCode 邀请码
+         * @param password 密码
+         * @param verifyCode 短信验证码
+         * @param sparam 预留参数
          */
-        reqLoginRegister(username: number, gameSite: string, nickname: string, heroId: number): void;
+        reqLoginRegister(mobile: string, inviteCode: string, password: string, repassword: string, verifyCode: string, sparam?: string): void;
+        /**
+         *  ===返回登陆/注册成功===
+         */
+        private onRegisterResponse(s);
         /**
          *  ===返回登陆/注册成功===
          */
@@ -1629,7 +1641,6 @@ declare module qmr {
 declare module qmr {
     /**
      *
-     * @author coler
      * @description 登陆数据模型
      *
      */
@@ -1654,18 +1665,40 @@ declare module qmr {
         imgWindSlow: eui.Image;
         imgWindFast: eui.Image;
         imgWindMiddle: eui.Image;
+        group_login: eui.Group;
         gpRead: eui.Group;
         lbUserBook: eui.Label;
         lbPrivacyPolicy: eui.Label;
-        cbRead: eui.CheckBox;
-        btn_login: eui.Image;
         groupAccount: eui.Group;
         txt_account: eui.TextInput;
+        groupAccount0: eui.Group;
+        txt_password: eui.TextInput;
+        btn_login: eui.Image;
+        btn_register_back: eui.Image;
+        group_register: eui.Group;
+        gpRead0: eui.Group;
+        lbUserBook0: eui.Label;
+        lbPrivacyPolicy0: eui.Label;
+        groupAccount1: eui.Group;
+        txt_register_tel: eui.TextInput;
+        groupAccount2: eui.Group;
+        txt_register_invitecode: eui.TextInput;
+        groupAccount3: eui.Group;
+        txt_register_pwd: eui.TextInput;
+        groupAccount4: eui.Group;
+        txt_register_repwd: eui.TextInput;
+        groupAccount5: eui.Group;
+        txt_register_verifycode: eui.TextInput;
+        btn_register: eui.Image;
+        btn_login_back: eui.Image;
         constructor();
         /**
          * @description 初始化事件
          */
         protected initListener(): void;
+        private gotoRegisterView();
+        private gotoLoginView();
+        private startRegister();
         private startLogin();
         protected addedToStage(evt: egret.Event): void;
         private onBgResBack();
@@ -1708,6 +1741,8 @@ declare module qmr {
         static S_USER_LOGIN: number;
         /** 注册 */
         static C_LOGIN_REGISTER: number;
+        /** 注册返回 */
+        static S_LOGIN_REGISTER: number;
         /** 登出 */
         static C_USER_LOGOUT: number;
         static S_USER_LOGOUT: number;

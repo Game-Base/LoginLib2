@@ -8,7 +8,8 @@ module qmr
 		public static loginInitFinish: boolean = false;			//是否是调试状态LOGIN_INIT_FINISH
 		public static isDebugF: boolean = false;			   	//是否是调试战斗状态
 		/**游戏登陆账号 */
-		public static account: number = 0;
+		public static account: string = "";
+		public static pwd:string = "";
 		/**登录服务器 */
 		public static loginServer: string = "129.226.177.253";//129.226.177.253   192.168.3.116
 		//登陆服务器端口
@@ -26,6 +27,8 @@ module qmr
 		public static clientIp: string = "127.0.0.1";
 		/**登录时间 */
 		public static logintime: number = 0;
+
+		public LOGIN_KEY:string = "Dragon2020WOMenYIQiFaDaCAI#WOCAO@^^%(*88888888abZ";
 		
 
 		/**

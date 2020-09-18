@@ -2675,6 +2675,7 @@ var qmr;
 (function (qmr) {
     var GlobalConfig = (function () {
         function GlobalConfig() {
+            this.LOGIN_KEY = "Dragon2020WOMenYIQiFaDaCAI#WOCAO@^^%(*88888888abZ";
         }
         Object.defineProperty(GlobalConfig, "isSysIos", {
             /**
@@ -2691,7 +2692,8 @@ var qmr;
         GlobalConfig.loginInitFinish = false; //是否是调试状态LOGIN_INIT_FINISH
         GlobalConfig.isDebugF = false; //是否是调试战斗状态
         /**游戏登陆账号 */
-        GlobalConfig.account = 0;
+        GlobalConfig.account = "";
+        GlobalConfig.pwd = "";
         /**登录服务器 */
         GlobalConfig.loginServer = "129.226.177.253"; //129.226.177.253   192.168.3.116
         //登陆服务器端口
@@ -2867,6 +2869,7 @@ var qmr;
         /** 错误日志 */
         NotifyConstLogin.S_ERROR_CODE = "S_ERROR_CODE"; //错误码事件
         /*-------------------------------登录--------------------------------------*/
+        NotifyConstLogin.S_LOGIN_REGISTER = "S_LOGIN_REGISTER"; // 注册返回
         NotifyConstLogin.S_USER_LOGIN = "S_USER_LOGIN"; //登陆成功
         NotifyConstLogin.S_USER_LOGIN_REPEAT = "S_USER_LOGIN_REPEAT"; //角色名重复
         NotifyConstLogin.S_LOGIN_OFFLINE_HANGUP_PUSH = "S_LOGIN_OFFLINE_HANGUP_PUSH"; //服务器返回离线信息
@@ -5261,37 +5264,47 @@ var qmr;
             t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGIN, t.onRecLoginSuccess, t, true);
             t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGOUT, t.onRecUseLoginOut, t, true);
             t.addSocketListener(qmr.MessageIDLogin.S_SEND_SDK_DATA, t.onSdkReportResponse, t, true);
+            t.addSocketListener(qmr.MessageIDLogin.S_LOGIN_REGISTER, t.onRegisterResponse, t, true);
         };
         /**
          *  ---请求登陆---
          */
-        LoginController.prototype.reqLogin = function (username, gameSite) {
-            if (gameSite === void 0) { gameSite = "1"; }
+        LoginController.prototype.reqLogin = function (tel, pwd) {
             qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
-            egret.log("登陆账号:" + username, "区服:" + gameSite);
+            egret.log("登陆账号:" + tel, "参数:" + sparam);
             var c = new com.message.C_USER_LOGIN();
-            c.username = username;
-            c.gameSite = gameSite;
-            var sparam = qmr.GlobalConfig.sparam;
-            if (sparam) {
-                c.sparam = JSON.stringify(sparam);
-            }
+            c.mobile = tel;
+            c.password = pwd;
+            var sparam = { "DeviceUID": "", "ClientVersion": qmr.PlatformConfig.resVersion, "ClientIp": "" };
+            c.sparam = JSON.stringify(sparam);
             this.sendCmd(c, qmr.MessageIDLogin.C_USER_LOGIN, true);
         };
         /**
-         *  ---请求注册---
+         * 请求注册
+         * @param mobile 手机号码
+         * @param inviteCode 邀请码
+         * @param password 密码
+         * @param verifyCode 短信验证码
+         * @param sparam 预留参数
          */
-        LoginController.prototype.reqLoginRegister = function (username, gameSite, nickname, heroId) {
+        LoginController.prototype.reqLoginRegister = function (mobile, inviteCode, password, repassword, verifyCode, sparam) {
+            if (sparam === void 0) { sparam = ""; }
             var c = new com.message.C_LOGIN_REGISTER();
-            c.username = username;
-            c.gameSite = gameSite;
-            c.nickname = nickname;
-            c.heroId = heroId;
-            var sparam = qmr.GlobalConfig.sparam;
-            if (sparam) {
-                c.sparam = JSON.stringify(sparam);
-            }
+            c.mobile = mobile;
+            c.inviteCode = inviteCode;
+            c.password = password;
+            c.rePassword = repassword;
+            c.verifyCode = verifyCode;
+            c.sparam = sparam;
             this.sendCmd(c, qmr.MessageIDLogin.C_LOGIN_REGISTER);
+        };
+        /**
+         *  ===返回登陆/注册成功===
+         */
+        LoginController.prototype.onRegisterResponse = function (s) {
+            var playerId = qmr.Int64Util.getNumber(s.playerId);
+            qmr.TipManagerCommon.getInstance().createCommonColorTip("注册成功");
+            this.dispatch(qmr.NotifyConstLogin.S_LOGIN_REGISTER);
         };
         /**
          *  ===返回登陆/注册成功===
@@ -5334,7 +5347,7 @@ var qmr;
                 return;
             }
             qmr.LoginModel.instance.isReconnect = true;
-            this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.sid);
+            this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
         };
         LoginController.prototype.reqRelogin = function () {
             //平台下如果未通过验证 不重连
@@ -5342,7 +5355,7 @@ var qmr;
                 return;
             }
             qmr.LoginModel.instance.isReconnect = false;
-            this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.sid);
+            this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
         };
         LoginController.prototype.reportSdkPortRequest = function (url, p) {
             var c = new com.message.C_SEND_SDK_DATA();
@@ -5362,7 +5375,6 @@ var qmr;
 (function (qmr) {
     /**
      *
-     * @author coler
      * @description 登陆数据模型
      *
      */
@@ -5437,6 +5449,25 @@ var qmr;
         LoginView.prototype.initListener = function () {
             _super.prototype.initListener.call(this);
             this.addClickEvent(this.btn_login, this.startLogin, this);
+            this.addClickEvent(this.btn_register_back, this.gotoRegisterView, this);
+            this.addClickEvent(this.btn_register, this.startRegister, this);
+            this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
+        };
+        LoginView.prototype.gotoRegisterView = function () {
+            this.group_login.visible = false;
+            this.group_register.visible = true;
+        };
+        LoginView.prototype.gotoLoginView = function () {
+            this.group_login.visible = true;
+            this.group_register.visible = false;
+        };
+        LoginView.prototype.startRegister = function () {
+            var tel = this.txt_account.text.trim();
+            var inviteCode = this.txt_register_invitecode.text;
+            var pwd = this.txt_register_pwd.text;
+            var repwd = this.txt_register_repwd.text;
+            var verifycode = this.txt_register_verifycode.text;
+            qmr.LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
         };
         LoginView.prototype.startLogin = function () {
             var userName = this.txt_account.text.trim();
@@ -5452,10 +5483,23 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
                 return;
             }
-            var telNum = Number(userName);
-            qmr.GlobalConfig.account = telNum;
-            qmr.LoginController.instance.reqLogin(telNum);
-            egret.localStorage.setItem("testUserid", qmr.GlobalConfig.account + "");
+            var password = this.txt_password.text.trim();
+            if (password.length == 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入密码");
+                return;
+            }
+            if (!qmr.LoginManager.isConnected) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                return;
+            }
+            if (password.length < 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("密码不能少于六位数...");
+                return;
+            }
+            qmr.GlobalConfig.account = userName;
+            qmr.GlobalConfig.pwd = password;
+            qmr.LoginController.instance.reqLogin(userName, password);
+            egret.localStorage.setItem("testUserid", qmr.GlobalConfig.account);
         };
         LoginView.prototype.addedToStage = function (evt) {
             _super.prototype.addedToStage.call(this, evt);
@@ -5501,6 +5545,8 @@ var qmr;
         LoginView.prototype.initData = function () {
             _super.prototype.initData.call(this);
             this.txt_account.text = egret.localStorage.getItem("testUserid");
+            this.group_login.visible = true;
+            this.group_register.visible = false;
         };
         LoginView.prototype.isPhoneNumber = function (phoneNum) {
             var reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
@@ -5562,6 +5608,8 @@ var qmr;
         MessageIDLogin.S_USER_LOGIN = 1002;
         /** 注册 */
         MessageIDLogin.C_LOGIN_REGISTER = 1005;
+        /** 注册返回 */
+        MessageIDLogin.S_LOGIN_REGISTER = 1006;
         /** 登出 */
         MessageIDLogin.C_USER_LOGOUT = 1007;
         MessageIDLogin.S_USER_LOGOUT = 1008;
@@ -6825,8 +6873,8 @@ var qmr;
             // {
             //     socketUrl = "ws://" + host + ":" + port + this.WEB_KEY;
             // }
-            // socketUrl = "ws://129.226.177.253/s1";
-            socketUrl = "ws://192.168.3.116:8004" + this.WEB_KEY;
+            socketUrl = "ws://129.226.177.253/s1";
+            // socketUrl = "ws://192.168.3.116:8004"+ this.WEB_KEY;
             this.websocket.connectByUrl(socketUrl);
             // let socketUrl = "wss://echo.websocket.org"
             // this.websocket.connect(host, port)

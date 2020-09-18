@@ -32,6 +32,8 @@ module qmr {
 		public static S_USER_LOGIN:number = 1002; 
 		/** 注册 */
 		public static C_LOGIN_REGISTER:number = 1005; 
+		/** 注册返回 */
+		public static S_LOGIN_REGISTER:number = 1006;
 		/** 登出 */
 		public static C_USER_LOGOUT:number = 1007; 
 		public static S_USER_LOGOUT:number = 1008;

@@ -21,42 +21,52 @@ module qmr
 			t.addSocketListener(MessageIDLogin.S_USER_LOGIN, t.onRecLoginSuccess, t, true);
 			t.addSocketListener(MessageIDLogin.S_USER_LOGOUT, t.onRecUseLoginOut, t, true);
 			t.addSocketListener(MessageIDLogin.S_SEND_SDK_DATA, t.onSdkReportResponse, t, true);
+			t.addSocketListener(MessageIDLogin.S_LOGIN_REGISTER, t.onRegisterResponse, t, true);
 		}
 
 		/**
 		 *  ---请求登陆---
 		 */
-		public reqLogin(username: number, gameSite: string = "1"): void
+		public reqLogin(tel: string, pwd:string): void
 		{
 			qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
-			egret.log("登陆账号:" + username, "区服:" + gameSite);
+			egret.log("登陆账号:" + tel, "参数:" + sparam);
 			var c: com.message.C_USER_LOGIN = new com.message.C_USER_LOGIN();
-			c.username = username;
-			c.gameSite = gameSite;
-			var sparam = GlobalConfig.sparam;
-			if (sparam)
-			{
-				c.sparam = JSON.stringify(sparam);
-			}
+			c.mobile = tel;
+			c.password = pwd;
+			var sparam = {"DeviceUID":"", "ClientVersion":PlatformConfig.resVersion,"ClientIp":""};
+			c.sparam = JSON.stringify(sparam);
 			this.sendCmd(c, MessageIDLogin.C_USER_LOGIN, true);
 		}
 
 		/**
-		 *  ---请求注册---
+		 * 请求注册
+		 * @param mobile 手机号码
+		 * @param inviteCode 邀请码
+		 * @param password 密码
+		 * @param verifyCode 短信验证码
+		 * @param sparam 预留参数
 		 */
-		public reqLoginRegister(username: number, gameSite: string, nickname: string, heroId: number): void
+		public reqLoginRegister(mobile: string, inviteCode: string, password: string,repassword:string, verifyCode: string, sparam:string = ""): void
 		{
 			var c: com.message.C_LOGIN_REGISTER = new com.message.C_LOGIN_REGISTER();
-			c.username = username;
-			c.gameSite = gameSite;
-			c.nickname = nickname;
-			c.heroId = heroId;
-			var sparam = GlobalConfig.sparam;
-			if (sparam)
-			{
-				c.sparam = JSON.stringify(sparam);
-			}
+			c.mobile = mobile;
+			c.inviteCode = inviteCode;
+			c.password = password;
+			c.rePassword = repassword;
+			c.verifyCode = verifyCode;
+			c.sparam = sparam;
 			this.sendCmd(c, MessageIDLogin.C_LOGIN_REGISTER);
+		}
+
+		/**
+		 *  ===返回登陆/注册成功===
+		 */
+		private onRegisterResponse(s: com.message.S_LOGIN_REGISTER): void
+		{
+			let playerId:number = Int64Util.getNumber(s.playerId);
+			TipManagerCommon.getInstance().createCommonColorTip("注册成功");
+			this.dispatch(NotifyConstLogin.S_LOGIN_REGISTER);
 		}
 
 		/**
@@ -112,7 +122,7 @@ module qmr
 				return;
 			}
 			LoginModel.instance.isReconnect = true;
-			this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.sid);
+			this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
 		}
 
 		public reqRelogin()
@@ -123,7 +133,7 @@ module qmr
 				return;
 			}
 			LoginModel.instance.isReconnect = false;
-			this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.sid);
+			this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
 		}
 
 
