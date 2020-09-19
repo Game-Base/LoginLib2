@@ -5302,8 +5302,7 @@ var qmr;
          *  ===返回登陆/注册成功===
          */
         LoginController.prototype.onRegisterResponse = function (s) {
-            var playerId = qmr.Int64Util.getNumber(s.playerId);
-            qmr.TipManagerCommon.getInstance().createCommonColorTip("注册成功");
+            qmr.LoginModel.instance.onRecRegisterSuccess(s);
             this.dispatch(qmr.NotifyConstLogin.S_LOGIN_REGISTER);
         };
         /**
@@ -5392,15 +5391,45 @@ var qmr;
             configurable: true
         });
         /**
-         *  返回登陆、注册成功
+         *  返回登陆成功
          */
         LoginModel.prototype.onRecLoginSuccess = function (s) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            qmr.SystemController.instance.startHeart(); //服务器说这里才开始心跳
                             qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+                            return [4 /*yield*/, this.startEnterGame()];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        /**
+         *  返回注册成功
+         */
+        LoginModel.prototype.onRecRegisterSuccess = function (s) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+                            return [4 /*yield*/, this.startEnterGame()];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        LoginModel.prototype.startEnterGame = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            qmr.SystemController.instance.startHeart(); //服务器说这里才开始心跳
                             if (!(qmr.GlobalConfig.userId > 0)) return [3 /*break*/, 2];
                             qmr.GameLoading.getInstance().close();
                             this.isEnterGame = true;
@@ -5452,6 +5481,7 @@ var qmr;
             this.addClickEvent(this.btn_register_back, this.gotoRegisterView, this);
             this.addClickEvent(this.btn_register, this.startRegister, this);
             this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
+            this.registerNotify(qmr.NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
         };
         LoginView.prototype.gotoRegisterView = function () {
             this.group_login.visible = false;
@@ -5462,7 +5492,7 @@ var qmr;
             this.group_register.visible = false;
         };
         LoginView.prototype.startRegister = function () {
-            var tel = this.txt_account.text.trim();
+            var tel = this.txt_register_tel.text.trim();
             var inviteCode = this.txt_register_invitecode.text;
             var pwd = this.txt_register_pwd.text;
             var repwd = this.txt_register_repwd.text;

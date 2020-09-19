@@ -55,6 +55,8 @@ module qmr
             this.addClickEvent(this.btn_register_back, this.gotoRegisterView, this);
             this.addClickEvent(this.btn_register, this.startRegister, this);
             this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
+
+            this.registerNotify(NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
         }
 
         private gotoRegisterView():void
@@ -71,7 +73,7 @@ module qmr
 
         private startRegister():void
         {
-            let tel: string = this.txt_account.text.trim();
+            let tel: string = this.txt_register_tel.text.trim();
             let inviteCode:string = this.txt_register_invitecode.text;
             let pwd:string = this.txt_register_pwd.text;
             let repwd:string = this.txt_register_repwd.text;

@@ -27,12 +27,27 @@ module qmr
 		}
 
 		/**
-		 *  返回登陆、注册成功
+		 *  返回登陆成功
 		 */
 		public async onRecLoginSuccess(s: com.message.S_USER_LOGIN)
 		{
-			SystemController.instance.startHeart();//服务器说这里才开始心跳
 			qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+			await this.startEnterGame();
+		}
+
+		/**
+		 *  返回注册成功
+		 */
+		public async onRecRegisterSuccess(s: com.message.S_LOGIN_REGISTER)
+		{
+			qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+			await this.startEnterGame();
+		}
+
+		public async startEnterGame()
+		{
+			SystemController.instance.startHeart();//服务器说这里才开始心跳
+			
 			if (qmr.GlobalConfig.userId > 0)//注册过，或者注册成功
 			{
 				GameLoading.getInstance().close();

@@ -64,8 +64,7 @@ module qmr
 		 */
 		private onRegisterResponse(s: com.message.S_LOGIN_REGISTER): void
 		{
-			let playerId:number = Int64Util.getNumber(s.playerId);
-			TipManagerCommon.getInstance().createCommonColorTip("注册成功");
+			LoginModel.instance.onRecRegisterSuccess(s);
 			this.dispatch(NotifyConstLogin.S_LOGIN_REGISTER);
 		}
 

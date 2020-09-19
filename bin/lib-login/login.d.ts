@@ -1653,9 +1653,14 @@ declare module qmr {
         constructor();
         static readonly instance: LoginModel;
         /**
-         *  返回登陆、注册成功
+         *  返回登陆成功
          */
         onRecLoginSuccess(s: com.message.S_USER_LOGIN): Promise<void>;
+        /**
+         *  返回注册成功
+         */
+        onRecRegisterSuccess(s: com.message.S_LOGIN_REGISTER): Promise<void>;
+        startEnterGame(): Promise<void>;
         private destoryLoginRes();
     }
 }
