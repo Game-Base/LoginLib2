@@ -1713,6 +1713,7 @@ declare module qmr {
         * @description 初始化数据,需被子类继承
         */
         protected initData(): void;
+        getQueryStringByName(name: any): string;
         isPhoneNumber(phoneNum: any): boolean;
         dispose(): void;
     }

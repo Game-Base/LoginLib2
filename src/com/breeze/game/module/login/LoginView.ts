@@ -34,10 +34,6 @@ module qmr
         public btn_login_back:eui.Image;
         
 
-
-
-
-
         public constructor()
         {
             super();
@@ -179,8 +175,26 @@ module qmr
         {
             super.initData();
             this.txt_account.text = egret.localStorage.getItem("testUserid");
-            this.group_login.visible = true;
-            this.group_register.visible = false;
+
+            let code:string = this.getQueryStringByName("code");
+            let register:string = this.getQueryStringByName("register");
+            if(!!code && register == "1"){
+                this.group_login.visible = false;
+                this.group_register.visible = true;
+                this.txt_register_invitecode.text = code;
+            } else {
+                this.group_login.visible = true;
+                this.group_register.visible = false;
+            }
+        }
+
+         //根据QueryString参数名称获取值
+         public getQueryStringByName(name) {
+            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
         }
 
         public isPhoneNumber(phoneNum): boolean {

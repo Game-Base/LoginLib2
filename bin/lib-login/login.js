@@ -5575,8 +5575,25 @@ var qmr;
         LoginView.prototype.initData = function () {
             _super.prototype.initData.call(this);
             this.txt_account.text = egret.localStorage.getItem("testUserid");
-            this.group_login.visible = true;
-            this.group_register.visible = false;
+            var code = this.getQueryStringByName("code");
+            var register = this.getQueryStringByName("register");
+            if (!!code && register == "1") {
+                this.group_login.visible = false;
+                this.group_register.visible = true;
+                this.txt_register_invitecode.text = code;
+            }
+            else {
+                this.group_login.visible = true;
+                this.group_register.visible = false;
+            }
+        };
+        //根据QueryString参数名称获取值
+        LoginView.prototype.getQueryStringByName = function (name) {
+            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
         };
         LoginView.prototype.isPhoneNumber = function (phoneNum) {
             var reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
@@ -6903,8 +6920,8 @@ var qmr;
             // {
             //     socketUrl = "ws://" + host + ":" + port + this.WEB_KEY;
             // }
-            socketUrl = "ws://129.226.177.253/s1";
-            // socketUrl = "ws://192.168.3.116:8004"+ this.WEB_KEY;
+            // socketUrl = "ws://129.226.177.253/s1";
+            socketUrl = "ws://192.168.3.116:8004" + this.WEB_KEY;
             this.websocket.connectByUrl(socketUrl);
             // let socketUrl = "wss://echo.websocket.org"
             // this.websocket.connect(host, port)
