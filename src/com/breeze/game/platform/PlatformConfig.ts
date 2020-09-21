@@ -51,6 +51,9 @@ module qmr {
 		/**oss域名 */
 		public static ossDoamin: string;
 
+		/**连接的服务器地址 */
+		public static connectAddress:string;
+
 		public static async init() {
 			let t = this;
 			let config = window["GAME_CONFIG"];
@@ -86,6 +89,7 @@ module qmr {
 			if(config["min_hw_ratio"]){
 				StageUtil.MIN_HW_RATIO = Math.max(StageUtil.MIN_HW_RATIO, config["min_hw_ratio"]);
 			}
+			t.connectAddress = config["connectAddress"];
 
 			t.appIdStr = config["appId"];
 			t.appKey = config["appKey"];

@@ -5481,7 +5481,11 @@ var qmr;
             this.addClickEvent(this.btn_register_back, this.gotoRegisterView, this);
             this.addClickEvent(this.btn_register, this.startRegister, this);
             this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
+            this.addClickEvent(this.btn_login_way, this.switchLoginWay, this);
             this.registerNotify(qmr.NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
+        };
+        LoginView.prototype.switchLoginWay = function () {
+            console.log("switchLoginWay");
         };
         LoginView.prototype.gotoRegisterView = function () {
             this.group_login.visible = false;
@@ -5509,7 +5513,7 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
                 return;
             }
-            if (!this.isPhoneNumber(userName)) {
+            if (!qmr.HtmlUtil.isPhoneNumber(userName)) {
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
                 return;
             }
@@ -5575,8 +5579,8 @@ var qmr;
         LoginView.prototype.initData = function () {
             _super.prototype.initData.call(this);
             this.txt_account.text = egret.localStorage.getItem("testUserid");
-            var code = this.getQueryStringByName("code");
-            var register = this.getQueryStringByName("register");
+            var code = qmr.HtmlUtil.getQueryStringByName("code");
+            var register = qmr.HtmlUtil.getQueryStringByName("register");
             if (!!code && register == "1") {
                 this.group_login.visible = false;
                 this.group_register.visible = true;
@@ -5586,18 +5590,6 @@ var qmr;
                 this.group_login.visible = true;
                 this.group_register.visible = false;
             }
-        };
-        //根据QueryString参数名称获取值
-        LoginView.prototype.getQueryStringByName = function (name) {
-            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
-            if (result == null || result.length < 1) {
-                return "";
-            }
-            return result[1];
-        };
-        LoginView.prototype.isPhoneNumber = function (phoneNum) {
-            var reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
-            return reg.test(phoneNum);
         };
         LoginView.prototype.dispose = function () {
             _super.prototype.dispose.call(this);
@@ -6022,6 +6014,7 @@ var qmr;
                             if (config["min_hw_ratio"]) {
                                 qmr.StageUtil.MIN_HW_RATIO = Math.max(qmr.StageUtil.MIN_HW_RATIO, config["min_hw_ratio"]);
                             }
+                            t.connectAddress = config["connectAddress"];
                             t.appIdStr = config["appId"];
                             t.appKey = config["appKey"];
                             t.platform = config["platform"];
@@ -6921,7 +6914,11 @@ var qmr;
             //     socketUrl = "ws://" + host + ":" + port + this.WEB_KEY;
             // }
             // socketUrl = "ws://129.226.177.253/s1";
-            socketUrl = "ws://192.168.3.116:8004" + this.WEB_KEY;
+            // let isDebug:string = HtmlUtil.getQueryStringByName("isDebug");
+            // if(isDebug){
+            //     socketUrl = "ws://192.168.3.116:8004"+ this.WEB_KEY;
+            // }
+            socketUrl = qmr.PlatformConfig.connectAddress;
             this.websocket.connectByUrl(socketUrl);
             // let socketUrl = "wss://echo.websocket.org"
             // this.websocket.connect(host, port)
@@ -8253,6 +8250,18 @@ var qmr;
                 backStr += args[i] + "\n";
             }
             return backStr;
+        };
+        //根据QueryString参数名称获取值
+        HtmlUtil.getQueryStringByName = function (name) {
+            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        };
+        HtmlUtil.isPhoneNumber = function (phoneNum) {
+            var reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
+            return reg.test(phoneNum);
         };
         HtmlUtil.htmlParse = new egret.HtmlTextParser();
         return HtmlUtil;

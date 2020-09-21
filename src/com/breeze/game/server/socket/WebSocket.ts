@@ -53,8 +53,13 @@ module qmr
             // }
 
             // socketUrl = "ws://129.226.177.253/s1";
-            socketUrl = "ws://192.168.3.116:8004"+ this.WEB_KEY;
-
+            // let isDebug:string = HtmlUtil.getQueryStringByName("isDebug");
+            // if(isDebug){
+            //     socketUrl = "ws://192.168.3.116:8004"+ this.WEB_KEY;
+            // }
+            
+            socketUrl = PlatformConfig.connectAddress;
+            
             this.websocket.connectByUrl(socketUrl);
             // let socketUrl = "wss://echo.websocket.org"
             // this.websocket.connect(host, port)

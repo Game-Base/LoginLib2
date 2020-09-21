@@ -1675,11 +1675,14 @@ declare module qmr {
         lbUserBook: eui.Label;
         lbPrivacyPolicy: eui.Label;
         groupAccount: eui.Group;
-        txt_account: eui.TextInput;
+        txt_account_des: eui.Label;
+        txt_account: eui.EditableText;
         groupAccount0: eui.Group;
         txt_password: eui.TextInput;
+        txt_pwd_des: eui.Label;
         btn_login: eui.Image;
-        btn_register_back: eui.Image;
+        btn_login_way: eui.Label;
+        btn_register_back: eui.Group;
         group_register: eui.Group;
         gpRead0: eui.Group;
         lbUserBook0: eui.Label;
@@ -1701,6 +1704,7 @@ declare module qmr {
          * @description 初始化事件
          */
         protected initListener(): void;
+        private switchLoginWay();
         private gotoRegisterView();
         private gotoLoginView();
         private startRegister();
@@ -1713,8 +1717,6 @@ declare module qmr {
         * @description 初始化数据,需被子类继承
         */
         protected initData(): void;
-        getQueryStringByName(name: any): string;
-        isPhoneNumber(phoneNum: any): boolean;
         dispose(): void;
     }
 }
@@ -1917,6 +1919,8 @@ declare module qmr {
         static markPointDomain: string;
         /**oss域名 */
         static ossDoamin: string;
+        /**连接的服务器地址 */
+        static connectAddress: string;
         static init(): Promise<void>;
     }
 }
@@ -2616,6 +2620,8 @@ declare module qmr {
          */
         static getItemHtmlText(itemDataId: number, count: number): string;
         static log(...args: any[]): string;
+        static getQueryStringByName(name: any): string;
+        static isPhoneNumber(phoneNum: any): boolean;
     }
 }
 declare module qmr {

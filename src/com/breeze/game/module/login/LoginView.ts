@@ -3,35 +3,38 @@ module qmr
     export class LoginView extends SuperBaseModule
     {
         public groupWind:eui.Group;
-        public imgWindSlow:eui.Image;
-        public imgWindFast:eui.Image;
-        public imgWindMiddle:eui.Image;
-        public group_login:eui.Group;
-        public gpRead:eui.Group;
-        public lbUserBook:eui.Label;
-        public lbPrivacyPolicy:eui.Label;
-        public groupAccount:eui.Group;
-        public txt_account:eui.TextInput;
-        public groupAccount0:eui.Group;
-        public txt_password:eui.TextInput;
-        public btn_login:eui.Image;
-        public btn_register_back:eui.Image;
-        public group_register:eui.Group;
-        public gpRead0:eui.Group;
-        public lbUserBook0:eui.Label;
-        public lbPrivacyPolicy0:eui.Label;
-        public groupAccount1:eui.Group;
-        public txt_register_tel:eui.TextInput;
-        public groupAccount2:eui.Group;
-        public txt_register_invitecode:eui.TextInput;
-        public groupAccount3:eui.Group;
-        public txt_register_pwd:eui.TextInput;
-        public groupAccount4:eui.Group;
-        public txt_register_repwd:eui.TextInput;
-        public groupAccount5:eui.Group;
-        public txt_register_verifycode:eui.TextInput;
-        public btn_register:eui.Image;
-        public btn_login_back:eui.Image;
+public imgWindSlow:eui.Image;
+public imgWindFast:eui.Image;
+public imgWindMiddle:eui.Image;
+public group_login:eui.Group;
+public gpRead:eui.Group;
+public lbUserBook:eui.Label;
+public lbPrivacyPolicy:eui.Label;
+public groupAccount:eui.Group;
+public txt_account_des:eui.Label;
+public txt_account:eui.EditableText;
+public groupAccount0:eui.Group;
+public txt_password:eui.TextInput;
+public txt_pwd_des:eui.Label;
+public btn_login:eui.Image;
+public btn_login_way:eui.Label;
+public btn_register_back:eui.Group;
+public group_register:eui.Group;
+public gpRead0:eui.Group;
+public lbUserBook0:eui.Label;
+public lbPrivacyPolicy0:eui.Label;
+public groupAccount1:eui.Group;
+public txt_register_tel:eui.TextInput;
+public groupAccount2:eui.Group;
+public txt_register_invitecode:eui.TextInput;
+public groupAccount3:eui.Group;
+public txt_register_pwd:eui.TextInput;
+public groupAccount4:eui.Group;
+public txt_register_repwd:eui.TextInput;
+public groupAccount5:eui.Group;
+public txt_register_verifycode:eui.TextInput;
+public btn_register:eui.Image;
+public btn_login_back:eui.Image;
         
 
         public constructor()
@@ -51,8 +54,14 @@ module qmr
             this.addClickEvent(this.btn_register_back, this.gotoRegisterView, this);
             this.addClickEvent(this.btn_register, this.startRegister, this);
             this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
+            this.addClickEvent(this.btn_login_way, this.switchLoginWay, this);
 
             this.registerNotify(NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
+        }
+
+        private switchLoginWay():void
+        {
+            console.log("switchLoginWay");
         }
 
         private gotoRegisterView():void
@@ -89,7 +98,7 @@ module qmr
                 TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
                 return;
             }
-            if(!this.isPhoneNumber(userName)){
+            if(!HtmlUtil.isPhoneNumber(userName)){
                 TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
                 return;
             }
@@ -176,8 +185,8 @@ module qmr
             super.initData();
             this.txt_account.text = egret.localStorage.getItem("testUserid");
 
-            let code:string = this.getQueryStringByName("code");
-            let register:string = this.getQueryStringByName("register");
+            let code:string = HtmlUtil.getQueryStringByName("code");
+            let register:string = HtmlUtil.getQueryStringByName("register");
             if(!!code && register == "1"){
                 this.group_login.visible = false;
                 this.group_register.visible = true;
@@ -186,20 +195,6 @@ module qmr
                 this.group_login.visible = true;
                 this.group_register.visible = false;
             }
-        }
-
-         //根据QueryString参数名称获取值
-         public getQueryStringByName(name) {
-            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
-            if (result == null || result.length < 1) {
-                return "";
-            }
-            return result[1];
-        }
-
-        public isPhoneNumber(phoneNum): boolean {
-            let reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
-            return reg.test(phoneNum);
         }
 
         public dispose(): void

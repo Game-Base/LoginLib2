@@ -100,5 +100,19 @@ module qmr
 			return backStr
 		}
 
+		//根据QueryString参数名称获取值
+		public static getQueryStringByName(name) {
+            var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        }
+
+        public static isPhoneNumber(phoneNum): boolean {
+            let reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
+            return reg.test(phoneNum);
+        }
+
 	}
 }
