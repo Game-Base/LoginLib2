@@ -5496,21 +5496,49 @@ var qmr;
             this.group_register.visible = false;
         };
         LoginView.prototype.startRegister = function () {
+            if (!qmr.LoginManager.isConnected) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                return;
+            }
             var tel = this.txt_register_tel.text.trim();
-            var inviteCode = this.txt_register_invitecode.text;
-            var pwd = this.txt_register_pwd.text;
-            var repwd = this.txt_register_repwd.text;
-            var verifycode = this.txt_register_verifycode.text;
+            var inviteCode = this.txt_register_invitecode.text.trim();
+            var pwd = this.txt_register_pwd.text.trim();
+            var repwd = this.txt_register_repwd.text.trim();
+            var verifycode = this.txt_register_verifycode.text.trim();
+            if (!qmr.HtmlUtil.isPhoneNumber(tel)) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
+                return;
+            }
+            if (inviteCode.length == 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入邀请码");
+                return;
+            }
+            if (pwd.length < 6) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("必须输入6-12位的密码");
+                return;
+            }
+            if (repwd.length == 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入重复密码");
+                return;
+            }
+            if (repwd !== pwd) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("两次输入的密码不一致");
+                return;
+            }
+            if (verifycode.length == 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
+                return;
+            }
             qmr.LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
         };
         LoginView.prototype.startLogin = function () {
+            if (!qmr.LoginManager.isConnected) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                return;
+            }
             var userName = this.txt_account.text.trim();
             if (userName.length == 0) {
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
-                return;
-            }
-            if (!qmr.LoginManager.isConnected) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
                 return;
             }
             if (!qmr.HtmlUtil.isPhoneNumber(userName)) {
@@ -5520,10 +5548,6 @@ var qmr;
             var password = this.txt_password.text.trim();
             if (password.length == 0) {
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入密码");
-                return;
-            }
-            if (!qmr.LoginManager.isConnected) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
                 return;
             }
             if (password.length < 0) {

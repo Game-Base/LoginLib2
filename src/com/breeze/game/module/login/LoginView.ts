@@ -78,24 +78,58 @@ public btn_login_back:eui.Image;
 
         private startRegister():void
         {
+            if(!LoginManager.isConnected){
+                TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                return;
+            }
             let tel: string = this.txt_register_tel.text.trim();
-            let inviteCode:string = this.txt_register_invitecode.text;
-            let pwd:string = this.txt_register_pwd.text;
-            let repwd:string = this.txt_register_repwd.text;
-            let verifycode:string = this.txt_register_verifycode.text;
+            let inviteCode:string = this.txt_register_invitecode.text.trim();
+            let pwd:string = this.txt_register_pwd.text.trim();
+            let repwd:string = this.txt_register_repwd.text.trim();
+            let verifycode:string = this.txt_register_verifycode.text.trim();
+            
+            if (!HtmlUtil.isPhoneNumber(tel))
+            {
+                TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
+                return;
+            }
+            if(inviteCode.length == 0){
+                TipManagerCommon.getInstance().createCommonColorTip("请输入邀请码");
+                return;
+            }
+
+            if(pwd.length < 6){
+                TipManagerCommon.getInstance().createCommonColorTip("必须输入6-12位的密码");
+                return;
+            }
+
+            if(repwd.length == 0){
+                TipManagerCommon.getInstance().createCommonColorTip("请输入重复密码");
+                return;
+            }
+
+            if(repwd !== pwd){
+                TipManagerCommon.getInstance().createCommonColorTip("两次输入的密码不一致");
+                return;
+            }
+
+            if(verifycode.length == 0){
+                TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
+                return;
+            }
 
             LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
         }
 
         private startLogin():void{
+            if(!LoginManager.isConnected){
+                TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                return;
+            }
             let userName: string = this.txt_account.text.trim();
             if (userName.length == 0)
             {
                 TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
-                return;
-            }
-            if(!LoginManager.isConnected){
-                TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
                 return;
             }
             if(!HtmlUtil.isPhoneNumber(userName)){
@@ -107,10 +141,6 @@ public btn_login_back:eui.Image;
             if (password.length == 0)
             {
                 TipManagerCommon.getInstance().createCommonColorTip("请输入密码");
-                return;
-            }
-            if(!LoginManager.isConnected){
-                TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
                 return;
             }
             if(password.length < 0){
