@@ -20,7 +20,6 @@ module qmr
 			let t = this;
 			t.addSocketListener(MessageIDLogin.S_USER_LOGIN, t.onRecLoginSuccess, t, true);
 			t.addSocketListener(MessageIDLogin.S_USER_LOGOUT, t.onRecUseLoginOut, t, true);
-			t.addSocketListener(MessageIDLogin.S_SEND_SDK_DATA, t.onSdkReportResponse, t, true);
 			t.addSocketListener(MessageIDLogin.S_LOGIN_REGISTER, t.onRegisterResponse, t, true);
 		}
 
@@ -36,6 +35,8 @@ module qmr
 			c.password = pwd;
 			var sparam = {"DeviceUID":"", "ClientVersion":PlatformConfig.resVersion,"ClientIp":""};
 			c.sparam = JSON.stringify(sparam);
+			c.fromGame = PlatformConfig.GameId;
+
 			this.sendCmd(c, MessageIDLogin.C_USER_LOGIN, true);
 		}
 
@@ -56,6 +57,7 @@ module qmr
 			c.rePassword = repassword;
 			c.verifyCode = verifyCode;
 			c.sparam = sparam;
+			c.fromGame = PlatformConfig.GameId;
 			this.sendCmd(c, MessageIDLogin.C_LOGIN_REGISTER);
 		}
 
@@ -133,20 +135,6 @@ module qmr
 			}
 			LoginModel.instance.isReconnect = false;
 			this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
-		}
-
-
-		public reportSdkPortRequest(url:string, p:any):void
-		{
-			var c: com.message.C_SEND_SDK_DATA = new com.message.C_SEND_SDK_DATA();
-			c.reportStr = p;
-			c.reportUrl = url;
-			this.sendCmd(c, MessageIDLogin.C_SEND_SDK_DATA, true);
-		}
-
-		private onSdkReportResponse(s:com.message.S_SEND_SDK_DATA):void
-		{
-			console.log("sdk数据上报结果："+s.canUse);
 		}
 	}
 }

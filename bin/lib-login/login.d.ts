@@ -1634,8 +1634,6 @@ declare module qmr {
         private onRecUseLoginOut(s);
         reqReconnect(): void;
         reqRelogin(): void;
-        reportSdkPortRequest(url: string, p: any): void;
-        private onSdkReportResponse(s);
     }
 }
 declare module qmr {
@@ -1921,6 +1919,7 @@ declare module qmr {
         static ossDoamin: string;
         /**连接的服务器地址 */
         static connectAddress: string;
+        static GameId: number;
         static init(): Promise<void>;
     }
 }

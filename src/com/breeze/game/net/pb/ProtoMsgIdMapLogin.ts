@@ -22,8 +22,6 @@ module qmr {
 			this.msgIdMap[MessageIDLogin.S_USER_LOGOUT] = com.message.S_USER_LOGOUT;
 			this.msgIdMap[MessageIDLogin.C_SYNC_TIME] = com.message.C_SYNC_TIME;
 			this.msgIdMap[MessageIDLogin.S_SYNC_TIME] = com.message.S_SYNC_TIME;
-			this.msgIdMap[MessageIDLogin.C_SEND_SDK_DATA] = com.message.C_SEND_SDK_DATA;
-			this.msgIdMap[MessageIDLogin.S_SEND_SDK_DATA] = com.message.S_SEND_SDK_DATA;
 
 		}
 

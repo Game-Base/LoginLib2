@@ -53,6 +53,8 @@ module qmr {
 
 		/**连接的服务器地址 */
 		public static connectAddress:string;
+		// 游戏入口，1海洋，2深海
+		public static GameId:number = 1;
 
 		public static async init() {
 			let t = this;
@@ -90,6 +92,7 @@ module qmr {
 				StageUtil.MIN_HW_RATIO = Math.max(StageUtil.MIN_HW_RATIO, config["min_hw_ratio"]);
 			}
 			t.connectAddress = config["connectAddress"];
+			t.GameId = Number(config["GameId"]);
 
 			t.appIdStr = config["appId"];
 			t.appKey = config["appKey"];

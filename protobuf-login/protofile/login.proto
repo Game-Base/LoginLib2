@@ -6,6 +6,7 @@ message C_USER_LOGIN {
 	string mobile=1; // 手机号码
 	string password=2; // 密码
 	string sparam = 3; //预留参数
+	int32 fromGame=4; // 游戏入口，1海洋，2深海
 }
 
 // 短信登录
@@ -13,11 +14,13 @@ message C_USER_LOGIN_VERIFY_CODE {
 	string mobile=1; // 手机号码
 	string verifyCode=2; //短信验证码
 	string sparam = 3; //预留参数
+	int32 fromGame=4; // 游戏入口，1海洋，2深海
 }
 
 // 登录返回
 message S_USER_LOGIN {
 	int64 playerId=1; // 玩家编号
+	int32 fromGame=4; // 游戏入口，1海洋，2深海
 }
 
 // 注册
@@ -28,12 +31,14 @@ message C_LOGIN_REGISTER {
 	string rePassword=4; // 重复密码
 	string verifyCode=5; //短信验证码
 	string sparam = 6; //预留参数
+	int32 fromGame=7; // 游戏入口，1海洋，2深海
 }
 
 
 // 注册返回
 message S_LOGIN_REGISTER {
 	int64 playerId=1; // 玩家编号
+	int32 fromGame=4; // 游戏入口，1海洋，2深海
 }
 
 //登出
@@ -59,22 +64,4 @@ message S_SYNC_TIME {
 	int64 time=1; //ms
 }
 
-// 客户端核查随机名字是否可以使用
-message C_GET_NICKNAME_INFO {
-	string nickName = 1;	// 核查的随机昵称
-}
 
-message S_GET_NICKNAME_INFO {
-	string nickName = 1;	// 核查的随机昵称
-	bool canUse = 2;		// 是否可用，true可用false不可用
-}
-
-// 客户端通知sdk上报数据操作
-message C_SEND_SDK_DATA {
-	string reportStr = 1;	// 要上报的字符串数据
-	string reportUrl = 2;	// 要上报的url参数
-}
-
-message S_SEND_SDK_DATA {
-	bool canUse = 1;		// 上报结果，true成功false失败
-}

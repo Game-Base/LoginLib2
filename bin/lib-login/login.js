@@ -5263,7 +5263,6 @@ var qmr;
             var t = this;
             t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGIN, t.onRecLoginSuccess, t, true);
             t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGOUT, t.onRecUseLoginOut, t, true);
-            t.addSocketListener(qmr.MessageIDLogin.S_SEND_SDK_DATA, t.onSdkReportResponse, t, true);
             t.addSocketListener(qmr.MessageIDLogin.S_LOGIN_REGISTER, t.onRegisterResponse, t, true);
         };
         /**
@@ -5277,6 +5276,7 @@ var qmr;
             c.password = pwd;
             var sparam = { "DeviceUID": "", "ClientVersion": qmr.PlatformConfig.resVersion, "ClientIp": "" };
             c.sparam = JSON.stringify(sparam);
+            c.fromGame = qmr.PlatformConfig.GameId;
             this.sendCmd(c, qmr.MessageIDLogin.C_USER_LOGIN, true);
         };
         /**
@@ -5296,6 +5296,7 @@ var qmr;
             c.rePassword = repassword;
             c.verifyCode = verifyCode;
             c.sparam = sparam;
+            c.fromGame = qmr.PlatformConfig.GameId;
             this.sendCmd(c, qmr.MessageIDLogin.C_LOGIN_REGISTER);
         };
         /**
@@ -5355,15 +5356,6 @@ var qmr;
             }
             qmr.LoginModel.instance.isReconnect = false;
             this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
-        };
-        LoginController.prototype.reportSdkPortRequest = function (url, p) {
-            var c = new com.message.C_SEND_SDK_DATA();
-            c.reportStr = p;
-            c.reportUrl = url;
-            this.sendCmd(c, qmr.MessageIDLogin.C_SEND_SDK_DATA, true);
-        };
-        LoginController.prototype.onSdkReportResponse = function (s) {
-            console.log("sdk数据上报结果：" + s.canUse);
         };
         return LoginController;
     }(qmr.BaseController));
@@ -5702,8 +5694,6 @@ var qmr;
             this.msgIdMap[qmr.MessageIDLogin.S_USER_LOGOUT] = com.message.S_USER_LOGOUT;
             this.msgIdMap[qmr.MessageIDLogin.C_SYNC_TIME] = com.message.C_SYNC_TIME;
             this.msgIdMap[qmr.MessageIDLogin.S_SYNC_TIME] = com.message.S_SYNC_TIME;
-            this.msgIdMap[qmr.MessageIDLogin.C_SEND_SDK_DATA] = com.message.C_SEND_SDK_DATA;
-            this.msgIdMap[qmr.MessageIDLogin.S_SEND_SDK_DATA] = com.message.S_SEND_SDK_DATA;
         }
         Object.defineProperty(ProtoMsgIdMapLogin, "instance", {
             /**
@@ -6039,6 +6029,7 @@ var qmr;
                                 qmr.StageUtil.MIN_HW_RATIO = Math.max(qmr.StageUtil.MIN_HW_RATIO, config["min_hw_ratio"]);
                             }
                             t.connectAddress = config["connectAddress"];
+                            t.GameId = Number(config["GameId"]);
                             t.appIdStr = config["appId"];
                             t.appKey = config["appKey"];
                             t.platform = config["platform"];
@@ -6083,6 +6074,8 @@ var qmr;
         PlatformConfig.baseRoot = "";
         PlatformConfig.webUrl = "";
         PlatformConfig.webRoot = "";
+        // 游戏入口，1海洋，2深海
+        PlatformConfig.GameId = 1;
         return PlatformConfig;
     }());
     qmr.PlatformConfig = PlatformConfig;
