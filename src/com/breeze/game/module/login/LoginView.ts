@@ -57,7 +57,35 @@ public btn_login_back:eui.Image;
             this.addClickEvent(this.btn_login_way, this.switchLoginWay, this);
 
             this.registerNotify(NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
+            // this.txt_password.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_password.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
+            // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
+            // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
+            // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
         }
+
+        private _posY:number;
+        public focusInTxtHandler()
+		{
+            let t = this;
+            t._posY = t.y;
+			egret.Tween.get(t).to({ y: -300}, 300).wait(50)
+            .call(()=>{
+                egret.Tween.removeTweens(t);
+			});
+        }
+        
+        public focusOutTxtHandler()
+		{
+			let t = this;
+			egret.Tween.get(t).to({ y: t._posY}, 300).wait(50)
+            .call(()=>{
+                egret.Tween.removeTweens(t);
+			});
+		}
 
         private switchLoginWay():void
         {

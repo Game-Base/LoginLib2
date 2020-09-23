@@ -1702,6 +1702,9 @@ declare module qmr {
          * @description 初始化事件
          */
         protected initListener(): void;
+        private _posY;
+        focusInTxtHandler(): void;
+        focusOutTxtHandler(): void;
         private switchLoginWay();
         private gotoRegisterView();
         private gotoLoginView();
@@ -2529,6 +2532,10 @@ declare module qmr {
     class CommonTool {
         constructor();
         static getMsg(...arg: any[]): string;
+        static addInputListener(textInput: eui.TextInput, thisObject: any): void;
+        static removeInputListener(textInput: eui.TextInput, thisObject: any): void;
+        static focusInTxtHandler(evt: FocusEvent): void;
+        static focusOutTxtHandler(): void;
     }
 }
 declare module qmr {

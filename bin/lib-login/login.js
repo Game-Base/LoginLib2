@@ -5475,6 +5475,29 @@ var qmr;
             this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
             this.addClickEvent(this.btn_login_way, this.switchLoginWay, this);
             this.registerNotify(qmr.NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
+            // this.txt_password.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_password.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
+            // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
+            // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
+            // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
+        };
+        LoginView.prototype.focusInTxtHandler = function () {
+            var t = this;
+            t._posY = t.y;
+            egret.Tween.get(t).to({ y: -300 }, 300).wait(50)
+                .call(function () {
+                egret.Tween.removeTweens(t);
+            });
+        };
+        LoginView.prototype.focusOutTxtHandler = function () {
+            var t = this;
+            egret.Tween.get(t).to({ y: t._posY }, 300).wait(50)
+                .call(function () {
+                egret.Tween.removeTweens(t);
+            });
         };
         LoginView.prototype.switchLoginWay = function () {
             console.log("switchLoginWay");
@@ -7979,6 +8002,38 @@ var qmr;
                 s = s.replace(/\{\d+\}/, value);
             }
             return s;
+        };
+        CommonTool.addInputListener = function (textInput, thisObject) {
+            textInput.addEventListener(egret.FocusEvent.FOCUS_IN, CommonTool.focusInTxtHandler, thisObject);
+            textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, CommonTool.focusOutTxtHandler, thisObject);
+        };
+        CommonTool.removeInputListener = function (textInput, thisObject) {
+            textInput.addEventListener(egret.FocusEvent.FOCUS_IN, CommonTool.focusInTxtHandler, thisObject);
+            textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, CommonTool.focusOutTxtHandler, thisObject);
+        };
+        CommonTool.focusInTxtHandler = function (evt) {
+            var inputFocus = function () {
+                if (document && document.body) {
+                    setTimeout(function () {
+                        if (window.scrollTo) {
+                            window.scrollTo(0, document.body.clientHeight);
+                        }
+                    }, 400);
+                }
+            };
+            inputFocus();
+        };
+        CommonTool.focusOutTxtHandler = function () {
+            var inputFocus = function () {
+                if (document && document.body) {
+                    setTimeout(function () {
+                        if (window.scrollTo) {
+                            window.scrollTo(0, document.body.clientHeight);
+                        }
+                    }, 400);
+                }
+            };
+            inputFocus();
         };
         return CommonTool;
     }());
