@@ -2566,6 +2566,152 @@ var qmr;
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
+    var GlobalConfig = (function () {
+        function GlobalConfig() {
+            this.LOGIN_KEY = "Dragon2020WOMenYIQiFaDaCAI#WOCAO@^^%(*88888888abZ";
+        }
+        Object.defineProperty(GlobalConfig, "isSysIos", {
+            /**
+             * 是否ios系统
+             */
+            get: function () {
+                return egret.Capabilities.os.toUpperCase() == "IOS";
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /** 是否开启Slow个人日志 */
+        GlobalConfig.bIsShowSlowLog = false;
+        GlobalConfig.loginInitFinish = false; //是否是调试状态LOGIN_INIT_FINISH
+        GlobalConfig.isDebugF = false; //是否是调试战斗状态
+        /**登录类型 0 账号密码登录 1 短信验证码登录 */
+        GlobalConfig.loginType = 0;
+        /**游戏登陆账号 */
+        GlobalConfig.account = "";
+        GlobalConfig.pwd = "";
+        /**游戏短信验证码登录 */
+        GlobalConfig.telephone = "";
+        GlobalConfig.verifyCode = "";
+        /**登录服务器 */
+        GlobalConfig.loginServer = "129.226.177.253"; //129.226.177.253   192.168.3.116
+        //登陆服务器端口
+        GlobalConfig.loginPort = 8003;
+        /**登陆服下发后端参数(直接透传给后端)*/
+        GlobalConfig.sparam = "0";
+        /**服务器id */
+        GlobalConfig.sid = "1";
+        /**客户端ip*/
+        GlobalConfig.clientIp = "127.0.0.1";
+        /**登录时间 */
+        GlobalConfig.logintime = 0;
+        return GlobalConfig;
+    }());
+    qmr.GlobalConfig = GlobalConfig;
+    __reflect(GlobalConfig.prototype, "qmr.GlobalConfig");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    var BaseConfigKeys = (function () {
+        function BaseConfigKeys() {
+        }
+        /**消息*/
+        BaseConfigKeys.CodeCfg = true;
+        /**音效*/
+        BaseConfigKeys.Music = true;
+        return BaseConfigKeys;
+    }());
+    qmr.BaseConfigKeys = BaseConfigKeys;
+    __reflect(BaseConfigKeys.prototype, "qmr.BaseConfigKeys");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    var CodeCfgCfg = (function (_super) {
+        __extends(CodeCfgCfg, _super);
+        function CodeCfgCfg(element) {
+            var _this = _super.call(this, element) || this;
+            _this.key = "id";
+            return _this;
+        }
+        Object.defineProperty(CodeCfgCfg.prototype, "id", {
+            /**ID*/
+            get: function () {
+                return this.d["id"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CodeCfgCfg.prototype, "msg", {
+            /**消息描述*/
+            get: function () {
+                return this.d["msg"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CodeCfgCfg.prototype, "type", {
+            /**消息类型*/
+            get: function () {
+                return this.d["type"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return CodeCfgCfg;
+    }(qmr.BaseBean));
+    qmr.CodeCfgCfg = CodeCfgCfg;
+    __reflect(CodeCfgCfg.prototype, "qmr.CodeCfgCfg");
+    var MusicCfg = (function (_super) {
+        __extends(MusicCfg, _super);
+        function MusicCfg(element) {
+            var _this = _super.call(this, element) || this;
+            _this.key = "soundType";
+            return _this;
+        }
+        Object.defineProperty(MusicCfg.prototype, "soundType", {
+            /**音效key*/
+            get: function () {
+                return this.d["soundType"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MusicCfg.prototype, "soundName", {
+            /**音效名字*/
+            get: function () {
+                return this.d["soundName"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MusicCfg.prototype, "isPlaySameTime", {
+            /**是否同时播放*/
+            get: function () {
+                return this.d["isPlaySameTime"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return MusicCfg;
+    }(qmr.BaseBean));
+    qmr.MusicCfg = MusicCfg;
+    __reflect(MusicCfg.prototype, "qmr.MusicCfg");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
+    var ConfigEnumBase = (function () {
+        function ConfigEnumBase() {
+        }
+        /**消息*/
+        ConfigEnumBase.CODECFG = 'CodeCfg';
+        /**音效*/
+        ConfigEnumBase.MUSIC = 'Music';
+        return ConfigEnumBase;
+    }());
+    qmr.ConfigEnumBase = ConfigEnumBase;
+    __reflect(ConfigEnumBase.prototype, "qmr.ConfigEnumBase");
+})(qmr || (qmr = {}));
+var qmr;
+(function (qmr) {
     var ConfigManager = (function () {
         function ConfigManager() {
         }
@@ -2602,7 +2748,7 @@ var qmr;
             var className = fileName.charAt(0).toLocaleUpperCase() + fileName.slice(1, fileName.length) + "Cfg"; //转换为类名
             var greeter = qmr[className];
             var zip;
-            if (fileName == qmr.ConfigEnumBase.MUSIC || fileName == qmr.ConfigEnumBase.PLAYERNAME || fileName == qmr.ConfigEnumBase.CODECFG || fileName == qmr.ConfigEnumBase.CLIENTCN) {
+            if (fileName == qmr.ConfigEnumBase.MUSIC || fileName == qmr.ConfigEnumBase.CODECFG) {
                 zip = t.getZip(t.BASE_CONFIG_NAME);
             }
             else {
@@ -2670,122 +2816,6 @@ var qmr;
     }());
     qmr.ConfigManager = ConfigManager;
     __reflect(ConfigManager.prototype, "qmr.ConfigManager");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var GlobalConfig = (function () {
-        function GlobalConfig() {
-            this.LOGIN_KEY = "Dragon2020WOMenYIQiFaDaCAI#WOCAO@^^%(*88888888abZ";
-        }
-        Object.defineProperty(GlobalConfig, "isSysIos", {
-            /**
-             * 是否ios系统
-             */
-            get: function () {
-                return egret.Capabilities.os.toUpperCase() == "IOS";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /** 是否开启Slow个人日志 */
-        GlobalConfig.bIsShowSlowLog = false;
-        GlobalConfig.loginInitFinish = false; //是否是调试状态LOGIN_INIT_FINISH
-        GlobalConfig.isDebugF = false; //是否是调试战斗状态
-        /**游戏登陆账号 */
-        GlobalConfig.account = "";
-        GlobalConfig.pwd = "";
-        /**登录服务器 */
-        GlobalConfig.loginServer = "129.226.177.253"; //129.226.177.253   192.168.3.116
-        //登陆服务器端口
-        GlobalConfig.loginPort = 8003;
-        //玩家的账号             
-        GlobalConfig.userId = 0;
-        /**登陆服下发后端参数(直接透传给后端)*/
-        GlobalConfig.sparam = "0";
-        /**服务器id */
-        GlobalConfig.sid = "1";
-        /**客户端ip*/
-        GlobalConfig.clientIp = "127.0.0.1";
-        /**登录时间 */
-        GlobalConfig.logintime = 0;
-        return GlobalConfig;
-    }());
-    qmr.GlobalConfig = GlobalConfig;
-    __reflect(GlobalConfig.prototype, "qmr.GlobalConfig");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var BaseConfigKeys = (function () {
-        function BaseConfigKeys() {
-        }
-        /**名字*/
-        BaseConfigKeys.PlayerName = true;
-        /**消息*/
-        BaseConfigKeys.CodeCfg = true;
-        /**音效*/
-        BaseConfigKeys.Music = true;
-        /**中文配置*/
-        BaseConfigKeys.ClientCn = true;
-        return BaseConfigKeys;
-    }());
-    qmr.BaseConfigKeys = BaseConfigKeys;
-    __reflect(BaseConfigKeys.prototype, "qmr.BaseConfigKeys");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var MusicCfg = (function (_super) {
-        __extends(MusicCfg, _super);
-        function MusicCfg(element) {
-            var _this = _super.call(this, element) || this;
-            _this.key = "soundType";
-            return _this;
-        }
-        Object.defineProperty(MusicCfg.prototype, "soundType", {
-            /**音效key*/
-            get: function () {
-                return this.d["soundType"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MusicCfg.prototype, "soundName", {
-            /**音效名字*/
-            get: function () {
-                return this.d["soundName"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MusicCfg.prototype, "isPlaySameTime", {
-            /**是否同时播放*/
-            get: function () {
-                return this.d["isPlaySameTime"];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return MusicCfg;
-    }(qmr.BaseBean));
-    qmr.MusicCfg = MusicCfg;
-    __reflect(MusicCfg.prototype, "qmr.MusicCfg");
-})(qmr || (qmr = {}));
-var qmr;
-(function (qmr) {
-    var ConfigEnumBase = (function () {
-        function ConfigEnumBase() {
-        }
-        /**名字*/
-        ConfigEnumBase.PLAYERNAME = 'PlayerName';
-        /**消息*/
-        ConfigEnumBase.CODECFG = 'CodeCfg';
-        /**音效*/
-        ConfigEnumBase.MUSIC = 'Music';
-        /**中文配置*/
-        ConfigEnumBase.CLIENTCN = 'ClientCn';
-        return ConfigEnumBase;
-    }());
-    qmr.ConfigEnumBase = ConfigEnumBase;
-    __reflect(ConfigEnumBase.prototype, "qmr.ConfigEnumBase");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -4263,8 +4293,6 @@ var qmr;
         SystemController.prototype.reqgetSystemTime = function () {
             var c = new com.message.C_SYNC_TIME();
             this.sendCmd(c, qmr.MessageIDLogin.C_SYNC_TIME);
-            // console.log("C_SYNC_TIME:", Date.now() - this.timeFlag);
-            // this.timeFlag = Date.now();
         };
         /**
          * ===同步心跳包===
@@ -4281,7 +4309,14 @@ var qmr;
          */
         SystemController.prototype.onRecExceptionMsg = function (s) {
             var code = s.code;
-            qmr.LogUtil.log("[错误码: " + code + "]");
+            var cfg = qmr.ConfigManager.getConf(qmr.ConfigEnumBase.CODECFG, code);
+            if (cfg) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip(cfg.msg);
+            }
+            else {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("未知错误码：" + code);
+            }
+            qmr.GameLoading.getInstance().close();
         };
         return SystemController;
     }(qmr.BaseController));
@@ -4828,7 +4863,6 @@ __reflect(Main.prototype, "Main");
 var qmr;
 (function (qmr) {
     /**
-     * coler
      * 掉线模块
      */
     var DisConnectView = (function (_super) {
@@ -5264,9 +5298,41 @@ var qmr;
             t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGIN, t.onRecLoginSuccess, t, true);
             t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGOUT, t.onRecUseLoginOut, t, true);
             t.addSocketListener(qmr.MessageIDLogin.S_LOGIN_REGISTER, t.onRegisterResponse, t, true);
+            t.addSocketListener(qmr.MessageIDLogin.S_SEND_VERIFY_CODE, t.onGetVerifyCodeResponse, t, true);
+            t.addSocketListener(qmr.MessageIDLogin.S_USER_LOGIN_BAN, t.onRecLoginBanResponse, t, true);
         };
         /**
-         *  ---请求登陆---
+         * 封号
+         * @param s
+         */
+        LoginController.prototype.onRecLoginBanResponse = function (s) {
+        };
+        /**
+         * 获取验证码
+         * @param tel
+         */
+        LoginController.prototype.reqVerifyCode = function (tel) {
+            var c = new com.message.C_SEND_VERIFY_CODE();
+            c.mobile = tel;
+            this.sendCmd(c, qmr.MessageIDLogin.C_SEND_VERIFY_CODE, true);
+        };
+        /**
+         * 获取验证码返回
+         * @param s
+         */
+        LoginController.prototype.onGetVerifyCodeResponse = function (s) {
+            egret.log("获取验证码手机号:" + s.mobile, "  结果:" + s.state);
+            if (s.state == 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("获取验证码成功", true);
+            }
+            else {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("获取验证码失败");
+            }
+        };
+        /**
+         * 账号密码登录
+         * @param tel
+         * @param pwd
          */
         LoginController.prototype.reqLogin = function (tel, pwd) {
             qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
@@ -5278,6 +5344,22 @@ var qmr;
             c.sparam = JSON.stringify(sparam);
             c.fromGame = qmr.PlatformConfig.GameId;
             this.sendCmd(c, qmr.MessageIDLogin.C_USER_LOGIN, true);
+        };
+        /**
+         * 短信验证码登录
+         * @param tel
+         * @param code
+         */
+        LoginController.prototype.reqVerfiyCodeLogin = function (tel, code) {
+            qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
+            egret.log("登陆账号:" + tel, "参数:" + sparam);
+            var c = new com.message.C_USER_LOGIN_VERIFY_CODE();
+            c.mobile = tel;
+            c.verifyCode = code;
+            var sparam = { "DeviceUID": "", "ClientVersion": qmr.PlatformConfig.resVersion, "ClientIp": "" };
+            c.sparam = JSON.stringify(sparam);
+            c.fromGame = qmr.PlatformConfig.GameId;
+            this.sendCmd(c, qmr.MessageIDLogin.C_USER_LOGIN_VERIFY_CODE, true);
         };
         /**
          * 请求注册
@@ -5311,7 +5393,6 @@ var qmr;
          */
         LoginController.prototype.onRecLoginSuccess = function (s) {
             if (qmr.LoginModel.instance.isReconnect) {
-                qmr.SystemController.instance.startHeart();
                 qmr.GameLoading.getInstance().close();
                 qmr.PbGlobalCounter.maxReconnectCount = 3;
                 qmr.LogUtil.log("断线重连完成！！");
@@ -5390,7 +5471,8 @@ var qmr;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+                            qmr.GlobalConfig.userId = s.playerId.toString();
+                            qmr.PlatformConfig.GameId = s.fromGame;
                             return [4 /*yield*/, this.startEnterGame()];
                         case 1:
                             _a.sent();
@@ -5407,7 +5489,8 @@ var qmr;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+                            qmr.GlobalConfig.userId = s.playerId.toString();
+                            qmr.PlatformConfig.GameId = s.fromGame;
                             return [4 /*yield*/, this.startEnterGame()];
                         case 1:
                             _a.sent();
@@ -5422,7 +5505,7 @@ var qmr;
                     switch (_a.label) {
                         case 0:
                             qmr.SystemController.instance.startHeart(); //服务器说这里才开始心跳
-                            if (!(qmr.GlobalConfig.userId > 0)) return [3 /*break*/, 2];
+                            if (!qmr.GlobalConfig.userId) return [3 /*break*/, 2];
                             qmr.GameLoading.getInstance().close();
                             this.isEnterGame = true;
                             this.destoryLoginRes();
@@ -5461,6 +5544,7 @@ var qmr;
         __extends(LoginView, _super);
         function LoginView() {
             var _this = _super.call(this) || this;
+            _this.__leftTime = 0;
             _this.qmrSkinName = "LoginViewSkin";
             return _this;
         }
@@ -5474,33 +5558,70 @@ var qmr;
             this.addClickEvent(this.btn_register, this.startRegister, this);
             this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
             this.addClickEvent(this.btn_login_way, this.switchLoginWay, this);
+            this.addClickEvent(this.btn_getCode, this.getVcode1, this);
+            this.addClickEvent(this.btn_getCode2, this.getVcode2, this);
             this.registerNotify(qmr.NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
-            // this.txt_password.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            // this.txt_password.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
-            // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
-            // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
-            // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_OUT, this.focusOutTxtHandler, this);
+            this.txt_account.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            this.txt_password.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            this.txt_password2.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            this.txt_register_tel.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            this.txt_register_invitecode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
         };
         LoginView.prototype.focusInTxtHandler = function () {
-            var t = this;
-            t._posY = t.y;
-            egret.Tween.get(t).to({ y: -300 }, 300).wait(50)
-                .call(function () {
-                egret.Tween.removeTweens(t);
-            });
+            this.scrollDocument(100);
         };
-        LoginView.prototype.focusOutTxtHandler = function () {
-            var t = this;
-            egret.Tween.get(t).to({ y: t._posY }, 300).wait(50)
-                .call(function () {
-                egret.Tween.removeTweens(t);
-            });
+        LoginView.prototype.scrollDocument = function (posy) {
+            var inputFocus = function () {
+                if (document && document.body) {
+                    console.log(Math.random());
+                    setTimeout(function () {
+                        if (window.scrollTo) {
+                            window.scrollTo(0, posy);
+                        }
+                    }, 500);
+                }
+            };
+            inputFocus();
+        };
+        LoginView.prototype.getVcode1 = function () {
+            if (this.__leftTime > 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请稍后再试");
+                return;
+            }
+            var userName = this.txt_account.text.trim();
+            if (userName.length == 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
+                return;
+            }
+            if (!qmr.HtmlUtil.isPhoneNumber(userName)) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
+                return;
+            }
+            qmr.LoginController.instance.reqVerifyCode(userName);
+            this.__leftTime = 59;
+            this.updateCd();
+        };
+        LoginView.prototype.getVcode2 = function () {
+            if (this.__leftTime > 0) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请稍后再试");
+                return;
+            }
+            var tel = this.txt_register_tel.text.trim();
+            if (!qmr.HtmlUtil.isPhoneNumber(tel)) {
+                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
+                return;
+            }
+            qmr.LoginController.instance.reqVerifyCode(tel);
+            this.__leftTime = 59;
+            this.updateCd();
         };
         LoginView.prototype.switchLoginWay = function () {
-            console.log("switchLoginWay");
+            var t = this;
+            qmr.GlobalConfig.loginType = qmr.GlobalConfig.loginType == 0 ? 1 : 0;
+            t.showLoginType();
         };
         LoginView.prototype.gotoRegisterView = function () {
             this.group_login.visible = false;
@@ -5560,18 +5681,35 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
                 return;
             }
-            var password = this.txt_password.text.trim();
-            if (password.length == 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入密码");
-                return;
+            var password;
+            if (qmr.GlobalConfig.loginType == 0) {
+                password = this.txt_password.text.trim();
+                if (password.length == 0) {
+                    qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入密码");
+                    return;
+                }
+                if (password.length < 0) {
+                    qmr.TipManagerCommon.getInstance().createCommonColorTip("密码不能少于六位数...");
+                    return;
+                }
             }
-            if (password.length < 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("密码不能少于六位数...");
-                return;
+            else if (qmr.GlobalConfig.loginType == 1) {
+                password = this.txt_password2.text.trim();
+                if (password.length == 0) {
+                    qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
+                    return;
+                }
             }
-            qmr.GlobalConfig.account = userName;
-            qmr.GlobalConfig.pwd = password;
-            qmr.LoginController.instance.reqLogin(userName, password);
+            if (qmr.GlobalConfig.loginType == 0) {
+                qmr.GlobalConfig.account = userName;
+                qmr.GlobalConfig.pwd = password;
+                qmr.LoginController.instance.reqLogin(userName, password);
+            }
+            else if (qmr.GlobalConfig.loginType == 1) {
+                qmr.GlobalConfig.telephone = userName;
+                qmr.GlobalConfig.verifyCode = password;
+                qmr.LoginController.instance.reqVerfiyCodeLogin(userName, password);
+            }
             egret.localStorage.setItem("testUserid", qmr.GlobalConfig.account);
         };
         LoginView.prototype.addedToStage = function (evt) {
@@ -5617,17 +5755,76 @@ var qmr;
         */
         LoginView.prototype.initData = function () {
             _super.prototype.initData.call(this);
-            this.txt_account.text = egret.localStorage.getItem("testUserid");
+            var t = this;
+            t.txt_account.text = egret.localStorage.getItem("testUserid");
+            t.updateView();
+        };
+        LoginView.prototype.updateView = function () {
+            var t = this;
             var code = qmr.HtmlUtil.getQueryStringByName("code");
             var register = qmr.HtmlUtil.getQueryStringByName("register");
-            if (!!code && register == "1") {
-                this.group_login.visible = false;
-                this.group_register.visible = true;
-                this.txt_register_invitecode.text = code;
+            if (code && register == "1") {
+                t.group_login.visible = false;
+                t.group_register.visible = true;
+                t.txt_register_invitecode.text = code;
             }
             else {
-                this.group_login.visible = true;
-                this.group_register.visible = false;
+                t.group_login.visible = true;
+                t.group_register.visible = false;
+            }
+            t.showLoginType();
+        };
+        LoginView.prototype.updateCd = function () {
+            var t = this;
+            if (t.__leftTime > 0) {
+                if (t.__timekey != -1) {
+                    egret.clearInterval(t.__timekey);
+                }
+                t.__timekey = egret.setInterval(t.updateTime, t, 1000);
+                t.txt_vcode.text = t.txt_vcode2.text = qmr.CommonTool.formatTime1(t.__leftTime) + "s";
+            }
+            else {
+                t.stopTime();
+            }
+        };
+        LoginView.prototype.updateTime = function () {
+            var t = this;
+            if (this.__leftTime <= 0) {
+                t.txt_vcode.text = t.txt_vcode2.text = "获取验证码";
+                return;
+            }
+            t.txt_vcode.text = t.txt_vcode2.text = qmr.CommonTool.formatTime1(t.__leftTime) + "s";
+            t.__leftTime--;
+        };
+        LoginView.prototype.stopTime = function () {
+            var t = this;
+            if (t.__timekey != -1) {
+                egret.clearInterval(t.__timekey);
+            }
+            t.__timekey = -1;
+            t.txt_vcode.text = "";
+        };
+        LoginView.prototype.showLoginType = function () {
+            var t = this;
+            if (qmr.GlobalConfig.loginType == 0) {
+                t.btn_login_way.textFlow = qmr.HtmlUtil.getHtmlString("<font><u>短信登录</u></font>");
+                t.txt_pwd_des2.visible = false;
+                t.btn_getCode.visible = false;
+                t.txt_password.visible = true;
+                t.txt_password2.visible = false;
+                t.txt_pwd_des.visible = true;
+                t.txt_account_des.visible = true;
+                t.txt_account_des2.visible = false;
+            }
+            else {
+                t.btn_login_way.textFlow = qmr.HtmlUtil.getHtmlString("<font><u>账号密码登录</u></font>");
+                t.txt_pwd_des2.visible = true;
+                t.btn_getCode.visible = true;
+                t.txt_password.visible = false;
+                t.txt_password2.visible = true;
+                t.txt_pwd_des.visible = false;
+                t.txt_account_des.visible = false;
+                t.txt_account_des2.visible = true;
             }
         };
         LoginView.prototype.dispose = function () {
@@ -5678,12 +5875,18 @@ var qmr;
          */
         /** 映射协议ID对应的协议名 */
         MessageIDLogin.MSG_KEYS = new qmr.Dictionary();
-        /**  异常消息 */
+        /** 异常消息 */
         MessageIDLogin.S_EXCEPTION_MSG = 900;
-        /**  登录 */
+        MessageIDLogin.C_SEND_VERIFY_CODE = 1019;
+        MessageIDLogin.S_SEND_VERIFY_CODE = 1020;
+        /** 登录 */
         MessageIDLogin.C_USER_LOGIN = 1001;
-        /**  登录成功 */
+        /** 登录成功 */
         MessageIDLogin.S_USER_LOGIN = 1002;
+        /**封号 */
+        MessageIDLogin.S_USER_LOGIN_BAN = 1003;
+        /**短信登录 */
+        MessageIDLogin.C_USER_LOGIN_VERIFY_CODE = 1004;
         /** 注册 */
         MessageIDLogin.C_LOGIN_REGISTER = 1005;
         /** 注册返回 */
@@ -8003,37 +8206,15 @@ var qmr;
             }
             return s;
         };
-        CommonTool.addInputListener = function (textInput, thisObject) {
-            textInput.addEventListener(egret.FocusEvent.FOCUS_IN, CommonTool.focusInTxtHandler, thisObject);
-            textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, CommonTool.focusOutTxtHandler, thisObject);
-        };
-        CommonTool.removeInputListener = function (textInput, thisObject) {
-            textInput.addEventListener(egret.FocusEvent.FOCUS_IN, CommonTool.focusInTxtHandler, thisObject);
-            textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, CommonTool.focusOutTxtHandler, thisObject);
-        };
-        CommonTool.focusInTxtHandler = function (evt) {
-            var inputFocus = function () {
-                if (document && document.body) {
-                    setTimeout(function () {
-                        if (window.scrollTo) {
-                            window.scrollTo(0, document.body.clientHeight);
-                        }
-                    }, 400);
-                }
-            };
-            inputFocus();
-        };
-        CommonTool.focusOutTxtHandler = function () {
-            var inputFocus = function () {
-                if (document && document.body) {
-                    setTimeout(function () {
-                        if (window.scrollTo) {
-                            window.scrollTo(0, document.body.clientHeight);
-                        }
-                    }, 400);
-                }
-            };
-            inputFocus();
+        /**
+         * 根据时间返回字符串 00:00:00
+         */
+        CommonTool.formatTime1 = function (second) {
+            var min = Math.floor(second / 60) % 60;
+            var sec = Math.floor(second % 60);
+            var minStr = min < 10 ? ("0" + min) : min.toString();
+            var secStr = sec < 10 ? ("0" + sec) : sec.toString();
+            return minStr + ":" + secStr;
         };
         return CommonTool;
     }());
@@ -9021,13 +9202,30 @@ var qmr;
             t.setStageFrameRate(t.FRAME_RATE);
             if (qmr.PlatformManager.instance.platform.canResizeStage) {
                 t.changeStageSize();
-                window.addEventListener("resize", t.changeStageSize);
             }
+            window.addEventListener("resize", t.changeStageSize);
         };
         /**
          * @description 注册舞台事件
          */
         StageUtil.changeStageSize = function () {
+            // var s = "";
+            // s += "\r\n网页可见区域宽：" + document.body.clientWidth;
+            // s += "\r\n网页可见区域高：" + document.body.clientHeight;
+            // s += "\r\n网页可见区域宽：" + document.body.offsetWidth + " (包括边线的宽)";
+            // s += "\r\n网页可见区域高：" + document.body.offsetHeight + " (包括边线的宽)";
+            // s += "\r\n网页正文全文宽：" + document.body.scrollWidth;
+            // s += "\r\n网页正文全文高：" + document.body.scrollHeight;
+            // s += "\r\n网页被卷去的高：" + document.body.scrollTop;
+            // s += "\r\n网页被卷去的左：" + document.body.scrollLeft;
+            // s += "\r\n网页正文部分上：" + window.screenTop;
+            // s += "\r\n网页正文部分左：" + window.screenLeft;
+            // s += "\r\n屏幕分辨率的高：" + window.screen.height;
+            // s += "\r\n屏幕分辨率的宽：" + window.screen.width;
+            // s += "\r\n屏幕可用工作区高度：" + window.screen.availHeight;
+            // s += "\r\n屏幕可用工作区宽度：" + window.screen.availWidth;
+            // console.log(s);
+            // console.log(this.stage.x, this.stage.y, this.stage.stageWidth, this.stage.stageHeight);
             var t = StageUtil;
             var updateStageScaleMode = function () {
                 var scaleMode = "";

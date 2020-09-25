@@ -57,8 +57,6 @@ module qmr
 		{
 			var c: com.message.C_SYNC_TIME = new com.message.C_SYNC_TIME();
 			this.sendCmd(c, MessageIDLogin.C_SYNC_TIME);
-			// console.log("C_SYNC_TIME:", Date.now() - this.timeFlag);
-			// this.timeFlag = Date.now();
 		}
 
 		/**
@@ -80,7 +78,14 @@ module qmr
 		private onRecExceptionMsg(s: com.message.S_EXCEPTION_MSG): void
 		{
 			let code = s.code;
-			LogUtil.log("[错误码: " + code + "]");
+			let cfg:CodeCfgCfg = ConfigManager.getConf(ConfigEnumBase.CODECFG, code);
+			if(cfg){
+				TipManagerCommon.getInstance().createCommonColorTip(cfg.msg);
+			} else {
+				TipManagerCommon.getInstance().createCommonColorTip("未知错误码："+code);
+			}
+
+			qmr.GameLoading.getInstance().close();
 		}
 	}
 }

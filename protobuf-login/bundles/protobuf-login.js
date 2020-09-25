@@ -502,7 +502,7 @@ $root.com = (function() {
                 if (message.playerId != null && message.hasOwnProperty("playerId"))
                     writer.uint32(/* id 1, wireType 0 =*/8).int64(message.playerId);
                 if (message.fromGame != null && message.hasOwnProperty("fromGame"))
-                    writer.uint32(/* id 4, wireType 0 =*/32).int32(message.fromGame);
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.fromGame);
                 return writer;
             };
 
@@ -527,7 +527,7 @@ $root.com = (function() {
                     case 1:
                         message.playerId = reader.int64();
                         break;
-                    case 4:
+                    case 2:
                         message.fromGame = reader.int32();
                         break;
                     default:
@@ -799,6 +799,182 @@ $root.com = (function() {
             };
 
             return S_LOGIN_REGISTER;
+        })();
+
+        message.C_SEND_VERIFY_CODE = (function() {
+
+            /**
+             * Properties of a C_SEND_VERIFY_CODE.
+             * @memberof com.message
+             * @interface IC_SEND_VERIFY_CODE
+             * @property {string|null} [mobile] C_SEND_VERIFY_CODE mobile
+             */
+
+            /**
+             * Constructs a new C_SEND_VERIFY_CODE.
+             * @memberof com.message
+             * @classdesc Represents a C_SEND_VERIFY_CODE.
+             * @implements IC_SEND_VERIFY_CODE
+             * @constructor
+             * @param {com.message.IC_SEND_VERIFY_CODE=} [properties] Properties to set
+             */
+            function C_SEND_VERIFY_CODE(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * C_SEND_VERIFY_CODE mobile.
+             * @member {string} mobile
+             * @memberof com.message.C_SEND_VERIFY_CODE
+             * @instance
+             */
+            C_SEND_VERIFY_CODE.prototype.mobile = "";
+
+            /**
+             * Encodes the specified C_SEND_VERIFY_CODE message. Does not implicitly {@link com.message.C_SEND_VERIFY_CODE.verify|verify} messages.
+             * @function encode
+             * @memberof com.message.C_SEND_VERIFY_CODE
+             * @static
+             * @param {com.message.IC_SEND_VERIFY_CODE} message C_SEND_VERIFY_CODE message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            C_SEND_VERIFY_CODE.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.mobile != null && message.hasOwnProperty("mobile"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.mobile);
+                return writer;
+            };
+
+            /**
+             * Decodes a C_SEND_VERIFY_CODE message from the specified reader or buffer.
+             * @function decode
+             * @memberof com.message.C_SEND_VERIFY_CODE
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {com.message.C_SEND_VERIFY_CODE} C_SEND_VERIFY_CODE
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            C_SEND_VERIFY_CODE.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.com.message.C_SEND_VERIFY_CODE();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.mobile = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            return C_SEND_VERIFY_CODE;
+        })();
+
+        message.S_SEND_VERIFY_CODE = (function() {
+
+            /**
+             * Properties of a S_SEND_VERIFY_CODE.
+             * @memberof com.message
+             * @interface IS_SEND_VERIFY_CODE
+             * @property {string|null} [mobile] S_SEND_VERIFY_CODE mobile
+             * @property {number|null} [state] S_SEND_VERIFY_CODE state
+             */
+
+            /**
+             * Constructs a new S_SEND_VERIFY_CODE.
+             * @memberof com.message
+             * @classdesc Represents a S_SEND_VERIFY_CODE.
+             * @implements IS_SEND_VERIFY_CODE
+             * @constructor
+             * @param {com.message.IS_SEND_VERIFY_CODE=} [properties] Properties to set
+             */
+            function S_SEND_VERIFY_CODE(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * S_SEND_VERIFY_CODE mobile.
+             * @member {string} mobile
+             * @memberof com.message.S_SEND_VERIFY_CODE
+             * @instance
+             */
+            S_SEND_VERIFY_CODE.prototype.mobile = "";
+
+            /**
+             * S_SEND_VERIFY_CODE state.
+             * @member {number} state
+             * @memberof com.message.S_SEND_VERIFY_CODE
+             * @instance
+             */
+            S_SEND_VERIFY_CODE.prototype.state = 0;
+
+            /**
+             * Encodes the specified S_SEND_VERIFY_CODE message. Does not implicitly {@link com.message.S_SEND_VERIFY_CODE.verify|verify} messages.
+             * @function encode
+             * @memberof com.message.S_SEND_VERIFY_CODE
+             * @static
+             * @param {com.message.IS_SEND_VERIFY_CODE} message S_SEND_VERIFY_CODE message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            S_SEND_VERIFY_CODE.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.mobile != null && message.hasOwnProperty("mobile"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.mobile);
+                if (message.state != null && message.hasOwnProperty("state"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.state);
+                return writer;
+            };
+
+            /**
+             * Decodes a S_SEND_VERIFY_CODE message from the specified reader or buffer.
+             * @function decode
+             * @memberof com.message.S_SEND_VERIFY_CODE
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {com.message.S_SEND_VERIFY_CODE} S_SEND_VERIFY_CODE
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            S_SEND_VERIFY_CODE.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.com.message.S_SEND_VERIFY_CODE();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.mobile = reader.string();
+                        break;
+                    case 2:
+                        message.state = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            return S_SEND_VERIFY_CODE;
         })();
 
         message.C_USER_LOGOUT = (function() {

@@ -1,4 +1,30 @@
-module qmr {
+module qmr
+{
+	export class CodeCfgCfg extends BaseBean
+	{
+		/**ID*/
+	get id():number
+	{			
+		return this.d["id"];			
+	}
+	/**消息描述*/
+	get msg():string
+	{			
+		return this.d["msg"];			
+	}
+	/**消息类型*/
+	get type():number
+	{			
+		return this.d["type"];			
+	}
+
+		constructor(element)
+		{				
+			super(element)
+		this.key="id";
+		}
+	}
+
 	export class MusicCfg extends BaseBean
 	{
 		/**音效key*/
@@ -23,5 +49,5 @@ module qmr {
 		this.key="soundType";
 		}
 	}
-	
+
 }

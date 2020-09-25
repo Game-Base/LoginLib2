@@ -862,37 +862,23 @@ declare module qmr {
     }
 }
 declare module qmr {
-    class ConfigManager {
-        private static cfgDic;
-        private static zipDic;
-        /**默认的资源包名称 */
-        private static WHOLE_CONFIG_NAME;
-        private static BASE_CONFIG_NAME;
-        /**
-         * @description 根据Id获取当前行数对象
-         * ConfigEnum
-         */
-        static getConf(jsonName: string, confId: any): any;
-        static getBean(fileName: string): Dictionary;
-        /**从zip中解析一张表*/
-        private static parseConfigFromZip(fileName);
-        private static getZip(resName);
-        private static getkey(cfg, cfgValue);
-    }
-}
-declare module qmr {
     class GlobalConfig {
         /** 是否开启Slow个人日志 */
         static bIsShowSlowLog: boolean;
         static loginInitFinish: boolean;
         static isDebugF: boolean;
+        /**登录类型 0 账号密码登录 1 短信验证码登录 */
+        static loginType: number;
         /**游戏登陆账号 */
         static account: string;
         static pwd: string;
+        /**游戏短信验证码登录 */
+        static telephone: string;
+        static verifyCode: string;
         /**登录服务器 */
         static loginServer: string;
         static loginPort: number;
-        static userId: number | Long;
+        static userId: string;
         /**登陆服下发后端参数(直接透传给后端)*/
         static sparam: any;
         /**服务器id */
@@ -911,17 +897,22 @@ declare module qmr {
 }
 declare module qmr {
     class BaseConfigKeys {
-        /**名字*/
-        static PlayerName: boolean;
         /**消息*/
         static CodeCfg: boolean;
         /**音效*/
         static Music: boolean;
-        /**中文配置*/
-        static ClientCn: boolean;
     }
 }
 declare module qmr {
+    class CodeCfgCfg extends BaseBean {
+        /**ID*/
+        readonly id: number;
+        /**消息描述*/
+        readonly msg: string;
+        /**消息类型*/
+        readonly type: number;
+        constructor(element: any);
+    }
     class MusicCfg extends BaseBean {
         /**音效key*/
         readonly soundType: string;
@@ -934,14 +925,29 @@ declare module qmr {
 }
 declare module qmr {
     class ConfigEnumBase {
-        /**名字*/
-        static PLAYERNAME: string;
         /**消息*/
         static CODECFG: string;
         /**音效*/
         static MUSIC: string;
-        /**中文配置*/
-        static CLIENTCN: string;
+    }
+}
+declare module qmr {
+    class ConfigManager {
+        private static cfgDic;
+        private static zipDic;
+        /**默认的资源包名称 */
+        private static WHOLE_CONFIG_NAME;
+        private static BASE_CONFIG_NAME;
+        /**
+         * @description 根据Id获取当前行数对象
+         * ConfigEnum
+         */
+        static getConf(jsonName: string, confId: any): any;
+        static getBean(fileName: string): Dictionary;
+        /**从zip中解析一张表*/
+        private static parseConfigFromZip(fileName);
+        private static getZip(resName);
+        private static getkey(cfg, cfgValue);
     }
 }
 declare module qmr {
@@ -1465,7 +1471,6 @@ declare class Main extends eui.UILayer {
 }
 declare module qmr {
     /**
-     * coler
      * 掉线模块
      */
     class DisConnectView extends SuperBaseModule {
@@ -1604,9 +1609,32 @@ declare module qmr {
         constructor();
         protected initListeners(): void;
         /**
-         *  ---请求登陆---
+         * 封号
+         * @param s
+         */
+        private onRecLoginBanResponse(s);
+        /**
+         * 获取验证码
+         * @param tel
+         */
+        reqVerifyCode(tel: string): void;
+        /**
+         * 获取验证码返回
+         * @param s
+         */
+        private onGetVerifyCodeResponse(s);
+        /**
+         * 账号密码登录
+         * @param tel
+         * @param pwd
          */
         reqLogin(tel: string, pwd: string): void;
+        /**
+         * 短信验证码登录
+         * @param tel
+         * @param code
+         */
+        reqVerfiyCodeLogin(tel: string, code: string): void;
         /**
          * 请求注册
          * @param mobile 手机号码
@@ -1673,20 +1701,25 @@ declare module qmr {
         lbUserBook: eui.Label;
         lbPrivacyPolicy: eui.Label;
         groupAccount: eui.Group;
+        txt_account_des2: eui.Label;
         txt_account_des: eui.Label;
         txt_account: eui.EditableText;
         groupAccount0: eui.Group;
         txt_password: eui.TextInput;
         txt_pwd_des: eui.Label;
+        txt_password2: eui.TextInput;
+        txt_pwd_des2: eui.Label;
+        btn_getCode: eui.Group;
+        txt_vcode: eui.Label;
         btn_login: eui.Image;
-        btn_login_way: eui.Label;
         btn_register_back: eui.Group;
+        btn_login_way: eui.Label;
         group_register: eui.Group;
         gpRead0: eui.Group;
         lbUserBook0: eui.Label;
         lbPrivacyPolicy0: eui.Label;
         groupAccount1: eui.Group;
-        txt_register_tel: eui.TextInput;
+        txt_register_tel: eui.EditableText;
         groupAccount2: eui.Group;
         txt_register_invitecode: eui.TextInput;
         groupAccount3: eui.Group;
@@ -1695,16 +1728,21 @@ declare module qmr {
         txt_register_repwd: eui.TextInput;
         groupAccount5: eui.Group;
         txt_register_verifycode: eui.TextInput;
+        btn_getCode2: eui.Group;
+        txt_vcode2: eui.Label;
         btn_register: eui.Image;
-        btn_login_back: eui.Image;
+        btn_login_back: eui.Group;
+        private __leftTime;
+        private __timekey;
         constructor();
         /**
          * @description 初始化事件
          */
         protected initListener(): void;
-        private _posY;
         focusInTxtHandler(): void;
-        focusOutTxtHandler(): void;
+        private scrollDocument(posy);
+        private getVcode1();
+        private getVcode2();
         private switchLoginWay();
         private gotoRegisterView();
         private gotoLoginView();
@@ -1718,6 +1756,11 @@ declare module qmr {
         * @description 初始化数据,需被子类继承
         */
         protected initData(): void;
+        private updateView();
+        private updateCd();
+        private updateTime();
+        private stopTime();
+        private showLoginType();
         dispose(): void;
     }
 }
@@ -1742,12 +1785,18 @@ declare module qmr {
         static init(): void;
         /** 通过本类的协议ID映射协议名字 */
         static getMsgNameById(id: number): string;
-        /**  异常消息 */
+        /** 异常消息 */
         static S_EXCEPTION_MSG: number;
-        /**  登录 */
+        static C_SEND_VERIFY_CODE: number;
+        static S_SEND_VERIFY_CODE: number;
+        /** 登录 */
         static C_USER_LOGIN: number;
-        /**  登录成功 */
+        /** 登录成功 */
         static S_USER_LOGIN: number;
+        /**封号 */
+        static S_USER_LOGIN_BAN: number;
+        /**短信登录 */
+        static C_USER_LOGIN_VERIFY_CODE: number;
         /** 注册 */
         static C_LOGIN_REGISTER: number;
         /** 注册返回 */
@@ -2532,10 +2581,10 @@ declare module qmr {
     class CommonTool {
         constructor();
         static getMsg(...arg: any[]): string;
-        static addInputListener(textInput: eui.TextInput, thisObject: any): void;
-        static removeInputListener(textInput: eui.TextInput, thisObject: any): void;
-        static focusInTxtHandler(evt: FocusEvent): void;
-        static focusOutTxtHandler(): void;
+        /**
+         * 根据时间返回字符串 00:00:00
+         */
+        static formatTime1(second: number): string;
     }
 }
 declare module qmr {

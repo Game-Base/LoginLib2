@@ -24,12 +24,18 @@ module qmr {
 			return MessageIDLogin.MSG_KEYS.get(id)
 		}
 		
-		/**  异常消息 */
+		/** 异常消息 */
 		public static S_EXCEPTION_MSG:number = 900; 
-		/**  登录 */
+		public static C_SEND_VERIFY_CODE:number = 1019;
+		public static S_SEND_VERIFY_CODE:number = 1020;
+		/** 登录 */
 		public static C_USER_LOGIN:number = 1001; 
-		/**  登录成功 */
+		/** 登录成功 */
 		public static S_USER_LOGIN:number = 1002; 
+		/**封号 */
+		public static S_USER_LOGIN_BAN:number = 1003;
+		/**短信登录 */
+		public static C_USER_LOGIN_VERIFY_CODE:number = 1004;
 		/** 注册 */
 		public static C_LOGIN_REGISTER:number = 1005; 
 		/** 注册返回 */

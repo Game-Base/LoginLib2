@@ -14,52 +14,17 @@ module qmr {
 			return s;
 		}
 
-		public static addInputListener(textInput: eui.TextInput, thisObject: any)
-		{
-			textInput.addEventListener(egret.FocusEvent.FOCUS_IN, CommonTool.focusInTxtHandler, thisObject)
-			textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, CommonTool.focusOutTxtHandler, thisObject)
-		}
+		/**
+         * 根据时间返回字符串 00:00:00
+         */
+        public static formatTime1(second: number): string
+        {
+            var min: number = Math.floor(second / 60) % 60;
+            var sec: number = Math.floor(second % 60);
+            var minStr: string = min < 10 ? ("0" + min) : min.toString();
+            var secStr: string = sec < 10 ? ("0" + sec) : sec.toString();
 
-		public static removeInputListener(textInput: eui.TextInput, thisObject: any)
-		{
-			textInput.addEventListener(egret.FocusEvent.FOCUS_IN, CommonTool.focusInTxtHandler, thisObject)
-			textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, CommonTool.focusOutTxtHandler, thisObject)
-		}
-
-		public static focusInTxtHandler(evt:FocusEvent)
-		{
-			var inputFocus = function ()
-			{
-				if (document && document.body)
-				{
-					setTimeout(function ()
-					{
-						if(window.scrollTo){
-							window.scrollTo(0, document.body.clientHeight);
-						}
-						
-					}, 400);
-				}
-			};
-			inputFocus();
-		}
-
-		public static focusOutTxtHandler()
-		{
-			var inputFocus = function ()
-			{
-				if (document && document.body)
-				{
-					setTimeout(function ()
-					{
-						if(window.scrollTo){
-							window.scrollTo(0, document.body.clientHeight);
-						}
-						
-					}, 400);
-				}
-			};
-			inputFocus();
-		}
+            return minStr + ":" + secStr;
+        }
 	}
 }

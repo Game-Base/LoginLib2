@@ -31,7 +31,8 @@ module qmr
 		 */
 		public async onRecLoginSuccess(s: com.message.S_USER_LOGIN)
 		{
-			qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+			qmr.GlobalConfig.userId = s.playerId.toString();
+			qmr.PlatformConfig.GameId = s.fromGame;
 			await this.startEnterGame();
 		}
 
@@ -40,7 +41,8 @@ module qmr
 		 */
 		public async onRecRegisterSuccess(s: com.message.S_LOGIN_REGISTER)
 		{
-			qmr.GlobalConfig.userId = parseFloat(s.playerId.toString());
+			qmr.GlobalConfig.userId = s.playerId.toString();
+			qmr.PlatformConfig.GameId = s.fromGame;
 			await this.startEnterGame();
 		}
 
@@ -48,7 +50,7 @@ module qmr
 		{
 			SystemController.instance.startHeart();//服务器说这里才开始心跳
 			
-			if (qmr.GlobalConfig.userId > 0)//注册过，或者注册成功
+			if (qmr.GlobalConfig.userId)//注册过，或者注册成功
 			{
 				GameLoading.getInstance().close();
 				this.isEnterGame = true;

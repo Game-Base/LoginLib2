@@ -362,6 +362,88 @@ declare namespace com {
             public static decode(reader: (protobuf.Reader|Uint8Array), length?: number): com.message.S_LOGIN_REGISTER;
         }
 
+        /** Properties of a C_SEND_VERIFY_CODE. */
+        interface IC_SEND_VERIFY_CODE {
+
+            /** C_SEND_VERIFY_CODE mobile */
+            mobile?: (string|null);
+        }
+
+        /** Represents a C_SEND_VERIFY_CODE. */
+        class C_SEND_VERIFY_CODE implements IC_SEND_VERIFY_CODE {
+
+            /**
+             * Constructs a new C_SEND_VERIFY_CODE.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: com.message.IC_SEND_VERIFY_CODE);
+
+            /** C_SEND_VERIFY_CODE mobile. */
+            public mobile: string;
+
+            /**
+             * Encodes the specified C_SEND_VERIFY_CODE message. Does not implicitly {@link com.message.C_SEND_VERIFY_CODE.verify|verify} messages.
+             * @param message C_SEND_VERIFY_CODE message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: com.message.IC_SEND_VERIFY_CODE, writer?: protobuf.Writer): protobuf.Writer;
+
+            /**
+             * Decodes a C_SEND_VERIFY_CODE message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns C_SEND_VERIFY_CODE
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: (protobuf.Reader|Uint8Array), length?: number): com.message.C_SEND_VERIFY_CODE;
+        }
+
+        /** Properties of a S_SEND_VERIFY_CODE. */
+        interface IS_SEND_VERIFY_CODE {
+
+            /** S_SEND_VERIFY_CODE mobile */
+            mobile?: (string|null);
+
+            /** S_SEND_VERIFY_CODE state */
+            state?: (number|null);
+        }
+
+        /** Represents a S_SEND_VERIFY_CODE. */
+        class S_SEND_VERIFY_CODE implements IS_SEND_VERIFY_CODE {
+
+            /**
+             * Constructs a new S_SEND_VERIFY_CODE.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: com.message.IS_SEND_VERIFY_CODE);
+
+            /** S_SEND_VERIFY_CODE mobile. */
+            public mobile: string;
+
+            /** S_SEND_VERIFY_CODE state. */
+            public state: number;
+
+            /**
+             * Encodes the specified S_SEND_VERIFY_CODE message. Does not implicitly {@link com.message.S_SEND_VERIFY_CODE.verify|verify} messages.
+             * @param message S_SEND_VERIFY_CODE message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: com.message.IS_SEND_VERIFY_CODE, writer?: protobuf.Writer): protobuf.Writer;
+
+            /**
+             * Decodes a S_SEND_VERIFY_CODE message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns S_SEND_VERIFY_CODE
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: (protobuf.Reader|Uint8Array), length?: number): com.message.S_SEND_VERIFY_CODE;
+        }
+
         /** Properties of a C_USER_LOGOUT. */
         interface IC_USER_LOGOUT {
 

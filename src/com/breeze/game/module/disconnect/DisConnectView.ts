@@ -1,7 +1,6 @@
 module qmr
 {
 	/**
-	 * coler
 	 * 掉线模块
 	 */
 	export class DisConnectView extends SuperBaseModule

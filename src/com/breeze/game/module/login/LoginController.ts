@@ -21,10 +21,48 @@ module qmr
 			t.addSocketListener(MessageIDLogin.S_USER_LOGIN, t.onRecLoginSuccess, t, true);
 			t.addSocketListener(MessageIDLogin.S_USER_LOGOUT, t.onRecUseLoginOut, t, true);
 			t.addSocketListener(MessageIDLogin.S_LOGIN_REGISTER, t.onRegisterResponse, t, true);
+			t.addSocketListener(MessageIDLogin.S_SEND_VERIFY_CODE, t.onGetVerifyCodeResponse, t, true);
+			t.addSocketListener(MessageIDLogin.S_USER_LOGIN_BAN, t.onRecLoginBanResponse, t, true);
 		}
 
 		/**
-		 *  ---请求登陆---
+		 * 封号
+		 * @param s 
+		 */
+		private onRecLoginBanResponse(s:com.message.S_USER_LOGIN_BAN):void
+		{
+
+		}
+
+		/**
+		 * 获取验证码
+		 * @param tel 
+		 */
+		public reqVerifyCode(tel: string): void
+		{
+			var c: com.message.C_SEND_VERIFY_CODE = new com.message.C_SEND_VERIFY_CODE();
+			c.mobile = tel;
+			this.sendCmd(c, MessageIDLogin.C_SEND_VERIFY_CODE, true);
+		}
+
+		/**
+		 * 获取验证码返回
+		 * @param s 
+		 */
+		private onGetVerifyCodeResponse(s:com.message.S_SEND_VERIFY_CODE):void
+		{
+			egret.log("获取验证码手机号:" + s.mobile, "  结果:" + s.state);
+			if(s.state == 0){
+				TipManagerCommon.getInstance().createCommonColorTip("获取验证码成功", true);
+			} else {
+				TipManagerCommon.getInstance().createCommonColorTip("获取验证码失败");
+			}
+		}
+
+		/**
+		 * 账号密码登录
+		 * @param tel 
+		 * @param pwd 
 		 */
 		public reqLogin(tel: string, pwd:string): void
 		{
@@ -38,6 +76,25 @@ module qmr
 			c.fromGame = PlatformConfig.GameId;
 
 			this.sendCmd(c, MessageIDLogin.C_USER_LOGIN, true);
+		}
+
+		/**
+		 * 短信验证码登录
+		 * @param tel 
+		 * @param code 
+		 */
+		public reqVerfiyCodeLogin(tel:string, code:string):void
+		{
+			qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
+			egret.log("登陆账号:" + tel, "参数:" + sparam);
+			var c: com.message.C_USER_LOGIN_VERIFY_CODE = new com.message.C_USER_LOGIN_VERIFY_CODE();
+			c.mobile = tel;
+			c.verifyCode = code;
+			var sparam = {"DeviceUID":"", "ClientVersion":PlatformConfig.resVersion,"ClientIp":""};
+			c.sparam = JSON.stringify(sparam);
+			c.fromGame = PlatformConfig.GameId;
+
+			this.sendCmd(c, MessageIDLogin.C_USER_LOGIN_VERIFY_CODE, true);
 		}
 
 		/**
@@ -77,7 +134,6 @@ module qmr
 		{
 			if (LoginModel.instance.isReconnect)
 			{
-				SystemController.instance.startHeart();
 				qmr.GameLoading.getInstance().close();
 				PbGlobalCounter.maxReconnectCount = 3;
 				LogUtil.log("断线重连完成！！");
