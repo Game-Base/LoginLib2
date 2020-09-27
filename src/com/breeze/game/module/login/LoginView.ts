@@ -11,16 +11,14 @@ public gpRead:eui.Group;
 public lbUserBook:eui.Label;
 public lbPrivacyPolicy:eui.Label;
 public groupAccount:eui.Group;
-public txt_account_des2:eui.Label;
-public txt_account_des:eui.Label;
-public txt_account:eui.EditableText;
+public group_account:eui.Group;
+public txt_account:eui.TextInput;
 public groupAccount0:eui.Group;
+public group_pwd:eui.Group;
 public txt_password:eui.TextInput;
-public txt_pwd_des:eui.Label;
-public txt_password2:eui.TextInput;
-public txt_pwd_des2:eui.Label;
+public group_vcode:eui.Group;
+public txt_vcode:eui.TextInput;
 public btn_getCode:eui.Group;
-public txt_vcode:eui.Label;
 public btn_login:eui.Image;
 public btn_register_back:eui.Group;
 public btn_login_way:eui.Label;
@@ -29,7 +27,7 @@ public gpRead0:eui.Group;
 public lbUserBook0:eui.Label;
 public lbPrivacyPolicy0:eui.Label;
 public groupAccount1:eui.Group;
-public txt_register_tel:eui.EditableText;
+public txt_register_tel:eui.TextInput;
 public groupAccount2:eui.Group;
 public txt_register_invitecode:eui.TextInput;
 public groupAccount3:eui.Group;
@@ -42,6 +40,10 @@ public btn_getCode2:eui.Group;
 public txt_vcode2:eui.Label;
 public btn_register:eui.Image;
 public btn_login_back:eui.Group;
+
+
+
+
 
 
         private __leftTime:number = 0;
@@ -60,24 +62,27 @@ public btn_login_back:eui.Group;
         {
             super.initListener();
 
-            this.addClickEvent(this.btn_login, this.startLogin, this);
-            this.addClickEvent(this.btn_register_back, this.gotoRegisterView, this);
-            this.addClickEvent(this.btn_register, this.startRegister, this);
-            this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
-            this.addClickEvent(this.btn_login_way, this.switchLoginWay, this);
-            this.addClickEvent(this.btn_getCode, this.getVcode1, this);
-            this.addClickEvent(this.btn_getCode2, this.getVcode2, this);
+            let t = this;
+            t.addClickEvent(t.btn_login, t.startLogin, t);
+            t.addClickEvent(t.btn_register_back, t.gotoRegisterView, t);
+            t.addClickEvent(t.btn_register, t.startRegister, t);
+            t.addClickEvent(t.btn_login_back, t.gotoLoginView, t);
+            t.addClickEvent(t.btn_login_way, t.switchLoginWay, t);
+            t.addClickEvent(t.btn_getCode, t.getVcode1, t);
+            t.addClickEvent(t.btn_getCode2, t.getVcode2, t);
 
-            this.registerNotify(NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
+            t.registerNotify(NotifyConstLogin.S_LOGIN_REGISTER, t.gotoLoginView, t);
 
-            this.txt_account.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_password.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_password2.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_tel.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_invitecode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_account.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_password.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_vcode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_tel.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_invitecode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+
+            t.addEvent(t.txt_password, egret.Event.CHANGE, t.oPasswordChange, t);
         }
         
         public focusInTxtHandler()
@@ -97,10 +102,23 @@ public btn_login_back:eui.Group;
 						if(window.scrollTo){
 							window.scrollTo(0, posy);
                         }
-					}, 500);
+					}, 200);
 				}
 			};
 			inputFocus();
+        }
+
+        private oPasswordChange():void
+        {
+            let t = this;
+            let str:string = t.txt_password.text.trim();
+            if(str.length > 0){
+                let pwd:string = "";
+                for(var i:number = 0; i < str.length; i ++){
+                    pwd += "*";
+                }
+                t.txt_password.text = pwd;
+            }
         }
 
         private getVcode1():void
@@ -120,7 +138,7 @@ public btn_login_back:eui.Group;
                 return;
             }
 
-            LoginController.instance.reqVerifyCode(userName);
+            LoginController.instance.reqVerifyCode(userName, 1);
             this.__leftTime = 59;
             this.updateCd();
         }
@@ -137,7 +155,7 @@ public btn_login_back:eui.Group;
                 TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
                 return;
             }
-            LoginController.instance.reqVerifyCode(tel);
+            LoginController.instance.reqVerifyCode(tel,2);
             this.__leftTime = 59;
             this.updateCd();
         }
@@ -235,7 +253,7 @@ public btn_login_back:eui.Group;
                     return;
                 }
             } else if(GlobalConfig.loginType == 1){
-                password = this.txt_password2.text.trim();
+                password = this.txt_vcode.text.trim();
                 if (password.length == 0)
                 {
                     TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
@@ -379,22 +397,14 @@ public btn_login_back:eui.Group;
             let t = this;
             if(GlobalConfig.loginType == 0){
                 t.btn_login_way.textFlow = HtmlUtil.getHtmlString("<font><u>短信登录</u></font>");
-                t.txt_pwd_des2.visible = false;
+                t.group_pwd.visible = true;
+                t.group_vcode.visible = false;
                 t.btn_getCode.visible = false;
-                t.txt_password.visible = true;
-                t.txt_password2.visible = false;
-                t.txt_pwd_des.visible = true;
-                t.txt_account_des.visible = true;
-                t.txt_account_des2.visible = false;
             } else {
                 t.btn_login_way.textFlow = HtmlUtil.getHtmlString("<font><u>账号密码登录</u></font>");
-                t.txt_pwd_des2.visible = true;
+                t.group_pwd.visible = false;
+                t.group_vcode.visible = true;
                 t.btn_getCode.visible = true;
-                t.txt_password.visible = false;
-                t.txt_password2.visible = true;
-                t.txt_pwd_des.visible = false;
-                t.txt_account_des.visible = false;
-                t.txt_account_des2.visible = true;
             }
         }
 

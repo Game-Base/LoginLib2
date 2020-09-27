@@ -808,6 +808,7 @@ $root.com = (function() {
              * @memberof com.message
              * @interface IC_SEND_VERIFY_CODE
              * @property {string|null} [mobile] C_SEND_VERIFY_CODE mobile
+             * @property {number|null} [type] C_SEND_VERIFY_CODE type
              */
 
             /**
@@ -834,6 +835,14 @@ $root.com = (function() {
             C_SEND_VERIFY_CODE.prototype.mobile = "";
 
             /**
+             * C_SEND_VERIFY_CODE type.
+             * @member {number} type
+             * @memberof com.message.C_SEND_VERIFY_CODE
+             * @instance
+             */
+            C_SEND_VERIFY_CODE.prototype.type = 0;
+
+            /**
              * Encodes the specified C_SEND_VERIFY_CODE message. Does not implicitly {@link com.message.C_SEND_VERIFY_CODE.verify|verify} messages.
              * @function encode
              * @memberof com.message.C_SEND_VERIFY_CODE
@@ -847,6 +856,8 @@ $root.com = (function() {
                     writer = $Writer.create();
                 if (message.mobile != null && message.hasOwnProperty("mobile"))
                     writer.uint32(/* id 1, wireType 2 =*/10).string(message.mobile);
+                if (message.type != null && message.hasOwnProperty("type"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.type);
                 return writer;
             };
 
@@ -870,6 +881,9 @@ $root.com = (function() {
                     switch (tag >>> 3) {
                     case 1:
                         message.mobile = reader.string();
+                        break;
+                    case 2:
+                        message.type = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);

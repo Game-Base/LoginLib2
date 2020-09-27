@@ -36,12 +36,13 @@ module qmr
 
 		/**
 		 * 获取验证码
-		 * @param tel 
+		 * @param type // 短信验证码类型：1登录，2注册，3找回密码，4提现
 		 */
-		public reqVerifyCode(tel: string): void
+		public reqVerifyCode(tel: string, type): void
 		{
 			var c: com.message.C_SEND_VERIFY_CODE = new com.message.C_SEND_VERIFY_CODE();
-			c.mobile = tel;
+			c.mobile = tel;// 短信验证码类型：1登录，2注册，3找回密码，4提现
+			c.type = type;
 			this.sendCmd(c, MessageIDLogin.C_SEND_VERIFY_CODE, true);
 		}
 
@@ -140,8 +141,13 @@ module qmr
 			}
 			else
 			{
-				LoginModel.instance.onRecLoginSuccess(s);
-				this.dispatch(NotifyConstLogin.S_USER_LOGIN);
+				if(!s.playerId){
+					qmr.GameLoading.getInstance().close();
+					TipManagerCommon.getInstance().createCommonColorTip("账号未注册");
+				} else {
+					LoginModel.instance.onRecLoginSuccess(s);
+					this.dispatch(NotifyConstLogin.S_USER_LOGIN);
+				}
 			}
 		}
 

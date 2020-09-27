@@ -5309,11 +5309,12 @@ var qmr;
         };
         /**
          * 获取验证码
-         * @param tel
+         * @param type // 短信验证码类型：1登录，2注册，3找回密码，4提现
          */
-        LoginController.prototype.reqVerifyCode = function (tel) {
+        LoginController.prototype.reqVerifyCode = function (tel, type) {
             var c = new com.message.C_SEND_VERIFY_CODE();
-            c.mobile = tel;
+            c.mobile = tel; // 短信验证码类型：1登录，2注册，3找回密码，4提现
+            c.type = type;
             this.sendCmd(c, qmr.MessageIDLogin.C_SEND_VERIFY_CODE, true);
         };
         /**
@@ -5398,8 +5399,14 @@ var qmr;
                 qmr.LogUtil.log("断线重连完成！！");
             }
             else {
-                qmr.LoginModel.instance.onRecLoginSuccess(s);
-                this.dispatch(qmr.NotifyConstLogin.S_USER_LOGIN);
+                if (!s.playerId) {
+                    qmr.GameLoading.getInstance().close();
+                    qmr.TipManagerCommon.getInstance().createCommonColorTip("账号未注册");
+                }
+                else {
+                    qmr.LoginModel.instance.onRecLoginSuccess(s);
+                    this.dispatch(qmr.NotifyConstLogin.S_USER_LOGIN);
+                }
             }
         };
         /**
@@ -5553,22 +5560,24 @@ var qmr;
          */
         LoginView.prototype.initListener = function () {
             _super.prototype.initListener.call(this);
-            this.addClickEvent(this.btn_login, this.startLogin, this);
-            this.addClickEvent(this.btn_register_back, this.gotoRegisterView, this);
-            this.addClickEvent(this.btn_register, this.startRegister, this);
-            this.addClickEvent(this.btn_login_back, this.gotoLoginView, this);
-            this.addClickEvent(this.btn_login_way, this.switchLoginWay, this);
-            this.addClickEvent(this.btn_getCode, this.getVcode1, this);
-            this.addClickEvent(this.btn_getCode2, this.getVcode2, this);
-            this.registerNotify(qmr.NotifyConstLogin.S_LOGIN_REGISTER, this.gotoLoginView, this);
-            this.txt_account.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_password.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_password2.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_tel.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_invitecode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            var t = this;
+            t.addClickEvent(t.btn_login, t.startLogin, t);
+            t.addClickEvent(t.btn_register_back, t.gotoRegisterView, t);
+            t.addClickEvent(t.btn_register, t.startRegister, t);
+            t.addClickEvent(t.btn_login_back, t.gotoLoginView, t);
+            t.addClickEvent(t.btn_login_way, t.switchLoginWay, t);
+            t.addClickEvent(t.btn_getCode, t.getVcode1, t);
+            t.addClickEvent(t.btn_getCode2, t.getVcode2, t);
+            t.registerNotify(qmr.NotifyConstLogin.S_LOGIN_REGISTER, t.gotoLoginView, t);
+            // this.txt_account.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_password.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_vcode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_tel.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_invitecode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
+            t.addEvent(t.txt_password, egret.Event.CHANGE, t.oPasswordChange, t);
         };
         LoginView.prototype.focusInTxtHandler = function () {
             this.scrollDocument(100);
@@ -5581,10 +5590,21 @@ var qmr;
                         if (window.scrollTo) {
                             window.scrollTo(0, posy);
                         }
-                    }, 500);
+                    }, 200);
                 }
             };
             inputFocus();
+        };
+        LoginView.prototype.oPasswordChange = function () {
+            var t = this;
+            var str = t.txt_password.text.trim();
+            if (str.length > 0) {
+                var pwd = "";
+                for (var i = 0; i < str.length; i++) {
+                    pwd += "*";
+                }
+                t.txt_password.text = pwd;
+            }
         };
         LoginView.prototype.getVcode1 = function () {
             if (this.__leftTime > 0) {
@@ -5600,7 +5620,7 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
                 return;
             }
-            qmr.LoginController.instance.reqVerifyCode(userName);
+            qmr.LoginController.instance.reqVerifyCode(userName, 1);
             this.__leftTime = 59;
             this.updateCd();
         };
@@ -5614,7 +5634,7 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
                 return;
             }
-            qmr.LoginController.instance.reqVerifyCode(tel);
+            qmr.LoginController.instance.reqVerifyCode(tel, 2);
             this.__leftTime = 59;
             this.updateCd();
         };
@@ -5694,7 +5714,7 @@ var qmr;
                 }
             }
             else if (qmr.GlobalConfig.loginType == 1) {
-                password = this.txt_password2.text.trim();
+                password = this.txt_vcode.text.trim();
                 if (password.length == 0) {
                     qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
                     return;
@@ -5808,23 +5828,15 @@ var qmr;
             var t = this;
             if (qmr.GlobalConfig.loginType == 0) {
                 t.btn_login_way.textFlow = qmr.HtmlUtil.getHtmlString("<font><u>短信登录</u></font>");
-                t.txt_pwd_des2.visible = false;
+                t.group_pwd.visible = true;
+                t.group_vcode.visible = false;
                 t.btn_getCode.visible = false;
-                t.txt_password.visible = true;
-                t.txt_password2.visible = false;
-                t.txt_pwd_des.visible = true;
-                t.txt_account_des.visible = true;
-                t.txt_account_des2.visible = false;
             }
             else {
                 t.btn_login_way.textFlow = qmr.HtmlUtil.getHtmlString("<font><u>账号密码登录</u></font>");
-                t.txt_pwd_des2.visible = true;
+                t.group_pwd.visible = false;
+                t.group_vcode.visible = true;
                 t.btn_getCode.visible = true;
-                t.txt_password.visible = false;
-                t.txt_password2.visible = true;
-                t.txt_pwd_des.visible = false;
-                t.txt_account_des.visible = false;
-                t.txt_account_des2.visible = true;
             }
         };
         LoginView.prototype.dispose = function () {

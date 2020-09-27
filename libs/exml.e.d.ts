@@ -80,3 +80,8 @@ declare class ServerListViewSkin extends eui.Skin{
 }
 declare class TextContentViewSkin extends eui.Skin{
 }
+declare class InputTextSkin2 extends eui.Skin{
+}
+declare class InputTextSkin3 extends eui.Skin{
+}
+

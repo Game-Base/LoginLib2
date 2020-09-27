@@ -1615,9 +1615,9 @@ declare module qmr {
         private onRecLoginBanResponse(s);
         /**
          * 获取验证码
-         * @param tel
+         * @param type // 短信验证码类型：1登录，2注册，3找回密码，4提现
          */
-        reqVerifyCode(tel: string): void;
+        reqVerifyCode(tel: string, type: any): void;
         /**
          * 获取验证码返回
          * @param s
@@ -1701,16 +1701,14 @@ declare module qmr {
         lbUserBook: eui.Label;
         lbPrivacyPolicy: eui.Label;
         groupAccount: eui.Group;
-        txt_account_des2: eui.Label;
-        txt_account_des: eui.Label;
-        txt_account: eui.EditableText;
+        group_account: eui.Group;
+        txt_account: eui.TextInput;
         groupAccount0: eui.Group;
+        group_pwd: eui.Group;
         txt_password: eui.TextInput;
-        txt_pwd_des: eui.Label;
-        txt_password2: eui.TextInput;
-        txt_pwd_des2: eui.Label;
+        group_vcode: eui.Group;
+        txt_vcode: eui.TextInput;
         btn_getCode: eui.Group;
-        txt_vcode: eui.Label;
         btn_login: eui.Image;
         btn_register_back: eui.Group;
         btn_login_way: eui.Label;
@@ -1719,7 +1717,7 @@ declare module qmr {
         lbUserBook0: eui.Label;
         lbPrivacyPolicy0: eui.Label;
         groupAccount1: eui.Group;
-        txt_register_tel: eui.EditableText;
+        txt_register_tel: eui.TextInput;
         groupAccount2: eui.Group;
         txt_register_invitecode: eui.TextInput;
         groupAccount3: eui.Group;
@@ -1741,6 +1739,7 @@ declare module qmr {
         protected initListener(): void;
         focusInTxtHandler(): void;
         private scrollDocument(posy);
+        private oPasswordChange();
         private getVcode1();
         private getVcode2();
         private switchLoginWay();

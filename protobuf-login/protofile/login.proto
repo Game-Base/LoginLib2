@@ -44,6 +44,7 @@ message S_LOGIN_REGISTER {
 // 发送短信验证码
 message C_SEND_VERIFY_CODE {
 	string mobile=1; // 手机号码
+	int32 type=2; // 短信验证码类型：1登录，2注册，3找回密码，4提现
 }
 
 

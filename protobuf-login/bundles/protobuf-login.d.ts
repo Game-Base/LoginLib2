@@ -367,6 +367,9 @@ declare namespace com {
 
             /** C_SEND_VERIFY_CODE mobile */
             mobile?: (string|null);
+
+            /** C_SEND_VERIFY_CODE type */
+            type?: (number|null);
         }
 
         /** Represents a C_SEND_VERIFY_CODE. */
@@ -380,6 +383,9 @@ declare namespace com {
 
             /** C_SEND_VERIFY_CODE mobile. */
             public mobile: string;
+
+            /** C_SEND_VERIFY_CODE type. */
+            public type: number;
 
             /**
              * Encodes the specified C_SEND_VERIFY_CODE message. Does not implicitly {@link com.message.C_SEND_VERIFY_CODE.verify|verify} messages.
