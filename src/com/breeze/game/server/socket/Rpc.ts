@@ -185,14 +185,14 @@ module qmr {
                     PbGlobalCounter.maxReconnectCount = 3;
                     Rpc.getInstance().close();
                     GameLoading.getInstance().close();
-                    TipManagerCommon.getInstance().createCommonColorTip("连接服务器失败，请重试！",false);
+                    TipManagerCommon.getInstance().showLanTip("CN_185");
                 }
                 else {
-                    t.showDisConnectView("重连服务器失败，请检查网络环境!");
+                    t.showDisConnectView("CN_186");
                 }
             }
             else{
-                t.showDisConnectView("小伙子，不要开车，你掉线了");
+                t.showDisConnectView("CN_187");
             }
         }
 
@@ -206,7 +206,7 @@ module qmr {
         }
 
         private onGameServerConnect(): void {
-            qmr.GameLoading.getInstance().setLoadingTip("重连中");
+            qmr.GameLoading.getInstance().setLoadingTip("CN_188");
             qmr.LoginController.instance.reqReconnect();
         }
 
@@ -215,7 +215,7 @@ module qmr {
         }
 
         private onGameLoginServerConnect(): void {
-            qmr.GameLoading.getInstance().setLoadingTip("登录中");
+            qmr.GameLoading.getInstance().setLoadingTip("CN_189");
             qmr.LoginController.instance.reqRelogin();
         }
 

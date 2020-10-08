@@ -64,7 +64,7 @@ module qmr
 				/**
 				 * 这里创建玩家账号
 				 * */
-				TipManagerCommon.getInstance().createCommonColorTip("非法账号，请确认账号信息");
+				TipManagerCommon.getInstance().showLanTip("CN_173");
 			}
 		}
 

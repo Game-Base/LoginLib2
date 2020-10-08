@@ -39,8 +39,6 @@ module qmr {
 
 		/**订单号 */
 		public orderId: number;
-		/**是否验证通过*/
-		public isVerify: boolean;
 		/**是否拉取到了平台参数，根据状态决定是否打点*/
 		public isGetPlatformInfo: boolean;
 		/**订单请求后的返回数据 */
@@ -107,7 +105,7 @@ module qmr {
 			if (window.location && window.location.reload) {
 				window.location.reload();
 			} else {
-				TipManagerCommon.getInstance().createCommonColorTip("请重启游戏");
+				TipManagerCommon.getInstance().showLanTip("CN_184");
 			}
 		}
 	}

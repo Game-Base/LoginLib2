@@ -36,6 +36,9 @@ module qmr
 		public static logintime: number = 0;
 
 		public LOGIN_KEY:string = "Dragon2020WOMenYIQiFaDaCAI#WOCAO@^^%(*88888888abZ";
+
+		/**语言版本 */
+		public static LAN_TYPE:string = "CN";//CN 中文  EN 英文
 		
 
 		/**
@@ -44,6 +47,12 @@ module qmr
 		public static get isSysIos(): boolean
 		{
 			return egret.Capabilities.os.toUpperCase() == "IOS";
+		}
+
+		/**是否是中文版本 */
+		public static get isCN():boolean
+		{
+			return GlobalConfig.LAN_TYPE == "CN";
 		}
 	}
 }

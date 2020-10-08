@@ -10,15 +10,14 @@ public group_login:eui.Group;
 public gpRead:eui.Group;
 public lbUserBook:eui.Label;
 public lbPrivacyPolicy:eui.Label;
-public groupAccount:eui.Group;
 public group_account:eui.Group;
 public txt_account:eui.TextInput;
-public groupAccount0:eui.Group;
 public group_pwd:eui.Group;
 public txt_password:eui.TextInput;
 public group_vcode:eui.Group;
 public txt_vcode:eui.TextInput;
 public btn_getCode:eui.Group;
+public txt_vcodeDes:eui.Label;
 public btn_login:eui.Image;
 public btn_register_back:eui.Group;
 public btn_login_way:eui.Label;
@@ -37,7 +36,7 @@ public txt_register_repwd:eui.TextInput;
 public groupAccount5:eui.Group;
 public txt_register_verifycode:eui.TextInput;
 public btn_getCode2:eui.Group;
-public txt_vcode2:eui.Label;
+public txt_vcodeDes2:eui.Label;
 public btn_register:eui.Image;
 public btn_login_back:eui.Group;
 
@@ -82,7 +81,7 @@ public btn_login_back:eui.Group;
             // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
             // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
 
-            t.addEvent(t.txt_password, egret.Event.CHANGE, t.oPasswordChange, t);
+            // t.addEvent(t.txt_password, egret.Event.CHANGE, t.oPasswordChange, t);
         }
         
         public focusInTxtHandler()
@@ -124,17 +123,17 @@ public btn_login_back:eui.Group;
         private getVcode1():void
         {
             if(this.__leftTime > 0){
-                TipManagerCommon.getInstance().createCommonColorTip("请稍后再试");
+                TipManagerCommon.getInstance().showLanTip("CN_174");
                 return;
             }
             let userName: string = this.txt_account.text.trim();
             if (userName.length == 0)
             {
-                TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
+                TipManagerCommon.getInstance().showLanTip("CN_175");
                 return;
             }
             if(!HtmlUtil.isPhoneNumber(userName)){
-                TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
+                TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
 
@@ -146,13 +145,13 @@ public btn_login_back:eui.Group;
         private getVcode2():void
         {
             if(this.__leftTime > 0){
-                TipManagerCommon.getInstance().createCommonColorTip("请稍后再试");
+                TipManagerCommon.getInstance().showLanTip("CN_174");
                 return;
             }
             let tel: string = this.txt_register_tel.text.trim();
             if (!HtmlUtil.isPhoneNumber(tel))
             {
-                TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
+                TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
             LoginController.instance.reqVerifyCode(tel,2);
@@ -182,7 +181,7 @@ public btn_login_back:eui.Group;
         private startRegister():void
         {
             if(!LoginManager.isConnected){
-                TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                TipManagerCommon.getInstance().showLanTip("CN_177");
                 return;
             }
             let tel: string = this.txt_register_tel.text.trim();
@@ -193,31 +192,31 @@ public btn_login_back:eui.Group;
             
             if (!HtmlUtil.isPhoneNumber(tel))
             {
-                TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
+                TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
             if(inviteCode.length == 0){
-                TipManagerCommon.getInstance().createCommonColorTip("请输入邀请码");
+                TipManagerCommon.getInstance().showLanTip("CN_178");
                 return;
             }
 
             if(pwd.length < 6){
-                TipManagerCommon.getInstance().createCommonColorTip("必须输入6-12位的密码");
+                TipManagerCommon.getInstance().showLanTip("CN_179");
                 return;
             }
 
             if(repwd.length == 0){
-                TipManagerCommon.getInstance().createCommonColorTip("请输入重复密码");
+                TipManagerCommon.getInstance().showLanTip("CN_180");
                 return;
             }
 
             if(repwd !== pwd){
-                TipManagerCommon.getInstance().createCommonColorTip("两次输入的密码不一致");
+                TipManagerCommon.getInstance().showLanTip("CN_181");
                 return;
             }
 
             if(verifycode.length == 0){
-                TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
+                TipManagerCommon.getInstance().showLanTip("CN_182");
                 return;
             }
 
@@ -226,17 +225,17 @@ public btn_login_back:eui.Group;
 
         private startLogin():void{
             if(!LoginManager.isConnected){
-                TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                TipManagerCommon.getInstance().showLanTip("CN_177");
                 return;
             }
             let userName: string = this.txt_account.text.trim();
             if (userName.length == 0)
             {
-                TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
+                TipManagerCommon.getInstance().showLanTip("CN_175");
                 return;
             }
             if(!HtmlUtil.isPhoneNumber(userName)){
-                TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
+                TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
 
@@ -245,18 +244,18 @@ public btn_login_back:eui.Group;
                 password = this.txt_password.text.trim();
                 if (password.length == 0)
                 {
-                    TipManagerCommon.getInstance().createCommonColorTip("请输入密码");
+                    TipManagerCommon.getInstance().showLanTip("CN_183");
                     return;
                 }
                 if(password.length < 0){
-                    TipManagerCommon.getInstance().createCommonColorTip("密码不能少于六位数...");
+                    TipManagerCommon.getInstance().showLanTip("CN_179");
                     return;
                 }
             } else if(GlobalConfig.loginType == 1){
                 password = this.txt_vcode.text.trim();
                 if (password.length == 0)
                 {
-                    TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
+                    TipManagerCommon.getInstance().showLanTip("CN_182");
                     return;
                 }
             }
@@ -366,7 +365,7 @@ public btn_login_back:eui.Group;
                     egret.clearInterval(t.__timekey);
                 }
                 t.__timekey = egret.setInterval(t.updateTime, t, 1000);
-                t.txt_vcode.text = t.txt_vcode2.text = CommonTool.formatTime1(t.__leftTime)+"s";
+                t.txt_vcodeDes.text = t.txt_vcodeDes2.text = CommonTool.formatTime1(t.__leftTime)+"s";
             } else {
                 t.stopTime();
             }
@@ -375,10 +374,10 @@ public btn_login_back:eui.Group;
         private updateTime(){
 			let t = this;
 			if(this.__leftTime <= 0){
-				t.txt_vcode.text = t.txt_vcode2.text = "获取验证码";
+				t.txt_vcodeDes.text = t.txt_vcodeDes2.text = "获取验证码";
 				return;
 			}
-			t.txt_vcode.text = t.txt_vcode2.text = CommonTool.formatTime1(t.__leftTime)+"s";
+			t.txt_vcodeDes.text = t.txt_vcodeDes2.text = CommonTool.formatTime1(t.__leftTime)+"s";
 			t.__leftTime --;
 		}
 
@@ -389,7 +388,7 @@ public btn_login_back:eui.Group;
 				egret.clearInterval(t.__timekey);
 			}
             t.__timekey = -1;
-			t.txt_vcode.text = "";
+			t.txt_vcodeDes.text = t.txt_vcodeDes2.text = "";
 		}
 
         private showLoginType():void

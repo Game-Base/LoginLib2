@@ -31,7 +31,8 @@ module qmr
 		 */
 		private onRecLoginBanResponse(s:com.message.S_USER_LOGIN_BAN):void
 		{
-
+			TipManagerCommon.getInstance().showLanTip("CN_168");
+			qmr.GameLoading.getInstance().close();
 		}
 
 		/**
@@ -54,9 +55,9 @@ module qmr
 		{
 			egret.log("获取验证码手机号:" + s.mobile, "  结果:" + s.state);
 			if(s.state == 0){
-				TipManagerCommon.getInstance().createCommonColorTip("获取验证码成功", true);
+				TipManagerCommon.getInstance().showLanTip("CN_169", true);
 			} else {
-				TipManagerCommon.getInstance().createCommonColorTip("获取验证码失败");
+				TipManagerCommon.getInstance().showLanTip("CN_170");
 			}
 		}
 
@@ -67,7 +68,7 @@ module qmr
 		 */
 		public reqLogin(tel: string, pwd:string): void
 		{
-			qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
+			qmr.GameLoading.getInstance().setLoadingTip("CN_171");
 			egret.log("登陆账号:" + tel, "参数:" + sparam);
 			var c: com.message.C_USER_LOGIN = new com.message.C_USER_LOGIN();
 			c.mobile = tel;
@@ -86,7 +87,7 @@ module qmr
 		 */
 		public reqVerfiyCodeLogin(tel:string, code:string):void
 		{
-			qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
+			qmr.GameLoading.getInstance().setLoadingTip("CN_171");
 			egret.log("登陆账号:" + tel, "参数:" + sparam);
 			var c: com.message.C_USER_LOGIN_VERIFY_CODE = new com.message.C_USER_LOGIN_VERIFY_CODE();
 			c.mobile = tel;
@@ -143,7 +144,7 @@ module qmr
 			{
 				if(!s.playerId){
 					qmr.GameLoading.getInstance().close();
-					TipManagerCommon.getInstance().createCommonColorTip("账号未注册");
+					TipManagerCommon.getInstance().showLanTip("CN_172");
 				} else {
 					LoginModel.instance.onRecLoginSuccess(s);
 					this.dispatch(NotifyConstLogin.S_USER_LOGIN);
@@ -179,22 +180,12 @@ module qmr
 
 		public reqReconnect()
 		{
-			//平台下如果未通过验证 不重连
-			if (!PlatformManager.instance.platform.isVerify)
-			{
-				return;
-			}
 			LoginModel.instance.isReconnect = true;
 			this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
 		}
 
 		public reqRelogin()
 		{
-			//平台下如果未通过验证 不重连
-			if (!PlatformManager.instance.platform.isVerify)
-			{
-				return;
-			}
 			LoginModel.instance.isReconnect = false;
 			this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
 		}

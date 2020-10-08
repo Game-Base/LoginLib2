@@ -80,9 +80,9 @@ module qmr
 			let code = s.code;
 			let cfg:CodeCfgCfg = ConfigManager.getConf(ConfigEnumBase.CODECFG, code);
 			if(cfg){
-				TipManagerCommon.getInstance().createCommonColorTip(cfg.msg);
+				TipManagerCommon.getInstance().showLanTip(cfg.msg);
 			} else {
-				TipManagerCommon.getInstance().createCommonColorTip("未知错误码："+code);
+				TipManagerCommon.getInstance().showLanTip("CN_167",code);
 			}
 
 			qmr.GameLoading.getInstance().close();

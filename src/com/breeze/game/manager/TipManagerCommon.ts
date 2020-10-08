@@ -33,6 +33,39 @@ module qmr
 			this.commonTips = [];
 		}
 
+		public getmsg(...arg): string
+		{
+			var s: string = arg.shift();
+			for (var key in arg)
+			{
+				var value: any = arg[key];
+				s = s.replace(/\{\d+\}/, value);
+			}
+			return s;
+		}
+
+		/**
+		 * 提示文字，包含多语言文字提示功能
+		 * @param id 多语言编号
+		 * @param args 需要替换的参数
+		 */
+		public showLanTip(id: string, ...args):string
+		{
+			let t = this;
+			let clientCfg:ClientCnCfg = ConfigManager.getConf(ConfigEnumBase.CLIENTCN, id);
+			if(!clientCfg){
+				console.error("缺少语言配置id："+id);
+				return;
+			}
+			let msg: string = GlobalConfig.isCN ? clientCfg.value:clientCfg.en_value;
+			if (args && args.length > 0)
+			{
+				args.unshift(msg);
+				msg = this.getmsg(...args);
+			}
+			t.createCommonTip(msg);
+		}
+
 		/**
 		 * ----------------------------添加飘字内容-------------------------------
 		 * 添加了新的背景，所有的颜色只能用白色  2017-04-01 by Don
@@ -57,12 +90,6 @@ module qmr
 				this.isConmmoning = true;
 				this.showCommonTip();
 			}
-		}
-
-		/**成功飘绿色的/失败飘红色*/
-		public createCommonColorTip(msg: string, isSuccess: boolean = false, yPos: number = 0): void
-		{
-			this.createCommonTip(msg, isSuccess ? 0x09a608 : 0xFF0000, yPos);
 		}
 
 		public recycleCommonTip(commonTip: CommonTip): void

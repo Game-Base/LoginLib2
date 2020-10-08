@@ -50,4 +50,29 @@ module qmr
 		}
 	}
 
+	export class ClientCnCfg extends BaseBean
+	{
+		/**键*/
+	get id():string
+	{			
+		return this.d["id"];			
+	}
+	/**中文*/
+	get value():string
+	{			
+		return this.d["value"];			
+	}
+	/**英文*/
+	get en_value():string
+	{			
+		return this.d["en_value"];			
+	}
+
+		constructor(element)
+		{				
+			super(element)
+		this.key="id";
+		}
+	}
+
 }

@@ -338,8 +338,6 @@ declare module qmr {
         verifyUrl: string;
         /**订单号 */
         orderId: number;
-        /**是否验证通过*/
-        isVerify: boolean;
         /**是否拉取到了平台参数，根据状态决定是否打点*/
         isGetPlatformInfo: boolean;
         /**订单请求后的返回数据 */
@@ -889,10 +887,14 @@ declare module qmr {
         /**登录时间 */
         static logintime: number;
         LOGIN_KEY: string;
+        /**语言版本 */
+        static LAN_TYPE: string;
         /**
          * 是否ios系统
          */
         static readonly isSysIos: boolean;
+        /**是否是中文版本 */
+        static readonly isCN: boolean;
     }
 }
 declare module qmr {
@@ -901,6 +903,8 @@ declare module qmr {
         static CodeCfg: boolean;
         /**音效*/
         static Music: boolean;
+        /**中文配置*/
+        static ClientCn: boolean;
     }
 }
 declare module qmr {
@@ -922,6 +926,15 @@ declare module qmr {
         readonly isPlaySameTime: number;
         constructor(element: any);
     }
+    class ClientCnCfg extends BaseBean {
+        /**键*/
+        readonly id: string;
+        /**中文*/
+        readonly value: string;
+        /**英文*/
+        readonly en_value: string;
+        constructor(element: any);
+    }
 }
 declare module qmr {
     class ConfigEnumBase {
@@ -929,6 +942,8 @@ declare module qmr {
         static CODECFG: string;
         /**音效*/
         static MUSIC: string;
+        /**中文配置*/
+        static CLIENTCN: string;
     }
 }
 declare module qmr {
@@ -1360,13 +1375,18 @@ declare module qmr {
         private commonTips;
         private commonTipCdTime;
         constructor();
+        getmsg(...arg: any[]): string;
+        /**
+         * 提示文字，包含多语言文字提示功能
+         * @param id 多语言编号
+         * @param args 需要替换的参数
+         */
+        showLanTip(id: string, ...args: any[]): string;
         /**
          * ----------------------------添加飘字内容-------------------------------
          * 添加了新的背景，所有的颜色只能用白色  2017-04-01 by Don
          */
         createCommonTip(msg: string, msgColor?: number, yPos?: number): void;
-        /**成功飘绿色的/失败飘红色*/
-        createCommonColorTip(msg: string, isSuccess?: boolean, yPos?: number): void;
         recycleCommonTip(commonTip: CommonTip): void;
         /**
          * 在界面显示飘字内容
@@ -1700,15 +1720,14 @@ declare module qmr {
         gpRead: eui.Group;
         lbUserBook: eui.Label;
         lbPrivacyPolicy: eui.Label;
-        groupAccount: eui.Group;
         group_account: eui.Group;
         txt_account: eui.TextInput;
-        groupAccount0: eui.Group;
         group_pwd: eui.Group;
         txt_password: eui.TextInput;
         group_vcode: eui.Group;
         txt_vcode: eui.TextInput;
         btn_getCode: eui.Group;
+        txt_vcodeDes: eui.Label;
         btn_login: eui.Image;
         btn_register_back: eui.Group;
         btn_login_way: eui.Label;
@@ -1727,7 +1746,7 @@ declare module qmr {
         groupAccount5: eui.Group;
         txt_register_verifycode: eui.TextInput;
         btn_getCode2: eui.Group;
-        txt_vcode2: eui.Label;
+        txt_vcodeDes2: eui.Label;
         btn_register: eui.Image;
         btn_login_back: eui.Group;
         private __leftTime;

@@ -1209,7 +1209,7 @@ var qmr;
                 window.location.reload();
             }
             else {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请重启游戏");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_184");
             }
         };
         return BasePlatform;
@@ -2580,6 +2580,14 @@ var qmr;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(GlobalConfig, "isCN", {
+            /**是否是中文版本 */
+            get: function () {
+                return GlobalConfig.LAN_TYPE == "CN";
+            },
+            enumerable: true,
+            configurable: true
+        });
         /** 是否开启Slow个人日志 */
         GlobalConfig.bIsShowSlowLog = false;
         GlobalConfig.loginInitFinish = false; //是否是调试状态LOGIN_INIT_FINISH
@@ -2604,6 +2612,8 @@ var qmr;
         GlobalConfig.clientIp = "127.0.0.1";
         /**登录时间 */
         GlobalConfig.logintime = 0;
+        /**语言版本 */
+        GlobalConfig.LAN_TYPE = "CN"; //CN 中文  EN 英文
         return GlobalConfig;
     }());
     qmr.GlobalConfig = GlobalConfig;
@@ -2618,6 +2628,8 @@ var qmr;
         BaseConfigKeys.CodeCfg = true;
         /**音效*/
         BaseConfigKeys.Music = true;
+        /**中文配置*/
+        BaseConfigKeys.ClientCn = true;
         return BaseConfigKeys;
     }());
     qmr.BaseConfigKeys = BaseConfigKeys;
@@ -2695,6 +2707,41 @@ var qmr;
     }(qmr.BaseBean));
     qmr.MusicCfg = MusicCfg;
     __reflect(MusicCfg.prototype, "qmr.MusicCfg");
+    var ClientCnCfg = (function (_super) {
+        __extends(ClientCnCfg, _super);
+        function ClientCnCfg(element) {
+            var _this = _super.call(this, element) || this;
+            _this.key = "id";
+            return _this;
+        }
+        Object.defineProperty(ClientCnCfg.prototype, "id", {
+            /**键*/
+            get: function () {
+                return this.d["id"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ClientCnCfg.prototype, "value", {
+            /**中文*/
+            get: function () {
+                return this.d["value"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ClientCnCfg.prototype, "en_value", {
+            /**英文*/
+            get: function () {
+                return this.d["en_value"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return ClientCnCfg;
+    }(qmr.BaseBean));
+    qmr.ClientCnCfg = ClientCnCfg;
+    __reflect(ClientCnCfg.prototype, "qmr.ClientCnCfg");
 })(qmr || (qmr = {}));
 var qmr;
 (function (qmr) {
@@ -2705,6 +2752,8 @@ var qmr;
         ConfigEnumBase.CODECFG = 'CodeCfg';
         /**音效*/
         ConfigEnumBase.MUSIC = 'Music';
+        /**中文配置*/
+        ConfigEnumBase.CLIENTCN = 'ClientCn';
         return ConfigEnumBase;
     }());
     qmr.ConfigEnumBase = ConfigEnumBase;
@@ -4311,10 +4360,10 @@ var qmr;
             var code = s.code;
             var cfg = qmr.ConfigManager.getConf(qmr.ConfigEnumBase.CODECFG, code);
             if (cfg) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip(cfg.msg);
+                qmr.TipManagerCommon.getInstance().showLanTip(cfg.msg);
             }
             else {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("未知错误码：" + code);
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_167", code);
             }
             qmr.GameLoading.getInstance().close();
         };
@@ -4342,6 +4391,41 @@ var qmr;
             }
             return TipManagerCommon.instance;
         };
+        TipManagerCommon.prototype.getmsg = function () {
+            var arg = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                arg[_i] = arguments[_i];
+            }
+            var s = arg.shift();
+            for (var key in arg) {
+                var value = arg[key];
+                s = s.replace(/\{\d+\}/, value);
+            }
+            return s;
+        };
+        /**
+         * 提示文字，包含多语言文字提示功能
+         * @param id 多语言编号
+         * @param args 需要替换的参数
+         */
+        TipManagerCommon.prototype.showLanTip = function (id) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            var t = this;
+            var clientCfg = qmr.ConfigManager.getConf(qmr.ConfigEnumBase.CLIENTCN, id);
+            if (!clientCfg) {
+                console.error("缺少语言配置id：" + id);
+                return;
+            }
+            var msg = qmr.GlobalConfig.isCN ? clientCfg.value : clientCfg.en_value;
+            if (args && args.length > 0) {
+                args.unshift(msg);
+                msg = this.getmsg.apply(this, args);
+            }
+            t.createCommonTip(msg);
+        };
         /**
          * ----------------------------添加飘字内容-------------------------------
          * 添加了新的背景，所有的颜色只能用白色  2017-04-01 by Don
@@ -4364,12 +4448,6 @@ var qmr;
                 this.isConmmoning = true;
                 this.showCommonTip();
             }
-        };
-        /**成功飘绿色的/失败飘红色*/
-        TipManagerCommon.prototype.createCommonColorTip = function (msg, isSuccess, yPos) {
-            if (isSuccess === void 0) { isSuccess = false; }
-            if (yPos === void 0) { yPos = 0; }
-            this.createCommonTip(msg, isSuccess ? 0x09a608 : 0xFF0000, yPos);
         };
         TipManagerCommon.prototype.recycleCommonTip = function (commonTip) {
             this.commonTips.push(commonTip);
@@ -5306,6 +5384,8 @@ var qmr;
          * @param s
          */
         LoginController.prototype.onRecLoginBanResponse = function (s) {
+            qmr.TipManagerCommon.getInstance().showLanTip("CN_168");
+            qmr.GameLoading.getInstance().close();
         };
         /**
          * 获取验证码
@@ -5324,10 +5404,10 @@ var qmr;
         LoginController.prototype.onGetVerifyCodeResponse = function (s) {
             egret.log("获取验证码手机号:" + s.mobile, "  结果:" + s.state);
             if (s.state == 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("获取验证码成功", true);
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_169", true);
             }
             else {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("获取验证码失败");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_170");
             }
         };
         /**
@@ -5336,7 +5416,7 @@ var qmr;
          * @param pwd
          */
         LoginController.prototype.reqLogin = function (tel, pwd) {
-            qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
+            qmr.GameLoading.getInstance().setLoadingTip("CN_171");
             egret.log("登陆账号:" + tel, "参数:" + sparam);
             var c = new com.message.C_USER_LOGIN();
             c.mobile = tel;
@@ -5352,7 +5432,7 @@ var qmr;
          * @param code
          */
         LoginController.prototype.reqVerfiyCodeLogin = function (tel, code) {
-            qmr.GameLoading.getInstance().setLoadingTip("正在登录游戏服务器，请稍后...");
+            qmr.GameLoading.getInstance().setLoadingTip("CN_171");
             egret.log("登陆账号:" + tel, "参数:" + sparam);
             var c = new com.message.C_USER_LOGIN_VERIFY_CODE();
             c.mobile = tel;
@@ -5401,7 +5481,7 @@ var qmr;
             else {
                 if (!s.playerId) {
                     qmr.GameLoading.getInstance().close();
-                    qmr.TipManagerCommon.getInstance().createCommonColorTip("账号未注册");
+                    qmr.TipManagerCommon.getInstance().showLanTip("CN_172");
                 }
                 else {
                     qmr.LoginModel.instance.onRecLoginSuccess(s);
@@ -5430,18 +5510,10 @@ var qmr;
             this.dispatch(qmr.NotifyConstLogin.S_USER_LOGOUT);
         };
         LoginController.prototype.reqReconnect = function () {
-            //平台下如果未通过验证 不重连
-            if (!qmr.PlatformManager.instance.platform.isVerify) {
-                return;
-            }
             qmr.LoginModel.instance.isReconnect = true;
             this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
         };
         LoginController.prototype.reqRelogin = function () {
-            //平台下如果未通过验证 不重连
-            if (!qmr.PlatformManager.instance.platform.isVerify) {
-                return;
-            }
             qmr.LoginModel.instance.isReconnect = false;
             this.reqLogin(qmr.GlobalConfig.account, qmr.GlobalConfig.pwd);
         };
@@ -5526,7 +5598,7 @@ var qmr;
                             /**
                              * 这里创建玩家账号
                              * */
-                            qmr.TipManagerCommon.getInstance().createCommonColorTip("非法账号，请确认账号信息");
+                            qmr.TipManagerCommon.getInstance().showLanTip("CN_173");
                             _a.label = 3;
                         case 3: return [2 /*return*/];
                     }
@@ -5577,7 +5649,7 @@ var qmr;
             // this.txt_register_pwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
             // this.txt_register_repwd.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
             // this.txt_register_verifycode.addEventListener(egret.FocusEvent.FOCUS_IN, this.focusInTxtHandler, this);
-            t.addEvent(t.txt_password, egret.Event.CHANGE, t.oPasswordChange, t);
+            // t.addEvent(t.txt_password, egret.Event.CHANGE, t.oPasswordChange, t);
         };
         LoginView.prototype.focusInTxtHandler = function () {
             this.scrollDocument(100);
@@ -5608,16 +5680,16 @@ var qmr;
         };
         LoginView.prototype.getVcode1 = function () {
             if (this.__leftTime > 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请稍后再试");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_174");
                 return;
             }
             var userName = this.txt_account.text.trim();
             if (userName.length == 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_175");
                 return;
             }
             if (!qmr.HtmlUtil.isPhoneNumber(userName)) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
             qmr.LoginController.instance.reqVerifyCode(userName, 1);
@@ -5626,12 +5698,12 @@ var qmr;
         };
         LoginView.prototype.getVcode2 = function () {
             if (this.__leftTime > 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请稍后再试");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_174");
                 return;
             }
             var tel = this.txt_register_tel.text.trim();
             if (!qmr.HtmlUtil.isPhoneNumber(tel)) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
             qmr.LoginController.instance.reqVerifyCode(tel, 2);
@@ -5653,7 +5725,7 @@ var qmr;
         };
         LoginView.prototype.startRegister = function () {
             if (!qmr.LoginManager.isConnected) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_177");
                 return;
             }
             var tel = this.txt_register_tel.text.trim();
@@ -5662,61 +5734,61 @@ var qmr;
             var repwd = this.txt_register_repwd.text.trim();
             var verifycode = this.txt_register_verifycode.text.trim();
             if (!qmr.HtmlUtil.isPhoneNumber(tel)) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
             if (inviteCode.length == 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入邀请码");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_178");
                 return;
             }
             if (pwd.length < 6) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("必须输入6-12位的密码");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_179");
                 return;
             }
             if (repwd.length == 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入重复密码");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_180");
                 return;
             }
             if (repwd !== pwd) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("两次输入的密码不一致");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_181");
                 return;
             }
             if (verifycode.length == 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_182");
                 return;
             }
             qmr.LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
         };
         LoginView.prototype.startLogin = function () {
             if (!qmr.LoginManager.isConnected) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("服务器连接失败...");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_177");
                 return;
             }
             var userName = this.txt_account.text.trim();
             if (userName.length == 0) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入用户名");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_175");
                 return;
             }
             if (!qmr.HtmlUtil.isPhoneNumber(userName)) {
-                qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入正确的手机号码...");
+                qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
             var password;
             if (qmr.GlobalConfig.loginType == 0) {
                 password = this.txt_password.text.trim();
                 if (password.length == 0) {
-                    qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入密码");
+                    qmr.TipManagerCommon.getInstance().showLanTip("CN_183");
                     return;
                 }
                 if (password.length < 0) {
-                    qmr.TipManagerCommon.getInstance().createCommonColorTip("密码不能少于六位数...");
+                    qmr.TipManagerCommon.getInstance().showLanTip("CN_179");
                     return;
                 }
             }
             else if (qmr.GlobalConfig.loginType == 1) {
                 password = this.txt_vcode.text.trim();
                 if (password.length == 0) {
-                    qmr.TipManagerCommon.getInstance().createCommonColorTip("请输入验证码");
+                    qmr.TipManagerCommon.getInstance().showLanTip("CN_182");
                     return;
                 }
             }
@@ -5801,7 +5873,7 @@ var qmr;
                     egret.clearInterval(t.__timekey);
                 }
                 t.__timekey = egret.setInterval(t.updateTime, t, 1000);
-                t.txt_vcode.text = t.txt_vcode2.text = qmr.CommonTool.formatTime1(t.__leftTime) + "s";
+                t.txt_vcodeDes.text = t.txt_vcodeDes2.text = qmr.CommonTool.formatTime1(t.__leftTime) + "s";
             }
             else {
                 t.stopTime();
@@ -5810,10 +5882,10 @@ var qmr;
         LoginView.prototype.updateTime = function () {
             var t = this;
             if (this.__leftTime <= 0) {
-                t.txt_vcode.text = t.txt_vcode2.text = "获取验证码";
+                t.txt_vcodeDes.text = t.txt_vcodeDes2.text = "获取验证码";
                 return;
             }
-            t.txt_vcode.text = t.txt_vcode2.text = qmr.CommonTool.formatTime1(t.__leftTime) + "s";
+            t.txt_vcodeDes.text = t.txt_vcodeDes2.text = qmr.CommonTool.formatTime1(t.__leftTime) + "s";
             t.__leftTime--;
         };
         LoginView.prototype.stopTime = function () {
@@ -5822,7 +5894,7 @@ var qmr;
                 egret.clearInterval(t.__timekey);
             }
             t.__timekey = -1;
-            t.txt_vcode.text = "";
+            t.txt_vcodeDes.text = t.txt_vcodeDes2.text = "";
         };
         LoginView.prototype.showLoginType = function () {
             var t = this;
@@ -7058,14 +7130,14 @@ var qmr;
                     qmr.PbGlobalCounter.maxReconnectCount = 3;
                     Rpc.getInstance().close();
                     qmr.GameLoading.getInstance().close();
-                    qmr.TipManagerCommon.getInstance().createCommonColorTip("连接服务器失败，请重试！", false);
+                    qmr.TipManagerCommon.getInstance().showLanTip("CN_185");
                 }
                 else {
-                    t.showDisConnectView("重连服务器失败，请检查网络环境!");
+                    t.showDisConnectView("CN_186");
                 }
             }
             else {
-                t.showDisConnectView("小伙子，不要开车，你掉线了");
+                t.showDisConnectView("CN_187");
             }
         };
         Rpc.prototype.showDisConnectView = function (msg) {
@@ -7076,14 +7148,14 @@ var qmr;
             this.connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, this.onGameServerConnect, this);
         };
         Rpc.prototype.onGameServerConnect = function () {
-            qmr.GameLoading.getInstance().setLoadingTip("重连中");
+            qmr.GameLoading.getInstance().setLoadingTip("CN_188");
             qmr.LoginController.instance.reqReconnect();
         };
         Rpc.prototype.startReLogin = function () {
             this.connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, this.onGameLoginServerConnect, this);
         };
         Rpc.prototype.onGameLoginServerConnect = function () {
-            qmr.GameLoading.getInstance().setLoadingTip("登录中");
+            qmr.GameLoading.getInstance().setLoadingTip("CN_189");
             qmr.LoginController.instance.reqRelogin();
         };
         /**
