@@ -4360,7 +4360,7 @@ var qmr;
             var code = s.code;
             var cfg = qmr.ConfigManager.getConf(qmr.ConfigEnumBase.CODECFG, code);
             if (cfg) {
-                qmr.TipManagerCommon.getInstance().showLanTip(cfg.msg);
+                qmr.TipManagerCommon.getInstance().createCommonTip(cfg.msg);
             }
             else {
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_167", code);
@@ -4586,7 +4586,7 @@ var qmr;
                 version = VersionManager.versionConfig[resPath];
             }
             // 文件路径中插入版本号+后缀扩展名
-            resPath = qmr.PlatformConfig.webUrl + VersionManager.defaultDir + "/" + version + "/" + resPath + "?v=" + Math.random();
+            resPath = qmr.PlatformConfig.webUrl + VersionManager.defaultDir + "/" + version + "/" + resPath;
             // qmr.LogUtil.log("==================》》》加载版本控制路径资源："+resPath);
             return resPath;
         };

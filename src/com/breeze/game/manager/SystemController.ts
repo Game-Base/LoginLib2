@@ -80,7 +80,7 @@ module qmr
 			let code = s.code;
 			let cfg:CodeCfgCfg = ConfigManager.getConf(ConfigEnumBase.CODECFG, code);
 			if(cfg){
-				TipManagerCommon.getInstance().showLanTip(cfg.msg);
+				TipManagerCommon.getInstance().createCommonTip(cfg.msg);
 			} else {
 				TipManagerCommon.getInstance().showLanTip("CN_167",code);
 			}
