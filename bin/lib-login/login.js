@@ -4360,7 +4360,7 @@ var qmr;
             var code = s.code;
             var cfg = qmr.ConfigManager.getConf(qmr.ConfigEnumBase.CODECFG, code);
             if (cfg) {
-                qmr.TipManagerCommon.getInstance().createCommonTip(cfg.msg);
+                qmr.TipManagerCommon.getInstance().showLanTip(cfg.msg);
             }
             else {
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_167", code);
@@ -6349,6 +6349,8 @@ var qmr;
                             t.markPointDomain = config["markPointServer"];
                             t.ossDoamin = config["ossServer"];
                             t.resVersion = config["resVersion"];
+                            t.InviteAddress = config["InviteAddress"];
+                            t.AppDownAddress = config["AppDownAddress"];
                             return [4 /*yield*/, qmr.VersionManager.initGameVersion(t.resVersion)];
                         case 1:
                             _a.sent();

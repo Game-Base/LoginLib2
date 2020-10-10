@@ -1990,6 +1990,10 @@ declare module qmr {
         /**连接的服务器地址 */
         static connectAddress: string;
         static GameId: number;
+        /**邀请链接的地址 */
+        static InviteAddress: string;
+        /**app下载地址 */
+        static AppDownAddress: string;
         static init(): Promise<void>;
     }
 }

@@ -55,6 +55,10 @@ module qmr {
 		public static connectAddress:string;
 		// 游戏入口，1海洋，2深海
 		public static GameId:number = 1;
+		/**邀请链接的地址 */
+		public static InviteAddress:string;
+		/**app下载地址 */
+		public static AppDownAddress:string;
 
 		public static async init() {
 			let t = this;
@@ -103,6 +107,8 @@ module qmr {
 			t.markPointDomain = config["markPointServer"];
 			t.ossDoamin = config["ossServer"];
 			t.resVersion = config["resVersion"];
+			t.InviteAddress = config["InviteAddress"];
+			t.AppDownAddress = config["AppDownAddress"];
 			await VersionManager.initGameVersion(t.resVersion);
 		}
 
