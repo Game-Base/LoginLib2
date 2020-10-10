@@ -8599,8 +8599,28 @@ var qmr;
             return result[1];
         };
         HtmlUtil.isPhoneNumber = function (phoneNum) {
-            var reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
-            return reg.test(phoneNum);
+            // let reg = /^1(3[0-9]|4[5,7]|5[0,1,2,3,5,6,7,8,9]|6[2,5,6,7]|7[0,1,7,8]|8[0-9]|9[1,8,9])\d{8}$/;
+            // return reg.test(phoneNum);
+            if (!phoneNum) {
+                return false;
+            }
+            if (!HtmlUtil.IsInteger(phoneNum)) {
+                return;
+            }
+            return String(phoneNum).length == 11;
+        };
+        /**
+         * 判断输入的字符是否为整数
+         */
+        HtmlUtil.IsInteger = function (value) {
+            var str = value.trim();
+            if (str.length != 0) {
+                var reg = new RegExp(/^[-+]?\d*$/);
+                if (!reg.test(str)) {
+                    return false;
+                }
+            }
+            return true;
         };
         HtmlUtil.htmlParse = new egret.HtmlTextParser();
         return HtmlUtil;

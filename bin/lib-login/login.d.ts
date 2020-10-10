@@ -2699,6 +2699,10 @@ declare module qmr {
         static log(...args: any[]): string;
         static getQueryStringByName(name: any): string;
         static isPhoneNumber(phoneNum: any): boolean;
+        /**
+         * 判断输入的字符是否为整数
+         */
+        static IsInteger(value: any): boolean;
     }
 }
 declare module qmr {
