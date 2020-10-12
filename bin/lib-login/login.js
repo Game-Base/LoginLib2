@@ -4587,6 +4587,9 @@ var qmr;
             }
             // 文件路径中插入版本号+后缀扩展名
             resPath = qmr.PlatformConfig.webUrl + VersionManager.defaultDir + "/" + version + "/" + resPath;
+            if (resPath.indexOf("configbase.bin") != -1) {
+                resPath += "?v=" + new Date().getTime();
+            }
             // qmr.LogUtil.log("==================》》》加载版本控制路径资源："+resPath);
             return resPath;
         };
