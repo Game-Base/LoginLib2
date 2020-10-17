@@ -55,7 +55,7 @@ module qmr
 				GameLoading.getInstance().close();
 				this.isEnterGame = true;
 				this.destoryLoginRes();
-				GameLoadManager.instance.loadGameResAfterLogin();
+				await GameLoadManager.instance.loadGameResAfterLogin();
 				await GameLoadManager.instance.waitGameResLoaded();
 				EntryAfterLogin.onEnterGame();
 			}

@@ -3733,40 +3733,44 @@ var qmr;
         */
         GameLoadManager.prototype.loadGameResAfterLogin = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var t;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            t = this;
                             if (this.isGameResAfterLoginLoading) {
                                 return [2 /*return*/];
                             }
-                            this.isGameResAfterLoginLoading = true;
-                            this.isGameResAfterLoginLoaded = false;
-                            return [4 /*yield*/, this.loadLoadingViewRes()];
+                            t.isGameResAfterLoginLoading = true;
+                            t.isGameResAfterLoginLoaded = false;
+                            return [4 /*yield*/, t.loadLoadingViewRes()];
                         case 1:
                             _a.sent();
-                            this.setLoadingViewParams("加载资源配置...", true, 0.05, 0.1, false);
-                            this.setLoadingViewParams("加载皮肤配置...", true, 0.1, 0.2, true);
-                            return [4 /*yield*/, this.loadResJson("default.res.json")];
+                            t.setLoadingViewParams("加载资源配置...", true, 0.05, 0.1, false);
+                            t.setLoadingViewParams("加载皮肤配置...", true, 0.1, 0.2, true);
+                            return [4 /*yield*/, t.loadResJson("default.res.json")];
                         case 2:
                             _a.sent();
-                            return [4 /*yield*/, this.loadDefaultThmJs()];
+                            return [4 /*yield*/, t.loadDefaultThmJs()];
                         case 3:
                             _a.sent();
-                            return [4 /*yield*/, this.loadThmJson("default.thm.json")];
+                            return [4 /*yield*/, t.loadThmJson("default.thm.json")];
                         case 4:
                             _a.sent();
-                            this.setLoadingViewParams("加载游戏配置...", true, 0.2, 0.5, true);
-                            return [4 /*yield*/, this.loadConfigGroup()];
+                            t.setLoadingViewParams("加载游戏配置...", true, 0.2, 0.5, true);
+                            return [4 /*yield*/, t.loadConfigGroup()];
                         case 5:
                             _a.sent();
-                            this.setLoadingViewParams("加载公共资源...", true, 0.5, 0.9, true);
-                            return [4 /*yield*/, this.loadCommonGroup()];
+                            t.setLoadingViewParams("加载公共资源...", true, 0.5, 0.9, true);
+                            return [4 /*yield*/, t.loadCommonGroup()];
                         case 6:
                             _a.sent();
-                            this.isGameResAfterLoginLoaded = true;
-                            if (this.gameResAfterLoginLoadedCall) {
-                                this.gameResAfterLoginLoadedCall.call(this);
+                            t.isGameResAfterLoginLoaded = true;
+                            if (t.gameResAfterLoginLoadedCall) {
+                                t.gameResAfterLoginLoadedCall.call(this);
                             }
+                            //发起预加载
+                            t.loadPreModel();
                             return [2 /*return*/];
                     }
                 });
@@ -3809,8 +3813,6 @@ var qmr;
                                 t.setLoadingViewParams("准备进入游戏...", true, 0.99, 0.99, true);
                                 var timer = new egret.Timer(30, 1);
                                 timer.addEventListener(egret.TimerEvent.TIMER, function () {
-                                    //发起预加载
-                                    t.loadPreModel();
                                     resolve();
                                 }, t);
                                 timer.start();
@@ -4055,13 +4057,18 @@ var qmr;
         * @description 预加载模型/技能资源
         */
         GameLoadManager.prototype.loadPreModel = function () {
-            // let uiResArr = [];
-            // let mapResArr = [];
-            // this.loadFristMap(mapResArr);
-            // let uiPath = PlatformConfig.baseRoot + "sheet/";
-            // uiResArr.push({ path: uiPath, res: "trade" });
-            // this.loaderSilentResource(mapResArr, null, LoadPriority.IMMEDIATELY);
-            // this.loaderSilentResource(uiResArr, null, LoadPriority.LOW);
+            var uiResArr = [];
+            var mapResArr = [];
+            this.loadFristMap(mapResArr);
+            var uiPath = qmr.PlatformConfig.baseRoot + "sheet/";
+            uiResArr.push({ path: uiPath, res: "trade" });
+            uiResArr.push({ path: uiPath, res: "panelui" });
+            uiResArr.push({ path: uiPath, res: "panel1" });
+            uiResArr.push({ path: uiPath, res: "panel2" });
+            uiResArr.push({ path: uiPath, res: "nameImg" });
+            uiResArr.push({ path: uiPath, res: "mainui" });
+            this.loaderSilentResource(mapResArr, null, qmr.LoadPriority.IMMEDIATELY);
+            this.loaderSilentResource(uiResArr, null, qmr.LoadPriority.LOW);
         };
         GameLoadManager.prototype.loadFristMap = function (resArr) {
             var mapResId = 1004;
@@ -4300,7 +4307,6 @@ var qmr;
         LoginManager.connectGameServer = function (connectCallBack, thisObject) {
             var t = this;
             var onConnect = function () {
-                // GameLoading.getInstance().setLoadingTip("服务器连接成功...");
                 qmr.GameLoading.getInstance().close();
                 LoginManager.isConnected = true;
                 console.log("==========================服务器socket连接成功==========================");
@@ -5622,23 +5628,25 @@ var qmr;
                     switch (_a.label) {
                         case 0:
                             qmr.SystemController.instance.startHeart(); //服务器说这里才开始心跳
-                            if (!qmr.GlobalConfig.userId) return [3 /*break*/, 2];
+                            if (!qmr.GlobalConfig.userId) return [3 /*break*/, 3];
                             qmr.GameLoading.getInstance().close();
                             this.isEnterGame = true;
                             this.destoryLoginRes();
-                            qmr.GameLoadManager.instance.loadGameResAfterLogin();
-                            return [4 /*yield*/, qmr.GameLoadManager.instance.waitGameResLoaded()];
+                            return [4 /*yield*/, qmr.GameLoadManager.instance.loadGameResAfterLogin()];
                         case 1:
                             _a.sent();
-                            qmr.EntryAfterLogin.onEnterGame();
-                            return [3 /*break*/, 3];
+                            return [4 /*yield*/, qmr.GameLoadManager.instance.waitGameResLoaded()];
                         case 2:
+                            _a.sent();
+                            qmr.EntryAfterLogin.onEnterGame();
+                            return [3 /*break*/, 4];
+                        case 3:
                             /**
                              * 这里创建玩家账号
                              * */
                             qmr.TipManagerCommon.getInstance().showLanTip("CN_173");
-                            _a.label = 3;
-                        case 3: return [2 /*return*/];
+                            _a.label = 4;
+                        case 4: return [2 /*return*/];
                     }
                 });
             });
@@ -5731,6 +5739,7 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
+            qmr.GameLoading.getInstance().setLoadingTip("正在获取登录验证码...");
             qmr.LoginManager.connectGameServer(function () {
                 qmr.LoginController.instance.reqVerifyCode(userName, 1);
             }, t);
@@ -5748,6 +5757,7 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
+            qmr.GameLoading.getInstance().setLoadingTip("正在获取注册验证码...");
             qmr.LoginManager.connectGameServer(function () {
                 qmr.LoginController.instance.reqVerifyCode(tel, 2);
             }, t);
@@ -5802,6 +5812,7 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_182");
                 return;
             }
+            qmr.GameLoading.getInstance().setLoadingTip("正在注册新用户...");
             qmr.LoginManager.connectGameServer(function () {
                 qmr.LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
             }, t);
@@ -5840,6 +5851,7 @@ var qmr;
                     return;
                 }
             }
+            qmr.GameLoading.getInstance().setLoadingTip("正在登陆服务器...");
             qmr.LoginManager.connectGameServer(function () {
                 if (qmr.GlobalConfig.loginType == 0) {
                     qmr.GlobalConfig.account = userName;

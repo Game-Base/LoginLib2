@@ -37,26 +37,30 @@ namespace qmr
 		*/
 		public async loadGameResAfterLogin()
 		{
+			let t = this;
 			if(this.isGameResAfterLoginLoading){
 				return;
 			}
-			this.isGameResAfterLoginLoading = true;
-			this.isGameResAfterLoginLoaded = false;
-			await this.loadLoadingViewRes();
-			this.setLoadingViewParams("加载资源配置...", true, 0.05, 0.1, false);
-			this.setLoadingViewParams("加载皮肤配置...", true, 0.1, 0.2, true);
-			await this.loadResJson("default.res.json");
-            await this.loadDefaultThmJs();
-			await this.loadThmJson("default.thm.json");
-			this.setLoadingViewParams("加载游戏配置...", true, 0.2, 0.5, true);
-			await this.loadConfigGroup();
-			this.setLoadingViewParams("加载公共资源...", true, 0.5, 0.9, true);
-			await this.loadCommonGroup();
+			t.isGameResAfterLoginLoading = true;
+			t.isGameResAfterLoginLoaded = false;
+			await t.loadLoadingViewRes();
+			t.setLoadingViewParams("加载资源配置...", true, 0.05, 0.1, false);
+			t.setLoadingViewParams("加载皮肤配置...", true, 0.1, 0.2, true);
+			await t.loadResJson("default.res.json");
+            await t.loadDefaultThmJs();
+			await t.loadThmJson("default.thm.json");
+			t.setLoadingViewParams("加载游戏配置...", true, 0.2, 0.5, true);
+			await t.loadConfigGroup();
+			t.setLoadingViewParams("加载公共资源...", true, 0.5, 0.9, true);
+			await t.loadCommonGroup();
 
-			this.isGameResAfterLoginLoaded = true;
-			if(this.gameResAfterLoginLoadedCall){
-				this.gameResAfterLoginLoadedCall.call(this);
+			t.isGameResAfterLoginLoaded = true;
+			if(t.gameResAfterLoginLoadedCall){
+				t.gameResAfterLoginLoadedCall.call(this);
 			}
+
+			//发起预加载
+			t.loadPreModel();
 		}
 
 		/**等待登录界面后台资源加载完成 */
@@ -90,8 +94,6 @@ namespace qmr
 					t.setLoadingViewParams("准备进入游戏...", true, 0.99, 0.99, true);
 					let timer = new egret.Timer(30, 1);
 					timer.addEventListener(egret.TimerEvent.TIMER, function(){
-						//发起预加载
-						t.loadPreModel();
 						resolve();
 					}, t);
 					timer.start();
@@ -266,7 +268,7 @@ namespace qmr
 				if(!resourceRootRalative){
 					resourceRootRalative = PlatformConfig.baseRoot;
 				}
-				 let resourceRoot = resourceRootRalative;
+				let resourceRoot = resourceRootRalative;
 				RES.loadConfig(resourceRoot + configName, resourceRoot);
 			})
 		}
@@ -335,14 +337,19 @@ namespace qmr
 		*/
 		private loadPreModel()
 		{
-			// let uiResArr = [];
-			// let mapResArr = [];
-			// this.loadFristMap(mapResArr);
-			// let uiPath = PlatformConfig.baseRoot + "sheet/";
-			// uiResArr.push({ path: uiPath, res: "trade" });
+			let uiResArr = [];
+			let mapResArr = [];
+			this.loadFristMap(mapResArr);
+			let uiPath = PlatformConfig.baseRoot + "sheet/";
+			uiResArr.push({ path: uiPath, res: "trade" });
+			uiResArr.push({ path: uiPath, res: "panelui" });
+			uiResArr.push({ path: uiPath, res: "panel1" });
+			uiResArr.push({ path: uiPath, res: "panel2" });
+			uiResArr.push({ path: uiPath, res: "nameImg" });
+			uiResArr.push({ path: uiPath, res: "mainui" });
 			
-			// this.loaderSilentResource(mapResArr, null, LoadPriority.IMMEDIATELY);
-			// this.loaderSilentResource(uiResArr, null, LoadPriority.LOW);
+			this.loaderSilentResource(mapResArr, null, LoadPriority.IMMEDIATELY);
+			this.loaderSilentResource(uiResArr, null, LoadPriority.LOW);
 		}
 
 		private loadFristMap(resArr: any[])

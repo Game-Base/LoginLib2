@@ -138,6 +138,7 @@ public btn_login_back:eui.Group;
                 return;
             }
 
+            GameLoading.getInstance().setLoadingTip("正在获取登录验证码...");
             LoginManager.connectGameServer(()=>{
                 LoginController.instance.reqVerifyCode(userName, 1);
             }, t)
@@ -160,6 +161,7 @@ public btn_login_back:eui.Group;
                 TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
+            GameLoading.getInstance().setLoadingTip("正在获取注册验证码...");
             LoginManager.connectGameServer(()=>{
                 LoginController.instance.reqVerifyCode(tel,2);
             }, t);
@@ -230,6 +232,7 @@ public btn_login_back:eui.Group;
                 return;
             }
 
+            GameLoading.getInstance().setLoadingTip("正在注册新用户...");
             LoginManager.connectGameServer(()=>{
                 LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
             }, t)
@@ -273,6 +276,7 @@ public btn_login_back:eui.Group;
                 }
             }
 
+            GameLoading.getInstance().setLoadingTip("正在登陆服务器...");
             LoginManager.connectGameServer(()=>{
                 if(GlobalConfig.loginType == 0){
                     GlobalConfig.account = userName;

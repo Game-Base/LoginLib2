@@ -10,7 +10,6 @@ module qmr {
 			let t = this;
 			let onConnect = function()
 			{
-				// GameLoading.getInstance().setLoadingTip("服务器连接成功...");
 				GameLoading.getInstance().close();
 				LoginManager.isConnected = true;
 				console.log("==========================服务器socket连接成功==========================");
