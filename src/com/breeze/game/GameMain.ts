@@ -24,7 +24,7 @@ module qmr {
 			await GameLoadManager.instance.loadLoginRes();
 			await PlatformManager.instance.platform.reqLogin();
 
-			LoginManager.connectGameServer();
+			ModuleManager.showModule(ModuleNameLogin.LOGIN_VIEW);
 		}
 
 		/** 读取缓存 */

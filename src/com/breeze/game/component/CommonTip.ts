@@ -51,15 +51,17 @@ module qmr
 			this.x = (StageUtil.stageWidth - 640) / 2;
 			this.isSeted = true;
 			this.alpha = 1;
-			if (this.data.color)
-			{
-				this.lbl_tipMsg.text = this.data.mess;
-				this.lbl_tipMsg.textColor = this.data.color;
-			}
-			else
-			{
-				this.lbl_tipMsg.textFlow = HtmlUtil.getHtmlString(this.data.mess);
-			}
+			// if (this.data.color)
+			// {
+			// 	this.lbl_tipMsg.text = this.data.mess;
+			// 	this.lbl_tipMsg.textColor = this.data.color;
+			// }
+			// else
+			// {
+			// 	this.lbl_tipMsg.textFlow = HtmlUtil.getHtmlString(this.data.mess);
+			// }
+
+			this.lbl_tipMsg.textFlow = HtmlUtil.getHtmlString(this.data.mess);
 			if(this.data.itemcfg)
 			{
 				ImageUtil.setItemIcon(this.img_icon, this.data.itemcfg.icon, this.data.itemcfg.page);

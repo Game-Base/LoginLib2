@@ -68,7 +68,7 @@ module qmr
 		 */
 		public reqLogin(tel: string, pwd:string): void
 		{
-			qmr.GameLoading.getInstance().setLoadingTip("CN_171");
+			qmr.GameLoading.getInstance().setLoadingTip("正在登陆中...");
 			egret.log("登陆账号:" + tel, "参数:" + sparam);
 			var c: com.message.C_USER_LOGIN = new com.message.C_USER_LOGIN();
 			c.mobile = tel;
@@ -87,7 +87,7 @@ module qmr
 		 */
 		public reqVerfiyCodeLogin(tel:string, code:string):void
 		{
-			qmr.GameLoading.getInstance().setLoadingTip("CN_171");
+			qmr.GameLoading.getInstance().setLoadingTip("正在登陆中...");
 			egret.log("登陆账号:" + tel, "参数:" + sparam);
 			var c: com.message.C_USER_LOGIN_VERIFY_CODE = new com.message.C_USER_LOGIN_VERIFY_CODE();
 			c.mobile = tel;

@@ -122,6 +122,7 @@ public btn_login_back:eui.Group;
 
         private getVcode1():void
         {
+            let t = this;
             if(this.__leftTime > 0){
                 TipManagerCommon.getInstance().showLanTip("CN_174");
                 return;
@@ -137,13 +138,18 @@ public btn_login_back:eui.Group;
                 return;
             }
 
-            LoginController.instance.reqVerifyCode(userName, 1);
+            LoginManager.connectGameServer(()=>{
+                LoginController.instance.reqVerifyCode(userName, 1);
+            }, t)
+
+            
             this.__leftTime = 59;
             this.updateCd();
         }
 
         private getVcode2():void
         {
+            let t = this;
             if(this.__leftTime > 0){
                 TipManagerCommon.getInstance().showLanTip("CN_174");
                 return;
@@ -154,7 +160,10 @@ public btn_login_back:eui.Group;
                 TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
-            LoginController.instance.reqVerifyCode(tel,2);
+            LoginManager.connectGameServer(()=>{
+                LoginController.instance.reqVerifyCode(tel,2);
+            }, t);
+            
             this.__leftTime = 59;
             this.updateCd();
         }
@@ -180,15 +189,16 @@ public btn_login_back:eui.Group;
 
         private startRegister():void
         {
-            if(!LoginManager.isConnected){
-                TipManagerCommon.getInstance().showLanTip("CN_177");
-                return;
-            }
-            let tel: string = this.txt_register_tel.text.trim();
-            let inviteCode:string = this.txt_register_invitecode.text.trim();
-            let pwd:string = this.txt_register_pwd.text.trim();
-            let repwd:string = this.txt_register_repwd.text.trim();
-            let verifycode:string = this.txt_register_verifycode.text.trim();
+            let t = this;
+            // if(!LoginManager.isConnected){
+            //     TipManagerCommon.getInstance().showLanTip("CN_177");
+            //     return;
+            // }
+            let tel: string = t.txt_register_tel.text.trim();
+            let inviteCode:string = t.txt_register_invitecode.text.trim();
+            let pwd:string = t.txt_register_pwd.text.trim();
+            let repwd:string = t.txt_register_repwd.text.trim();
+            let verifycode:string = t.txt_register_verifycode.text.trim();
             
             if (!HtmlUtil.isPhoneNumber(tel))
             {
@@ -220,15 +230,18 @@ public btn_login_back:eui.Group;
                 return;
             }
 
-            LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
+            LoginManager.connectGameServer(()=>{
+                LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
+            }, t)
         }
 
         private startLogin():void{
-            if(!LoginManager.isConnected){
-                TipManagerCommon.getInstance().showLanTip("CN_177");
-                return;
-            }
-            let userName: string = this.txt_account.text.trim();
+            let t = this;
+            // if(!LoginManager.isConnected){
+            //     TipManagerCommon.getInstance().showLanTip("CN_177");
+            //     return;
+            // }
+            let userName: string = t.txt_account.text.trim();
             if (userName.length == 0)
             {
                 TipManagerCommon.getInstance().showLanTip("CN_175");
@@ -241,7 +254,7 @@ public btn_login_back:eui.Group;
 
             let password:string;
             if(GlobalConfig.loginType == 0){
-                password = this.txt_password.text.trim();
+                password = t.txt_password.text.trim();
                 if (password.length == 0)
                 {
                     TipManagerCommon.getInstance().showLanTip("CN_183");
@@ -252,7 +265,7 @@ public btn_login_back:eui.Group;
                     return;
                 }
             } else if(GlobalConfig.loginType == 1){
-                password = this.txt_vcode.text.trim();
+                password = t.txt_vcode.text.trim();
                 if (password.length == 0)
                 {
                     TipManagerCommon.getInstance().showLanTip("CN_182");
@@ -260,18 +273,19 @@ public btn_login_back:eui.Group;
                 }
             }
 
-
-            if(GlobalConfig.loginType == 0){
-                GlobalConfig.account = userName;
-                GlobalConfig.pwd = password;
-                LoginController.instance.reqLogin(userName, password);
-            } else if(GlobalConfig.loginType == 1){
-                GlobalConfig.telephone = userName;
-                GlobalConfig.verifyCode = password;
-                LoginController.instance.reqVerfiyCodeLogin(userName, password);
-            }
-            
-            egret.localStorage.setItem("testUserid", GlobalConfig.account);
+            LoginManager.connectGameServer(()=>{
+                if(GlobalConfig.loginType == 0){
+                    GlobalConfig.account = userName;
+                    GlobalConfig.pwd = password;
+                    LoginController.instance.reqLogin(userName, password);
+                } else if(GlobalConfig.loginType == 1){
+                    GlobalConfig.telephone = userName;
+                    GlobalConfig.verifyCode = password;
+                    LoginController.instance.reqVerfiyCodeLogin(userName, password);
+                }
+                
+                egret.localStorage.setItem("testUserid", GlobalConfig.account);
+            }, t);
         }
 
         protected addedToStage(evt: egret.Event): void
@@ -289,7 +303,6 @@ public btn_login_back:eui.Group;
                 styleSpan.parentNode.removeChild(styleSpan);
             }
             
-            GameLoading.getInstance().close();
             WebLoadingManager.setLoadingStatus("");
             GameLoadManager.instance.loadGameResAfterLogin();
 

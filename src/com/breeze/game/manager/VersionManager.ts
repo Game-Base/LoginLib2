@@ -95,9 +95,16 @@ module qmr{
                 // qmr.LogUtil.log("==================》》》加载eui_skins资源："+url);
                 return url;
             }
+            if(url.indexOf("configbase.bin") != -1){
+                return url + "?v=" + new Date().getTime();
+            }
             let starIndex = url.indexOf(PlatformConfig.baseRoot);
             if(starIndex == -1){
                 // qmr.LogUtil.error("==============================》》》出现不在跟目录下的资源："+url);
+                // starIndex = url.indexOf(SystemPath.LoginRoot);
+                // if(starIndex == -1){
+                //     return url;
+                // }
                 return url;
             }
             // 部分文件可能存在？v=加数字进行控制的形式，在引擎底层这里是不支持加v=的，只会以原始url加载路径
@@ -121,12 +128,11 @@ module qmr{
             }
             // 文件路径中插入版本号+后缀扩展名
             resPath = PlatformConfig.webUrl + VersionManager.defaultDir +  "/" + version + "/" + resPath;
-            if(resPath.indexOf("configbase.bin") != -1){
-                resPath += "?v="+new Date().getTime();
-            }
             // qmr.LogUtil.log("==================》》》加载版本控制路径资源："+resPath);
             return resPath;
         }
+
+
     
     
         /**

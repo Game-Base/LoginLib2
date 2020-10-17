@@ -47,7 +47,7 @@ module qmr {
 			let className: string = fileName.charAt(0).toLocaleUpperCase() + fileName.slice(1, fileName.length) + "Cfg";//转换为类名
 			let greeter: any = qmr[className];
 			let zip;
-			if(fileName == ConfigEnumBase.MUSIC || fileName == ConfigEnumBase.CODECFG){
+			if(fileName == ConfigEnumBase.MUSIC || fileName == ConfigEnumBase.CODECFG || fileName == ConfigEnumBase.CLIENTCN){
 				zip = t.getZip(t.BASE_CONFIG_NAME);
 			} else {
 				zip = t.getZip(t.WHOLE_CONFIG_NAME);

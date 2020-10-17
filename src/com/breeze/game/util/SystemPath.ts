@@ -7,11 +7,14 @@ module qmr
 	 */
     export class SystemPath
     {
+        public static get LoginRoot():string{
+            return "resourceLogin/";
+        }
         public static get loginPath(): string {
-            return PlatformConfig.webRoot + "resourceLogin/";
+            return PlatformConfig.webRoot + SystemPath.LoginRoot;
         }
         public static get defaultPath(): string {
-            return "resourceLogin/animation/";
+            return SystemPath.LoginRoot + "animation/";
         }
         public static get rolePath(): string {
             return PlatformConfig.webRoot + "avatar/role/";
@@ -40,9 +43,9 @@ module qmr
         }
         public static getLoginResDir(): string
         {
-            let dirUrl: string = "resourceLogin/";
+            let dirUrl: string = SystemPath.LoginRoot;
             if(PlatformConfig.useCdnRes){
-                dirUrl = PlatformConfig.webUrl + "resourceLogin/";
+                dirUrl = PlatformConfig.webUrl + SystemPath.LoginRoot;
             }
             return dirUrl;
         }

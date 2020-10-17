@@ -25,7 +25,7 @@ namespace qmr
 		public async loadLoginRes()
 		{
 			WebLoadingManager.setLoadingStatus("玩命加载中...");
-			await this.loadResJson("login.res.json", "resourceLogin/");
+			await this.loadResJson("login.res.json", SystemPath.LoginRoot);
 			await this.loadThmJson("login.thm.json");
 			//游戏配置文件、屏蔽字、随机名字都是在这个地方加载
 			await this.loadPreloadingGroup();
@@ -335,7 +335,27 @@ namespace qmr
 		*/
 		private loadPreModel()
 		{
+			// let uiResArr = [];
+			// let mapResArr = [];
+			// this.loadFristMap(mapResArr);
+			// let uiPath = PlatformConfig.baseRoot + "sheet/";
+			// uiResArr.push({ path: uiPath, res: "trade" });
 			
+			// this.loaderSilentResource(mapResArr, null, LoadPriority.IMMEDIATELY);
+			// this.loaderSilentResource(uiResArr, null, LoadPriority.LOW);
+		}
+
+		private loadFristMap(resArr: any[])
+		{
+			let mapResId = 1004;
+			let fileName, mapPath: string;
+			let bgNames: string[] = ["_hang_top.jpg", "_hang_middle.png", "_hang_down.png"];
+			bgNames.forEach(element =>
+			{
+				fileName = mapResId + element;
+				mapPath = PlatformConfig.webRoot + "map/" + fileName; 
+				resArr.push({ path: mapPath, type: RES.ResourceItem.TYPE_IMAGE });
+			});
 		}
 
 		private static _instance: GameLoadManager;

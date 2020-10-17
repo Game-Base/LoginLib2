@@ -2530,13 +2530,16 @@ var qmr;
             this.x = (qmr.StageUtil.stageWidth - 640) / 2;
             this.isSeted = true;
             this.alpha = 1;
-            if (this.data.color) {
-                this.lbl_tipMsg.text = this.data.mess;
-                this.lbl_tipMsg.textColor = this.data.color;
-            }
-            else {
-                this.lbl_tipMsg.textFlow = qmr.HtmlUtil.getHtmlString(this.data.mess);
-            }
+            // if (this.data.color)
+            // {
+            // 	this.lbl_tipMsg.text = this.data.mess;
+            // 	this.lbl_tipMsg.textColor = this.data.color;
+            // }
+            // else
+            // {
+            // 	this.lbl_tipMsg.textFlow = HtmlUtil.getHtmlString(this.data.mess);
+            // }
+            this.lbl_tipMsg.textFlow = qmr.HtmlUtil.getHtmlString(this.data.mess);
             if (this.data.itemcfg) {
                 qmr.ImageUtil.setItemIcon(this.img_icon, this.data.itemcfg.icon, this.data.itemcfg.page);
             }
@@ -2797,7 +2800,7 @@ var qmr;
             var className = fileName.charAt(0).toLocaleUpperCase() + fileName.slice(1, fileName.length) + "Cfg"; //转换为类名
             var greeter = qmr[className];
             var zip;
-            if (fileName == qmr.ConfigEnumBase.MUSIC || fileName == qmr.ConfigEnumBase.CODECFG) {
+            if (fileName == qmr.ConfigEnumBase.MUSIC || fileName == qmr.ConfigEnumBase.CODECFG || fileName == qmr.ConfigEnumBase.CLIENTCN) {
                 zip = t.getZip(t.BASE_CONFIG_NAME);
             }
             else {
@@ -3708,7 +3711,7 @@ var qmr;
                     switch (_a.label) {
                         case 0:
                             qmr.WebLoadingManager.setLoadingStatus("玩命加载中...");
-                            return [4 /*yield*/, this.loadResJson("login.res.json", "resourceLogin/")];
+                            return [4 /*yield*/, this.loadResJson("login.res.json", qmr.SystemPath.LoginRoot)];
                         case 1:
                             _a.sent();
                             return [4 /*yield*/, this.loadThmJson("login.thm.json")];
@@ -4052,6 +4055,23 @@ var qmr;
         * @description 预加载模型/技能资源
         */
         GameLoadManager.prototype.loadPreModel = function () {
+            // let uiResArr = [];
+            // let mapResArr = [];
+            // this.loadFristMap(mapResArr);
+            // let uiPath = PlatformConfig.baseRoot + "sheet/";
+            // uiResArr.push({ path: uiPath, res: "trade" });
+            // this.loaderSilentResource(mapResArr, null, LoadPriority.IMMEDIATELY);
+            // this.loaderSilentResource(uiResArr, null, LoadPriority.LOW);
+        };
+        GameLoadManager.prototype.loadFristMap = function (resArr) {
+            var mapResId = 1004;
+            var fileName, mapPath;
+            var bgNames = ["_hang_top.jpg", "_hang_middle.png", "_hang_down.png"];
+            bgNames.forEach(function (element) {
+                fileName = mapResId + element;
+                mapPath = qmr.PlatformConfig.webRoot + "map/" + fileName;
+                resArr.push({ path: mapPath, type: RES.ResourceItem.TYPE_IMAGE });
+            });
         };
         Object.defineProperty(GameLoadManager, "instance", {
             get: function () {
@@ -4277,16 +4297,27 @@ var qmr;
         function LoginManager() {
         }
         /**请求连接游戏服务器 */
-        LoginManager.connectGameServer = function () {
+        LoginManager.connectGameServer = function (connectCallBack, thisObject) {
             var t = this;
             var onConnect = function () {
-                qmr.GameLoading.getInstance().setLoadingTip("服务器连接成功...");
+                // GameLoading.getInstance().setLoadingTip("服务器连接成功...");
+                qmr.GameLoading.getInstance().close();
                 LoginManager.isConnected = true;
                 console.log("==========================服务器socket连接成功==========================");
-                qmr.ModuleManager.showModule(qmr.ModuleNameLogin.LOGIN_VIEW);
+                if (connectCallBack && thisObject) {
+                    connectCallBack.call(thisObject);
+                }
             };
-            qmr.GameLoading.getInstance().setLoadingTip("正在连接服务器...");
-            qmr.Rpc.getInstance().connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, onConnect, t);
+            if (LoginManager.isConnected) {
+                qmr.GameLoading.getInstance().close();
+                if (connectCallBack && thisObject) {
+                    connectCallBack.call(thisObject);
+                }
+            }
+            else {
+                qmr.GameLoading.getInstance().setLoadingTip("正在连接服务器...");
+                qmr.Rpc.getInstance().connect(qmr.GlobalConfig.loginServer, qmr.GlobalConfig.loginPort, onConnect, t);
+            }
         };
         LoginManager.isConnected = false;
         return LoginManager;
@@ -4564,9 +4595,16 @@ var qmr;
                 // qmr.LogUtil.log("==================》》》加载eui_skins资源："+url);
                 return url;
             }
+            if (url.indexOf("configbase.bin") != -1) {
+                return url + "?v=" + new Date().getTime();
+            }
             var starIndex = url.indexOf(qmr.PlatformConfig.baseRoot);
             if (starIndex == -1) {
                 // qmr.LogUtil.error("==============================》》》出现不在跟目录下的资源："+url);
+                // starIndex = url.indexOf(SystemPath.LoginRoot);
+                // if(starIndex == -1){
+                //     return url;
+                // }
                 return url;
             }
             // 部分文件可能存在？v=加数字进行控制的形式，在引擎底层这里是不支持加v=的，只会以原始url加载路径
@@ -4587,9 +4625,6 @@ var qmr;
             }
             // 文件路径中插入版本号+后缀扩展名
             resPath = qmr.PlatformConfig.webUrl + VersionManager.defaultDir + "/" + version + "/" + resPath;
-            if (resPath.indexOf("configbase.bin") != -1) {
-                resPath += "?v=" + new Date().getTime();
-            }
             // qmr.LogUtil.log("==================》》》加载版本控制路径资源："+resPath);
             return resPath;
         };
@@ -5156,7 +5191,7 @@ var qmr;
                             return [4 /*yield*/, qmr.PlatformManager.instance.platform.reqLogin()];
                         case 3:
                             _a.sent();
-                            qmr.LoginManager.connectGameServer();
+                            qmr.ModuleManager.showModule(qmr.ModuleNameLogin.LOGIN_VIEW);
                             return [2 /*return*/];
                     }
                 });
@@ -5419,7 +5454,7 @@ var qmr;
          * @param pwd
          */
         LoginController.prototype.reqLogin = function (tel, pwd) {
-            qmr.GameLoading.getInstance().setLoadingTip("CN_171");
+            qmr.GameLoading.getInstance().setLoadingTip("正在登陆中...");
             egret.log("登陆账号:" + tel, "参数:" + sparam);
             var c = new com.message.C_USER_LOGIN();
             c.mobile = tel;
@@ -5435,7 +5470,7 @@ var qmr;
          * @param code
          */
         LoginController.prototype.reqVerfiyCodeLogin = function (tel, code) {
-            qmr.GameLoading.getInstance().setLoadingTip("CN_171");
+            qmr.GameLoading.getInstance().setLoadingTip("正在登陆中...");
             egret.log("登陆账号:" + tel, "参数:" + sparam);
             var c = new com.message.C_USER_LOGIN_VERIFY_CODE();
             c.mobile = tel;
@@ -5682,6 +5717,7 @@ var qmr;
             }
         };
         LoginView.prototype.getVcode1 = function () {
+            var t = this;
             if (this.__leftTime > 0) {
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_174");
                 return;
@@ -5695,11 +5731,14 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
-            qmr.LoginController.instance.reqVerifyCode(userName, 1);
+            qmr.LoginManager.connectGameServer(function () {
+                qmr.LoginController.instance.reqVerifyCode(userName, 1);
+            }, t);
             this.__leftTime = 59;
             this.updateCd();
         };
         LoginView.prototype.getVcode2 = function () {
+            var t = this;
             if (this.__leftTime > 0) {
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_174");
                 return;
@@ -5709,7 +5748,9 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
             }
-            qmr.LoginController.instance.reqVerifyCode(tel, 2);
+            qmr.LoginManager.connectGameServer(function () {
+                qmr.LoginController.instance.reqVerifyCode(tel, 2);
+            }, t);
             this.__leftTime = 59;
             this.updateCd();
         };
@@ -5727,15 +5768,16 @@ var qmr;
             this.group_register.visible = false;
         };
         LoginView.prototype.startRegister = function () {
-            if (!qmr.LoginManager.isConnected) {
-                qmr.TipManagerCommon.getInstance().showLanTip("CN_177");
-                return;
-            }
-            var tel = this.txt_register_tel.text.trim();
-            var inviteCode = this.txt_register_invitecode.text.trim();
-            var pwd = this.txt_register_pwd.text.trim();
-            var repwd = this.txt_register_repwd.text.trim();
-            var verifycode = this.txt_register_verifycode.text.trim();
+            var t = this;
+            // if(!LoginManager.isConnected){
+            //     TipManagerCommon.getInstance().showLanTip("CN_177");
+            //     return;
+            // }
+            var tel = t.txt_register_tel.text.trim();
+            var inviteCode = t.txt_register_invitecode.text.trim();
+            var pwd = t.txt_register_pwd.text.trim();
+            var repwd = t.txt_register_repwd.text.trim();
+            var verifycode = t.txt_register_verifycode.text.trim();
             if (!qmr.HtmlUtil.isPhoneNumber(tel)) {
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_176");
                 return;
@@ -5760,14 +5802,17 @@ var qmr;
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_182");
                 return;
             }
-            qmr.LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
+            qmr.LoginManager.connectGameServer(function () {
+                qmr.LoginController.instance.reqLoginRegister(tel, inviteCode, pwd, repwd, verifycode);
+            }, t);
         };
         LoginView.prototype.startLogin = function () {
-            if (!qmr.LoginManager.isConnected) {
-                qmr.TipManagerCommon.getInstance().showLanTip("CN_177");
-                return;
-            }
-            var userName = this.txt_account.text.trim();
+            var t = this;
+            // if(!LoginManager.isConnected){
+            //     TipManagerCommon.getInstance().showLanTip("CN_177");
+            //     return;
+            // }
+            var userName = t.txt_account.text.trim();
             if (userName.length == 0) {
                 qmr.TipManagerCommon.getInstance().showLanTip("CN_175");
                 return;
@@ -5778,7 +5823,7 @@ var qmr;
             }
             var password;
             if (qmr.GlobalConfig.loginType == 0) {
-                password = this.txt_password.text.trim();
+                password = t.txt_password.text.trim();
                 if (password.length == 0) {
                     qmr.TipManagerCommon.getInstance().showLanTip("CN_183");
                     return;
@@ -5789,23 +5834,25 @@ var qmr;
                 }
             }
             else if (qmr.GlobalConfig.loginType == 1) {
-                password = this.txt_vcode.text.trim();
+                password = t.txt_vcode.text.trim();
                 if (password.length == 0) {
                     qmr.TipManagerCommon.getInstance().showLanTip("CN_182");
                     return;
                 }
             }
-            if (qmr.GlobalConfig.loginType == 0) {
-                qmr.GlobalConfig.account = userName;
-                qmr.GlobalConfig.pwd = password;
-                qmr.LoginController.instance.reqLogin(userName, password);
-            }
-            else if (qmr.GlobalConfig.loginType == 1) {
-                qmr.GlobalConfig.telephone = userName;
-                qmr.GlobalConfig.verifyCode = password;
-                qmr.LoginController.instance.reqVerfiyCodeLogin(userName, password);
-            }
-            egret.localStorage.setItem("testUserid", qmr.GlobalConfig.account);
+            qmr.LoginManager.connectGameServer(function () {
+                if (qmr.GlobalConfig.loginType == 0) {
+                    qmr.GlobalConfig.account = userName;
+                    qmr.GlobalConfig.pwd = password;
+                    qmr.LoginController.instance.reqLogin(userName, password);
+                }
+                else if (qmr.GlobalConfig.loginType == 1) {
+                    qmr.GlobalConfig.telephone = userName;
+                    qmr.GlobalConfig.verifyCode = password;
+                    qmr.LoginController.instance.reqVerfiyCodeLogin(userName, password);
+                }
+                egret.localStorage.setItem("testUserid", qmr.GlobalConfig.account);
+            }, t);
         };
         LoginView.prototype.addedToStage = function (evt) {
             _super.prototype.addedToStage.call(this, evt);
@@ -5817,7 +5864,6 @@ var qmr;
             if (styleSpan && styleSpan.parentNode) {
                 styleSpan.parentNode.removeChild(styleSpan);
             }
-            qmr.GameLoading.getInstance().close();
             qmr.WebLoadingManager.setLoadingStatus("");
             qmr.GameLoadManager.instance.loadGameResAfterLogin();
             this.onBgResBack();
@@ -9426,16 +9472,23 @@ var qmr;
     var SystemPath = (function () {
         function SystemPath() {
         }
+        Object.defineProperty(SystemPath, "LoginRoot", {
+            get: function () {
+                return "resourceLogin/";
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(SystemPath, "loginPath", {
             get: function () {
-                return qmr.PlatformConfig.webRoot + "resourceLogin/";
+                return qmr.PlatformConfig.webRoot + SystemPath.LoginRoot;
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(SystemPath, "defaultPath", {
             get: function () {
-                return "resourceLogin/animation/";
+                return SystemPath.LoginRoot + "animation/";
             },
             enumerable: true,
             configurable: true
@@ -9494,9 +9547,9 @@ var qmr;
             configurable: true
         });
         SystemPath.getLoginResDir = function () {
-            var dirUrl = "resourceLogin/";
+            var dirUrl = SystemPath.LoginRoot;
             if (qmr.PlatformConfig.useCdnRes) {
-                dirUrl = qmr.PlatformConfig.webUrl + "resourceLogin/";
+                dirUrl = qmr.PlatformConfig.webUrl + SystemPath.LoginRoot;
             }
             return dirUrl;
         };
